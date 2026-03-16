@@ -16,143 +16,146 @@ import NewsPage from './pages/NewsPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicLayout from './layouts/PublicLayout'
 import LegalPage from './pages/LegalPage'
+import ScrollToTop from './components/ScrollToTop'
 
 export default function App() {
   return (
-    <Routes>
-      <Route
-        path="/"
-        element={
-          <PublicLayout>
-            <HomePage />
-          </PublicLayout>
-        }
-      />
+    <>
+      <ScrollToTop />
 
-      <Route path="/home" element={<Navigate to="/" replace />} />
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <PublicLayout>
+              <HomePage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/chi-siamo"
-        element={
-          <PublicLayout>
-            <AboutPage />
-          </PublicLayout>
-        }
-      />
+        <Route path="/home" element={<Navigate to="/" replace />} />
 
-      <Route
-        path="/prodotti"
-        element={
-          <PublicLayout>
-            <ProductsPage />
-          </PublicLayout>
-        }
-      />
+        <Route
+          path="/chi-siamo"
+          element={
+            <PublicLayout>
+              <AboutPage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/special-machines"
-        element={
-          <PublicLayout>
-            <SpecialMachinesPage />
-          </PublicLayout>
-        }
-      />
+        <Route
+          path="/prodotti"
+          element={
+            <PublicLayout>
+              <ProductsPage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/store"
-        element={
-          <PublicLayout>
-            <PublicStorePage />
-          </PublicLayout>
-        }
-      />
+        <Route
+          path="/special-machines"
+          element={
+            <PublicLayout>
+              <SpecialMachinesPage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/servizi"
-        element={
-          <PublicLayout>
-            <ServicesPage />
-          </PublicLayout>
-        }
-      />
+        <Route
+          path="/store"
+          element={
+            <PublicLayout>
+              <PublicStorePage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/contatti"
-        element={
-          <PublicLayout>
-            <ContactsPage />
-          </PublicLayout>
-        }
-      />
+        <Route
+          path="/servizi"
+          element={
+            <PublicLayout>
+              <ServicesPage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/news"
-        element={
-          <PublicLayout>
-            <NewsPage />
-          </PublicLayout>
-        }
-      />
+        <Route
+          path="/contatti"
+          element={
+            <PublicLayout>
+              <ContactsPage />
+            </PublicLayout>
+          }
+        />
 
-      <Route path="/termini-e-privacy" element={<LegalPage />} />
+        <Route
+          path="/news"
+          element={
+            <PublicLayout>
+              <NewsPage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/macchinario/:slug"
-        element={
-          <PublicLayout>
-            <MachineDetailPage />
-          </PublicLayout>
-        }
-      />
+        <Route path="/termini-e-privacy" element={<LegalPage />} />
 
-      <Route path="/login" element={<LoginPage />} />
+        <Route
+          path="/macchinario/:slug"
+          element={
+            <PublicLayout>
+              <MachineDetailPage />
+            </PublicLayout>
+          }
+        />
 
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <AdminDashboard />
-          </ProtectedRoute>
-        }
-      />
+        <Route path="/login" element={<LoginPage />} />
 
-      <Route
-        path="/admin/macchinari"
-        element={
-          <ProtectedRoute>
-            <AdminMachinesPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/admin"
+          element={
+            <ProtectedRoute>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/admin/macchinari/nuovo"
-        element={
-          <ProtectedRoute>
-            <MachineFormPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/admin/macchinari"
+          element={
+            <ProtectedRoute>
+              <AdminMachinesPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/admin/macchinari/:id/modifica"
-        element={
-          <ProtectedRoute>
-            <MachineFormPage />
-          </ProtectedRoute>
-        }
-      />
+        <Route
+          path="/admin/macchinari/nuovo"
+          element={
+            <ProtectedRoute>
+              <MachineFormPage />
+            </ProtectedRoute>
+          }
+        />
 
-      <Route
-        path="/admin/news"
-        element={
-          <ProtectedRoute>
-            <AdminNewsPage />
-          </ProtectedRoute>
-        }
-      />
-    </Routes>
+        <Route
+          path="/admin/macchinari/:id/modifica"
+          element={
+            <ProtectedRoute>
+              <MachineFormPage />
+            </ProtectedRoute>
+          }
+        />
 
-    
+        <Route
+          path="/admin/news"
+          element={
+            <ProtectedRoute>
+              <AdminNewsPage />
+            </ProtectedRoute>
+          }
+        />
+      </Routes>
+    </>
   )
 }
