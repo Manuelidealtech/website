@@ -93,3 +93,130 @@
     gap: 14px;
   }
 }
+
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  position: relative;
+}
+
+.navbar__nav {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+}
+
+.navbar__actions {
+  display: flex;
+  align-items: center;
+}
+
+.navbar__toggle {
+  display: none;
+  width: 46px;
+  height: 46px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  z-index: 1102;
+}
+
+.navbar__toggle span {
+  display: block;
+  width: 26px;
+  height: 3px;
+  margin: 5px auto;
+  border-radius: 999px;
+  background: #0d3b8e;
+  transition: all 0.3s ease;
+}
+
+.navbar__toggle.is-open span:nth-child(1) {
+  transform: translateY(8px) rotate(45deg);
+}
+
+.navbar__toggle.is-open span:nth-child(2) {
+  opacity: 0;
+}
+
+.navbar__toggle.is-open span:nth-child(3) {
+  transform: translateY(-8px) rotate(-45deg);
+}
+
+.navbar__mobile-actions {
+  display: none;
+}
+
+.navbar__overlay {
+  display: none;
+}
+
+/* MOBILE */
+@media (max-width: 992px) {
+  .navbar__toggle {
+    display: block;
+  }
+
+  .navbar__actions {
+    display: none;
+  }
+
+  .navbar__nav {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: min(82vw, 340px);
+    height: 100vh;
+    background: rgba(255, 255, 255, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    box-shadow: -10px 0 30px rgba(0, 0, 0, 0.12);
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 90px 24px 24px;
+    transition: right 0.3s ease;
+    z-index: 1101;
+    overflow-y: auto;
+  }
+
+  .navbar__nav.is-open {
+    right: 0;
+  }
+
+  .navbar__link {
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(13, 59, 142, 0.08);
+  }
+
+  .navbar__mobile-actions {
+    display: flex;
+    width: 100%;
+    margin-top: 16px;
+  }
+
+  .navbar__mobile-actions .navbar__login-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .navbar__overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 1100;
+  }
+}

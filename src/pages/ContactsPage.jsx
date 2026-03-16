@@ -20,7 +20,11 @@ const officeSections = [
   },
   {
     title: 'Ufficio acquisti',
-    items: [{ text: 'Contattaci per ordini, forniture e richieste acquisti dedicate.' }],
+    items: [{ text: 'Contattaci per ordini, forniture e richieste acquisti dedicate.',
+      employee: 'Federica Ciocia',
+        phone: '+39 0362 543041',
+        email: 'acquisti@idealtech.it'
+     }],
   },
   {
     title: 'Amministrazione',

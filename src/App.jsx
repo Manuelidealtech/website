@@ -15,6 +15,7 @@ import AdminNewsPage from './pages/AdminNewsPage'
 import NewsPage from './pages/NewsPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import PublicLayout from './layouts/PublicLayout'
+import LegalPage from './pages/LegalPage'
 
 export default function App() {
   return (
@@ -93,6 +94,8 @@ export default function App() {
         }
       />
 
+      <Route path="/termini-e-privacy" element={<LegalPage />} />
+
       <Route
         path="/macchinario/:slug"
         element={
@@ -149,5 +152,7 @@ export default function App() {
         }
       />
     </Routes>
+
+    
   )
 }

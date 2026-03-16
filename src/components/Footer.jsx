@@ -49,6 +49,7 @@ export default function Footer() {
                 <p>Telefono: +39 0362 543041</p>
                 <p>Via Sondrio, 11</p>
                 <p>20814 Varedo (MB)</p>
+                <Link to="/termini-e-privacy">Termini, Condizioni e Privacy</Link>
               </div>
             </div>
           </div>
