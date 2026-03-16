@@ -1,9 +1,10 @@
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 100;
+  z-index: 1000;
   background: rgba(255, 255, 255, 0.96);
   backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(15, 23, 42, 0.08);
 }
 
@@ -12,7 +13,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 28px;
+  gap: 24px;
+  position: relative;
 }
 
 .navbar__brand {
@@ -70,55 +72,6 @@
   box-shadow: 0 12px 24px rgba(77, 159, 230, 0.24);
 }
 
-@media (max-width: 1180px) {
-  .navbar__inner {
-    padding: 16px 0;
-    min-height: auto;
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .navbar__nav {
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
-@media (max-width: 768px) {
-  .navbar__brand-logo {
-    height: 46px;
-  }
-
-  .navbar__nav {
-    gap: 14px;
-  }
-}
-
-.navbar {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-}
-
-.navbar__inner {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  position: relative;
-}
-
-.navbar__nav {
-  display: flex;
-  align-items: center;
-  gap: 22px;
-}
-
-.navbar__actions {
-  display: flex;
-  align-items: center;
-}
-
 .navbar__toggle {
   display: none;
   width: 46px;
@@ -161,8 +114,27 @@
   display: none;
 }
 
+/* TABLET */
+@media (max-width: 1180px) {
+  .navbar__nav {
+    gap: 16px;
+  }
+
+  .navbar__link {
+    font-size: 13px;
+  }
+}
+
 /* MOBILE */
 @media (max-width: 992px) {
+  .navbar__inner {
+    min-height: 78px;
+  }
+
+  .navbar__brand-logo {
+    height: 46px;
+  }
+
   .navbar__toggle {
     display: block;
   }
@@ -174,10 +146,10 @@
   .navbar__nav {
     position: fixed;
     top: 0;
-    right: -100%;
+    right: 0;
     width: min(82vw, 340px);
     height: 100vh;
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(255, 255, 255, 0.97);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.12);
@@ -186,19 +158,23 @@
     justify-content: flex-start;
     gap: 10px;
     padding: 90px 24px 24px;
-    transition: right 0.3s ease;
-    z-index: 1101;
     overflow-y: auto;
+    z-index: 1101;
+    flex-wrap: nowrap;
+
+    transform: translateX(100%);
+    transition: transform 0.3s ease;
   }
 
   .navbar__nav.is-open {
-    right: 0;
+    transform: translateX(0);
   }
 
   .navbar__link {
     width: 100%;
     padding: 12px 0;
     border-bottom: 1px solid rgba(13, 59, 142, 0.08);
+    font-size: 14px;
   }
 
   .navbar__mobile-actions {
