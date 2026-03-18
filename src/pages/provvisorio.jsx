@@ -61,72 +61,6 @@ const sectors = [
   },
 ]
 
-const distributors = [
-  {
-    country: 'Regno Unito',
-    city: 'London',
-    name: 'Distributor UK',
-    logo: '/meltwood.png',
-    top: '32%',
-    left: '49.9%',
-    popupClass: 'popup-left',
-  },
-  {
-    country: 'Spagna',
-    city: 'Madrid',
-    name: 'Distributor Spain',
-    logo: '/meltwood.png',
-    top: '39%',
-    left: '49.8%',
-    popupClass: 'popup-left',
-  },
-  {
-    country: 'Germania',
-    city: 'Berlin',
-    name: 'Distributor Germany',
-    logo: '/meltwood.png',
-    top: '33.8%',
-    left: '52.8%',
-    popupClass: 'popup-right',
-  },
-  {
-    country: 'Turchia',
-    city: 'Istanbul',
-    name: 'Novmelt',
-    logo: '/novmelt.jpg',
-    top: '40%',
-    left: '59.8%',
-    popupClass: 'popup-right',
-  },
-  {
-    country: 'Algeria',
-    city: 'Algeri',
-    name: 'Distributor Algeria',
-    logo: '/novmelt.jpg',
-    top: '46.5%',
-    left: '51.0%',
-    popupClass: 'popup-bottom',
-  },
-  {
-    country: 'India',
-    city: 'Mumbai',
-    name: 'Distributor India',
-    logo: '/novmelt.jpg',
-    top: '48.5%',
-    left: '71.8%',
-    popupClass: 'popup-right',
-  },
-  {
-    country: 'Brasile',
-    city: 'São Paulo',
-    name: 'Distributor Brazil',
-    logo: '/novmelt.jpg',
-    top: '66.5%',
-    left: '37.5%',
-    popupClass: 'popup-top',
-  },
-]
-
 const strengths = [
   'Progettazione su misura',
   'Integrazione in linee produttive',
@@ -366,45 +300,17 @@ export default function HomePage() {
             <span className="home-section-label">La nostra rete nel mondo</span>
             <h2>Partner e presenza internazionale</h2>
             <p>
-              Passa il mouse sui paesi evidenziati per visualizzare il distributore
-              di riferimento.
+              Collaboriamo con partner selezionati per garantire supporto e
+              presenza nei principali mercati internazionali.
             </p>
           </div>
 
-          <div className="home-world-map-card">
-            <div className="home-world-map-interactive">
-              <img
-                src="/world-map.png"
-                alt="Mappa del mondo con paesi distributori evidenziati"
-                className="home-world-map-image"
-              />
-
-              {distributors.map((item) => (
-                <div
-                  key={item.country}
-                  className={`home-world-hotspot ${item.popupClass || ''}`}
-                  style={{ top: item.top, left: item.left }}
-                >
-                  <button
-                    type="button"
-                    className="home-world-hotspot-button"
-                    aria-label={`${item.country} - ${item.name}`}
-                  />
-
-                  <div className="home-world-distributor-card">
-                    <div className="home-world-distributor-logo">
-                      <img src={item.logo} alt={item.name} />
-                    </div>
-
-                    <div className="home-world-distributor-info">
-                      <strong>{item.name}</strong>
-                      <span>
-                        {item.city}, {item.country}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
+          <div className="home-world-map">
+            <div className="home-world-map-overlay">
+              <div className="home-world-point">
+                <span className="home-world-pin" />
+                <div className="home-world-tooltip">Istanbul, Turchia</div>
+              </div>
             </div>
           </div>
         </div>
