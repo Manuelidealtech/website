@@ -2,7 +2,6 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import AboutPage from './pages/AboutPage'
 import ProductsPage from './pages/ProductsPage'
-import SpecialMachinesPage from './pages/SpecialMachinesPage'
 import PublicStorePage from './pages/PublicStorePage'
 import ServicesPage from './pages/ServicesPage'
 import ContactsPage from './pages/ContactsPage'
@@ -17,6 +16,18 @@ import ProtectedRoute from './components/ProtectedRoute'
 import PublicLayout from './layouts/PublicLayout'
 import LegalPage from './pages/LegalPage'
 import ScrollToTop from './components/ScrollToTop'
+import DrumLinePage from './products/DrumLinePage'
+import ExtruderLinePage from './products/ExtruderLinePage'
+import AssyLinePage from './products/AssyLinePage'
+import CoatingHeadsPage from './products/CoatingHeadsPage'
+import CustomMachinesPage from './products/CustomMachinesPage'
+import IdealMeltPage from './products/IdealMeltPage'
+import IdmGpPage from './products/IdmGpPage'
+import GunLinePage from './products/GunLinePage'
+import HoseLinePage from './products/HoseLinePage'
+import ColdLinePage from './products/ColdLinePage'
+import HandGunPage from './products/HandGunPage'
+import SparePartsPage from './products/SparePartsPage'
 
 export default function App() {
   return (
@@ -49,15 +60,6 @@ export default function App() {
           element={
             <PublicLayout>
               <ProductsPage />
-            </PublicLayout>
-          }
-        />
-
-        <Route
-          path="/special-machines"
-          element={
-            <PublicLayout>
-              <SpecialMachinesPage />
             </PublicLayout>
           }
         />
@@ -155,7 +157,118 @@ export default function App() {
             </ProtectedRoute>
           }
         />
+        
+        <Route
+          path="/prodotti/drum-line"
+          element={
+            <PublicLayout>
+              <DrumLinePage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/extruder-line"
+          element={
+            <PublicLayout>
+              <ExtruderLinePage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/assy-line"
+          element={
+            <PublicLayout>
+              <AssyLinePage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/coating-heads"
+          element={
+            <PublicLayout>
+              <CoatingHeadsPage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/custom-machines"
+          element={
+            <PublicLayout>
+              <CustomMachinesPage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/ideal-melt"
+          element={
+            <PublicLayout>
+              <IdealMeltPage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/idm-gp"
+          element={
+            <PublicLayout>
+              <IdmGpPage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/gun-line"
+          element={
+            <PublicLayout>
+              <GunLinePage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/hose-line"
+          element={
+            <PublicLayout>
+              <HoseLinePage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/cold-line"
+          element={
+            <PublicLayout>
+              <ColdLinePage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/hand-gun"
+          element={
+            <PublicLayout>
+              <HandGunPage />
+            </PublicLayout>
+          }
+        />
+
+        <Route
+          path="/prodotti/spare-parts"
+          element={
+            <PublicLayout>
+              <SparePartsPage />
+            </PublicLayout>
+          }
+        />
+
+
       </Routes>
+      
     </>
   )
 }

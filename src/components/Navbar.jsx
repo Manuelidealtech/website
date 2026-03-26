@@ -15,7 +15,7 @@ const productMenuItems = [
   { label: 'Applicatori per colla a freddo', to: '/prodotti?categoria=applicatori-colla-freddo' },
   { label: 'Pistole Manuali', to: '/prodotti?categoria=pistole-manuali' },
   { label: 'Ricambi Compatibili', to: '/prodotti?categoria=ricambi-compatibili' },
-  { label: 'Custom Machines', to: '/prodotti?categoria=custom-machines', featured: true },
+  { label: 'Custom Machines', to: '/prodotti?categoria=custom-machines'},
 ]
 
 export default function Navbar() {
@@ -73,15 +73,16 @@ export default function Navbar() {
             onMouseEnter={() => setProductsOpen(true)}
             onMouseLeave={() => setProductsOpen(false)}
           >
-            <button
-              type="button"
-              className="navbar__dropdown-trigger"
-              aria-expanded={productsOpen}
-              onClick={toggleProducts}
+            <NavLink
+              to="/prodotti"
+              onClick={closeMenu}
+              className={({ isActive }) =>
+                isActive ? 'navbar__link active' : 'navbar__link'
+              }
             >
               Prodotti
               <span className="navbar__dropdown-arrow">⌄</span>
-            </button>
+            </NavLink>
 
             <div className="navbar__dropdown-menu">
               {productMenuItems.map((item) => (
@@ -96,16 +97,6 @@ export default function Navbar() {
               ))}
             </div>
           </div>
-
-          <NavLink
-            to="/special-machines"
-            onClick={closeMenu}
-            className={({ isActive }) =>
-              isActive ? 'navbar__link active' : 'navbar__link'
-            }
-          >
-            Special Machines
-          </NavLink>
 
           <NavLink
             to="/store"

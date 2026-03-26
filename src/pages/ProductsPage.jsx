@@ -1,60 +1,129 @@
 import '../styles/ProductsPage.css'
+import { useNavigate } from 'react-router-dom'
 
 const productCards = [
   {
+    id: 'drum-line',
     title: 'Drum Line',
     subtitle: 'Piatti prementi',
     description:
-      'Progettati per la fusione e il dosaggio di svariati materiali termoplastici.',
-    image:
-      'https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=1200&auto=format&fit=crop',
-    cta: 'Guarda i modelli di Piatto Premente',
+      'Progettati per la fusione e il dosaggio di svariati materiali termoplastici come hot melt EVA, pressure sensitive, poliammidi, poliuretano e mastici.',
+    image: '/images/products/drum-line.jpg',
+    cta: 'Scopri di più',
+    slug: '/prodotti/drum-line',
   },
-  {
-    title: 'Extrude Line',
-    subtitle: 'Estrusori',
-    description:
-      'Per le applicazioni che richiedono un’elevata capacità di fusione.',
-    image:
-      'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?q=80&w=1200&auto=format&fit=crop',
-    cta: 'Guarda i modelli di estrusori',
-  },
-  {
-    title: 'Assy Line',
-    subtitle: 'Fusori a vasca per Hot Melt',
-    description:
-      'Progettati per ottimizzare processi produttivi continui e precisi.',
-    image:
-      'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?q=80&w=1200&auto=format&fit=crop',
-    cta: 'Guarda i modelli di fusori',
-  },
-  {
-    title: 'Coating Heads',
-    subtitle: 'Teste di spalmatura',
-    description:
-      'Sistemi per applicazioni uniformi, affidabili e ad alta precisione.',
-    image:
-      'https://images.unsplash.com/photo-1517048676732-d65bc937f952?q=80&w=1200&auto=format&fit=crop',
-    cta: 'Scopri le coating heads',
-  },
-  {
-    title: 'Automazioni',
-    subtitle: 'Special machines',
-    description:
-      'Soluzioni dedicate e personalizzate per linee produttive industriali.',
-    image:
-      'https://images.unsplash.com/photo-1581092580497-e0d23cbdf1dc?q=80&w=1200&auto=format&fit=crop',
-    cta: 'Scopri le automazioni',
-  },
-  {
-    title: 'Ideal Melt 5-12',
-    subtitle: 'Fusori Plug & Work',
-    description:
-      'Macchine compatte e pronte all’uso per performance affidabili e immediate.',
-    image:
-      'https://images.unsplash.com/photo-1565043589221-1a6fd9ae45c7?q=80&w=1200&auto=format&fit=crop',
-    cta: 'Scopri i fusori Plug & Work',
-  },
+
+{
+  id: 'extruder-line',
+  title: 'Extruder Line',
+  subtitle: 'Estrusori',
+  description:
+    'L’uso di un estrusore è indicato soprattutto nelle applicazioni che richiedono un’elevata capacità di fusione.',
+  image: '/images/products/extruder-line.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/extruder-line',
+},
+{
+  id: 'assy-line',
+  title: 'Assy Line',
+  subtitle: 'Fusori per Adesivi Hot Melt',
+  description:
+    'Applicatori hot melt modulari, robusti e flessibili, progettati per linee produttive industriali continue.',
+  image: '/images/products/assy-line.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/assy-line',
+},
+{
+  id: 'coating-heads',
+  title: 'Coating Heads',
+  subtitle: 'Teste di spalmatura',
+  description:
+    'Teste di spalmatura per adesivizzare o accoppiare tessuti, pannelli e altri materiali in applicazioni industriali.',
+  image: '/images/products/coating-heads.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/coating-heads',
+},
+{
+  id: 'custom-machines',
+  title: 'Custom Machines',
+  subtitle: 'Macchine speciali su misura',
+  description:
+    'Progetti custom per piccole e medie automazioni, sviluppati attorno alle esigenze produttive del cliente.',
+  image: '/images/products/custom-machines.png',
+  cta: 'Scopri di più',
+  slug: '/prodotti/custom-machines',
+},
+{
+  id: 'ideal-melt',
+  title: 'Ideal Melt',
+  subtitle: 'Fusore per Hot Melt',
+  description:
+    'Incollatori hot melt particolarmente indicati per produzioni con bassi consumi di colla.',
+  image: '/images/products/ideal-melt.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/ideal-melt',
+},
+{
+  id: 'idm-gp',
+  title: 'Fusori',
+  subtitle: 'Fusori a vasca IDM-GP',
+  description:
+    'Fusori a vasca disponibili in versione 6, 9 e 12 litri, progettati per garantire dosatura precisa e costi contenuti.',
+  image: '/images/products/idm-gp.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/idm-gp',
+},
+{
+  id: 'gun-line',
+  title: 'Gun Line',
+  subtitle: 'Applicatori Hot Melt',
+  description:
+    'Pistole automatiche modulari per applicare adesivo in cordoli, punti o strisce di varia larghezza.',
+  image: '/images/products/gun-line.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/gun-line',
+},
+{
+  id: 'hose-line',
+  title: 'Hose Line',
+  subtitle: 'Tubi Elettroriscaldati',
+  description:
+    'Tubi elettroriscaldati robusti e flessibili, compatibili con i principali impianti di applicazione hot melt.',
+  image: '/images/products/hose-line.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/hose-line',
+},
+{
+  id: 'cold-line',
+  title: 'Cold Line',
+  subtitle: 'Applicatori per colla a freddo',
+  description:
+    'Applicatori per colle a freddo con elevate prestazioni, alta precisione, affidabilità e manutenzione ridotta.',
+  image: '/images/products/cold-line.png',
+  cta: 'Scopri di più',
+  slug: '/prodotti/cold-line',
+},
+{
+  id: 'hand-gun',
+  title: 'Hand Guns',
+  subtitle: 'Pistola per Colla Manuale',
+  description:
+    'Pistole manuali ergonomiche e flessibili per applicazioni a punto, cordolo, spirale o spray.',
+  image: '/images/products/hand-gun.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/hand-gun',
+},
+{
+  id: 'spare-parts',
+  title: 'Spare Parts',
+  subtitle: 'Ricambi per Hot Melt',
+  description:
+    'Ugelli, filtri e moduli compatibili per applicatori hot melt, studiati per garantire precisione e affidabilità.',
+  image: '/images/products/spare-parts.jpg',
+  cta: 'Scopri di più',
+  slug: '/prodotti/spare-parts',
+},
+
 ]
 
 const sectors = [
@@ -70,6 +139,19 @@ const sectors = [
 ]
 
 export default function ProductsPage() {
+  const navigate = useNavigate()
+
+  const handleProductClick = (product) => {
+    if (product.slug) {
+      navigate(product.slug)
+      return
+    }
+
+    if (product.technicalSheet && product.technicalSheet !== '#') {
+      window.open(product.technicalSheet, '_blank', 'noopener,noreferrer')
+    }
+  }
+
   return (
     <div className="products-page">
       <section className="products-hero">
@@ -130,7 +212,7 @@ export default function ProductsPage() {
         <div className="site-container">
           <div className="products-grid">
             {productCards.map((product) => (
-              <article className="product-card" key={product.title}>
+              <article className="product-card" key={product.id}>
                 <div className="product-card__image">
                   <img src={product.image} alt={product.subtitle} />
                 </div>
@@ -140,7 +222,11 @@ export default function ProductsPage() {
                   <h3>{product.subtitle}</h3>
                   <p>{product.description}</p>
 
-                  <button type="button" className="product-card__btn">
+                  <button
+                    type="button"
+                    className="product-card__btn"
+                    onClick={() => handleProductClick(product)}
+                  >
                     {product.cta}
                   </button>
                 </div>

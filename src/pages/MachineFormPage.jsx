@@ -452,15 +452,6 @@ export default function MachineFormPage() {
             </div>
 
             <div className="form-group">
-              <label>Località</label>
-              <input
-                type="text"
-                value={form.location}
-                onChange={(e) => updateField('location', e.target.value)}
-              />
-            </div>
-
-            <div className="form-group">
               <label>Stato</label>
               <select
                 value={form.status}

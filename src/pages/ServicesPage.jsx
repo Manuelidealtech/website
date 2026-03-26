@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import '../styles/ServicesPage.css'
+import { sendServicesEmail } from '../lib/emailjs'
 
 const services = [
   'Vendita ed installazione',
@@ -21,6 +23,61 @@ const galleryImages = [
 ]
 
 export default function ServicesPage() {
+  const [formData, setFormData] = useState({
+  name: '',
+  email: '',
+  phone: '',
+  message: '',
+  privacyAccepted: false,
+})
+
+  const [loading, setLoading] = useState(false)
+  const [feedback, setFeedback] = useState({ type: '', text: '' })
+
+  function handleChange(e) {
+    const { name, value, type, checked } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }))
+  }
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+
+    if (!formData.privacyAccepted) {
+      setFeedback({ type: 'error', text: 'Devi accettare la privacy.' })
+      return
+    }
+
+    try {
+      setLoading(true)
+      setFeedback({ type: '', text: '' })
+
+      await sendServicesEmail({
+        title: 'Richiesta preventivo',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone || 'Non inserito',
+        message: formData.message,
+      })
+
+      setFeedback({ type: 'success', text: 'Richiesta inviata correttamente.' })
+      setFormData({
+        name: '',
+        email: '',
+        phone: '',
+        message: '',
+        privacyAccepted: false,
+      })
+    } catch (error) {
+      console.error('Errore EmailJS:', error)
+      setFeedback({ type: 'error', text: 'Errore durante l’invio della richiesta.' })
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return (
     <div className="services-page">
       <section className="services-hero">
@@ -113,34 +170,79 @@ export default function ServicesPage() {
               </p>
             </div>
 
-            <form className="services-contact-form">
+            <form className="services-contact-form" onSubmit={handleSubmit}>
               <div className="services-contact-row">
                 <div className="services-form-group">
                   <label>Nome Cognome</label>
-                  <input type="text" placeholder="Inserisci il tuo nome" />
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Inserisci il tuo nome"
+                    value={formData.name}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
 
                 <div className="services-form-group">
                   <label>E-mail</label>
-                  <input type="email" placeholder="Inserisci la tua email" />
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Inserisci la tua email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                  />
                 </div>
+
+                <div className="services-form-group">
+                  <label>Cellulare</label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="Inserisci il tuo numero"
+                    value={formData.phone}
+                    onChange={handleChange}
+                  />
+                </div>
+
               </div>
 
               <div className="services-form-group">
                 <label>Messaggio</label>
-                <textarea rows="4" placeholder="Scrivi il tuo messaggio" />
+                <textarea
+                  rows="4"
+                  name="message"
+                  placeholder="Scrivi il tuo messaggio"
+                  value={formData.message}
+                  onChange={handleChange}
+                  required
+                />
               </div>
 
               <label className="services-checkbox">
-                <input type="checkbox" />
+                <input
+                  type="checkbox"
+                  name="privacyAccepted"
+                  checked={formData.privacyAccepted}
+                  onChange={handleChange}
+                  required
+                />
                 <span>
                   Dichiaro di accettare i termini di servizio e l’informativa sulla
                   privacy.
                 </span>
               </label>
 
-              <button type="submit" className="services-submit-btn">
-                Invia il messaggio
+              {feedback.text ? (
+                <p className={`form-feedback form-feedback--${feedback.type}`}>
+                  {feedback.text}
+                </p>
+              ) : null}
+
+              <button type="submit" className="services-submit-btn" disabled={loading}>
+                {loading ? 'Invio in corso...' : 'Invia il messaggio'}
               </button>
             </form>
           </div>

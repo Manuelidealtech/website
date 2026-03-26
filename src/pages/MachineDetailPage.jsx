@@ -179,10 +179,6 @@ export default function MachineDetailPage() {
               <strong>{machine.year || '—'}</strong>
             </div>
 
-            <div className="detail-info-item">
-              <span>Località</span>
-              <strong>{machine.location || '—'}</strong>
-            </div>
           </div>
 
           <div className="detail-description">

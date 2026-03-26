@@ -9,28 +9,28 @@ const productAreas = [
     description:
       'Fusori, estrusori e sistemi professionali per la fusione e l’erogazione di adesivi hot-melt.',
     link: '/prodotti',
-    icon: '🔥',
+    icon: '/icon-hotmelt.png',
   },
   {
     title: 'Applicatori e Pistole',
     description:
       'Applicatori automatici, pistole manuali e accessori per ogni esigenza produttiva.',
     link: '/prodotti',
-    icon: '🔧',
+    icon: '/icon-pistole.png',
   },
   {
     title: 'Linee di Incollaggio',
     description:
       'Soluzioni integrate per linee produttive complete, personalizzate secondo il processo.',
     link: '/servizi',
-    icon: '🏭',
+    icon: '/icon-sistemi.png',
   },
   {
     title: 'Ricambi e Componenti',
     description:
       'Ricambi compatibili, componenti tecnici e supporto per mantenere alte le performance.',
     link: '/prodotti',
-    icon: '⚙️',
+    icon: '/icon-ricambi.png',
   },
 ]
 
@@ -63,75 +63,114 @@ const sectors = [
 
 const distributors = [
   {
-    country: 'Regno Unito',
-    city: 'London',
-    name: 'Distributor UK',
-    logo: '/meltwood.png',
-    top: '32%',
-    left: '49.9%',
+    country: 'Ukraine',
+    city: 'Kiev',
+    name: 'Distributor UA',
+    logo: '/belmix.jpg',
+    top: '34%',
+    left: '59.0%',
     popupClass: 'popup-left',
   },
   {
-    country: 'Spagna',
+    country: 'Spain',
     city: 'Madrid',
     name: 'Distributor Spain',
     logo: '/meltwood.png',
-    top: '39%',
-    left: '49.8%',
+    top: '40%',
+    left: '49.3%',
     popupClass: 'popup-left',
   },
   {
-    country: 'Germania',
-    city: 'Berlin',
-    name: 'Distributor Germany',
-    logo: '/meltwood.png',
-    top: '33.8%',
-    left: '52.8%',
+    country: 'Portugal',
+    city: 'Lisbon',
+    name: 'Distributor Portugal',
+    logo: '/macentro.jpg',
+    top: '39.8%',
+    left: '47.8%',
     popupClass: 'popup-right',
   },
   {
     country: 'Turchia',
     city: 'Istanbul',
-    name: 'Novmelt',
-    logo: '/novmelt.jpg',
-    top: '40%',
+    name: 'Idealtech Turkey',
+    logo: '/logo-idealtech.png',
+    top: '40.5%',
     left: '59.8%',
     popupClass: 'popup-right',
   },
-  {
-    country: 'Algeria',
-    city: 'Algeri',
-    name: 'Distributor Algeria',
-    logo: '/novmelt.jpg',
-    top: '46.5%',
-    left: '51.0%',
-    popupClass: 'popup-bottom',
+    {
+    country: 'Greece',
+    city: 'Athene',
+    name: 'Distributor Greece',
+    logo: '/grecia.png',
+    top: '40.5%',
+    left: '55.8%',
+    popupClass: 'popup-right',
   },
-  {
-    country: 'India',
-    city: 'Mumbai',
-    name: 'Distributor India',
-    logo: '/novmelt.jpg',
-    top: '48.5%',
-    left: '71.8%',
+      {
+    country: 'Italy',
+    city: 'Milan',
+    name: 'Idealtech Italy',
+    logo: '/logo-idealtech.png',
+    top: '37.5%',
+    left: '52.9%',
     popupClass: 'popup-right',
   },
   {
-    country: 'Brasile',
-    city: 'São Paulo',
-    name: 'Distributor Brazil',
-    logo: '/novmelt.jpg',
-    top: '66.5%',
-    left: '37.5%',
+    country: 'Mexico',
+    city: 'Città del Messico',
+    name: 'Distributor Mexico',
+    logo: '/messico.png',
+    top: '46.5%',
+    left: '21.0%',
+    popupClass: 'popup-bottom',
+  },
+    {
+    country: 'USA',
+    city: 'Washington',
+    name: 'Distributor USA',
+    logo: '/meltwood.png',
+    top: '39.5%',
+    left: '21.0%',
+    popupClass: 'popup-bottom',
+  },
+  {
+    country: 'China',
+    city: 'Beijing',
+    name: 'Distributor China',
+    logo: '/labmates.png',
+    top: '42.5%',
+    left: '77.0%',
+    popupClass: 'popup-right',
+  },
+  {
+    country: 'Canada',
+    city: 'Ottawa',
+    name: 'Distributor Canada',
+    logo: '/servicentre.jpg',
+    top: '30.5%',
+    left: '30.5%',
     popupClass: 'popup-top',
   },
 ]
 
 const strengths = [
-  'Progettazione su misura',
-  'Integrazione in linee produttive',
-  'Assistenza tecnica',
-  'Ricambi compatibili',
+  {
+    title: 'Progettazione su misura',
+    icon: '/public/icon-progettazione.png',
+  },
+  {
+    title: 'Integrazione in linee produttive',
+    icon: '/public/icon-integrazione.png',
+  },
+  {
+    title: 'Assistenza tecnica',
+    icon: '/public/icon-assistenza.png',
+  },
+  {
+    title: 'Ricambi compatibili',
+    icon: '/public/icon-spareparts.png',
+  },
 ]
 
 function truncateText(text = '', maxLength = 140) {
@@ -264,7 +303,10 @@ export default function HomePage() {
           <div className="home-product-areas-grid">
             {productAreas.map((item) => (
               <article className="home-product-card" key={item.title}>
-                <div className="home-product-card-icon">{item.icon}</div>
+                <div className="home-product-card-icon">
+                  <img src={item.icon} alt={item.title} />
+                </div>
+
                 <h3>{item.title}</h3>
                 <p>{item.description}</p>
                 <Link to={item.link}>Scopri di più</Link>
@@ -350,10 +392,10 @@ export default function HomePage() {
           </div>
 
           <div className="home-strengths-grid">
-            {strengths.map((item) => (
-              <div className="home-strength-card" key={item}>
-                <div className="home-strength-icon">✓</div>
-                <h3>{item}</h3>
+            {strengths.map((item, index) => (
+              <div key={index} className="home-strength-card">
+                <img src={item.icon} alt={item.title} className="home-strength-icon" />
+                <span>{item.title}</span>
               </div>
             ))}
           </div>
