@@ -26,22 +26,37 @@ const officeSections = [
       {
         text: 'Contattaci per ordini, forniture e richieste acquisti dedicate.',
         employee: 'Federica Ciocia',
-        phone: '+39 0362 543041',
+        phone: '+39 0362 543041 - interno 3',
         email: 'acquisti@idealtech.it',
       },
     ],
   },
   {
     title: 'Amministrazione',
-    items: [{ text: 'Supporto per fatturazione, pratiche amministrative e documentazione.' }],
+    items: [{ 
+      text: 'Supporto per fatturazione, pratiche amministrative e documentazione.',
+      employee: 'Giusy Scarano',
+      phone: '+39 0362 543041 - interno 4',
+      email: 'amministrazione@idealtech.it',
+    }],
   },
   {
     title: 'Ufficio tecnico',
-    items: [{ text: 'Informazioni tecniche su impianti, automazioni e sistemi speciali.' }],
+    items: [{ 
+      text: 'Supporto tecnico e consulenza.',
+      employee: 'Giorgio Perego',
+      phone: '+39 0362 543041 - interno 5',
+      email: 'ufficiotecnico1@idealtech.it',
+    }],
   },
   {
     title: 'Assistenza tecnica',
-    items: [{ text: 'Supporto operativo e manutenzione su impianti e linee di incollaggio.' }],
+    items: [{ 
+      text: 'Supporto operativo e manutenzione su impianti e linee di incollaggio.',
+      employee: 'Andrea Orlando',
+      phone: '+39 0362 543041 - interno 6',
+      email: 'assistenza@idealtech.it',
+    }],
   },
 ]
 
