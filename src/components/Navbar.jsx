@@ -4,18 +4,18 @@ import { useAuth } from '../context/AuthContext'
 import '../styles/Navbar.css'
 
 const productMenuItems = [
-  { label: 'Piatti Prementi', to: '/prodotti?categoria=piatti-prementi' },
-  { label: 'Estrusori', to: '/prodotti?categoria=estrusori' },
-  { label: 'Fusori per Hot-Melt', to: '/prodotti?categoria=fusori-hot-melt' },
-  { label: 'Teste di Spalmatura', to: '/prodotti?categoria=teste-di-spalmatura' },
-  { label: 'Fusori Plug & Work', to: '/prodotti?categoria=fusori-plug-work' },
-  { label: 'Fusori DM-GO', to: '/prodotti?categoria=fusori-dm-go' },
-  { label: 'Applicatori Hot-melt', to: '/prodotti?categoria=applicatori-hot-melt' },
-  { label: 'Tubi elettroriscaldati', to: '/prodotti?categoria=tubi-elettroriscaldati' },
-  { label: 'Applicatori per colla a freddo', to: '/prodotti?categoria=applicatori-colla-freddo' },
-  { label: 'Pistole Manuali', to: '/prodotti?categoria=pistole-manuali' },
-  { label: 'Ricambi Compatibili', to: '/prodotti?categoria=ricambi-compatibili' },
-  { label: 'Custom Machines', to: '/prodotti?categoria=custom-machines'},
+  { label: 'Piatti Prementi', to: '/prodotti/drum-line' },
+  { label: 'Estrusori', to: '/prodotti/extruder-line' },
+  { label: 'Fusori per Hot-Melt', to: '/prodotti/assy-line' },
+  { label: 'Teste di Spalmatura', to: '/prodotti/coating-heads' },
+  { label: 'Fusori Plug & Work', to: '/prodotti/idm-gp' },
+  { label: 'Fusori DM-GO', to: '/prodotti/idm-gp' },
+  { label: 'Applicatori Hot-melt', to: '/prodotti/gun-line' },
+  { label: 'Tubi elettroriscaldati', to: '/prodotti/hose-line' },
+  { label: 'Applicatori per colla a freddo', to: '/prodotti/cold-line' },
+  { label: 'Pistole Manuali', to: '/prodotti/hand-gun' },
+  { label: 'Ricambi Compatibili', to: '/prodotti/spare-parts' },
+  { label: 'Custom Machines', to: '/prodotti/custom-machines'},
 ]
 
 export default function Navbar() {
