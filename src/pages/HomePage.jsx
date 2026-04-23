@@ -9,28 +9,28 @@ const productAreas = [
     description:
       'Fusori, estrusori e sistemi professionali per la fusione e l’erogazione di adesivi hot-melt.',
     link: '/prodotti',
-    icon: '/icon-hotmelt.png',
+    icon: '/images/icons/icon-hotmelt.png',
   },
   {
     title: 'Applicatori e Pistole',
     description:
       'Applicatori automatici, pistole manuali e accessori per ogni esigenza produttiva.',
     link: '/prodotti',
-    icon: '/icon-pistole.png',
+    icon: '/images/icons/icon-pistole.png',
   },
   {
     title: 'Linee di Incollaggio',
     description:
       'Soluzioni integrate per linee produttive complete, personalizzate secondo il processo.',
     link: '/servizi',
-    icon: '/icon-sistemi.png',
+    icon: '/images/icons/icon-sistemi.png',
   },
   {
     title: 'Ricambi e Componenti',
     description:
       'Ricambi compatibili, componenti tecnici e supporto per mantenere alte le performance.',
     link: '/prodotti',
-    icon: '/icon-ricambi.png',
+    icon: '/images/icons/icon-ricambi.png',
   },
 ]
 
@@ -156,22 +156,22 @@ const distributors = [
 
 const strengths = [
   {
-    icon: '/public/icon-progettazione.png',
+    icon: '/images/icons/icon-progettazione.png',
     title: 'PROGETTAZIONE SU MISURA',
     description: 'Soluzioni progettate ad hoc in base alle esigenze del cliente.',
   },
   {
-    icon: '/public/icon-integrazione.png',
+    icon: '/images/icons/icon-integrazione.png',
     title: 'INTEGRAZIONE IN LINEE PRODUTTIVE',
     description: 'Sistemi studiati per integrarsi perfettamente negli impianti esistenti.',
   },
   {
-    icon: '/public/icon-assistenza.png',
+    icon: '/images/icons/icon-assistenza.png',
     title: 'ASSISTENZA TECNICA',
-    description: 'Supporto tecnico specializzato per interventi rapidi ed risolutivi.',
+    description: 'Supporto tecnico specializzato per interventi rapidi e risolutivi.',
   },
   {
-    icon: '/public/icon-ricambi.png',
+    icon: '/images/icons/icon-ricambi.png',
     title: 'RICAMBI COMPATIBILI',
     description: 'Ampia gamma di componenti di alta qualità accuratamente selezionati.',
   },
