@@ -12,14 +12,14 @@ const services = [
 ]
 
 const galleryImages = [
-  './public/servizi-1.png',
-  './public/servizi-2.png',
-  './public/servizi-3.png',
-  './public/servizi-4.png',
-  './public/servizi-5.png',
-  './public/servizi-6.png',
-  './public/servizi-7.png',
-  './public/servizi-8.png',
+  './images/servizi/gallery-1.png',
+  './images/servizi/gallery-2.png',
+  './images/servizi/gallery-3.png',
+  './images/servizi/gallery-4.png',
+  './images/servizi/gallery-5.png',
+  './images/servizi/gallery-6.png',
+  './images/servizi/gallery-7.png',
+  './images/servizi/gallery-8.png',
 ]
 
 export default function ServicesPage() {
