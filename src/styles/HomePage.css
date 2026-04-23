@@ -308,8 +308,8 @@
 }
 
 .home-strength-icon {
-  width: 46px;
-  height: 46px;
+  width: 90px;
+  height: 90px;
   object-fit: contain;
   flex-shrink: 0;
 }
@@ -810,8 +810,8 @@
   }
 
   .home-product-card-icon img {
-    width: 40px;
-    height: 40px;
+    width: 50px;
+    height: 50px;
   }
 
   .home-product-card h3 {
@@ -830,4 +830,26 @@
     display: inline-block;
     font-size: 0.98rem;
   }
+}
+
+.home-strength-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 12px;
+}
+
+.home-strength-title {
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.home-strength-description {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  color: rgba(0, 0, 0, 0.78);
+  max-width: 280px;
 }

@@ -7,16 +7,22 @@ const officeSections = [
     title: 'Ufficio commerciale',
     items: [
       {
-        office: 'Ufficio commerciale Italia - Interno 1',
+        office: 'Ufficio commerciale Italia',
         employee: 'Lucia Bisceglia',
         phone: '+39 0362 543041',
+        phoneHref: '+390362543041',
+        extension: 'Interno 1',
         email: 'lucia.bisceglia@idealtech.it',
+        photo: '/images/team/lucia-bisceglia.png',
       },
       {
-        office: 'Ufficio commerciale estero - Interno 2',
+        office: 'Ufficio commerciale estero',
         employee: 'Noemi Silvio',
         phone: '+39 338 1382452',
+        phoneHref: '+393381382452',
+        extension: 'Interno 2',
         email: 'info@idealtech.it',
+        photo: '/images/team/noemi-silvio.png',
       },
     ],
   },
@@ -26,48 +32,64 @@ const officeSections = [
       {
         text: 'Contattaci per ordini, forniture e richieste acquisti dedicate.',
         employee: 'Federica Ciocia',
-        phone: '+39 0362 543041 - interno 3',
+        phone: '+39 0362 543041',
+        phoneHref: '+390362543041',
+        extension: 'Interno 3',
         email: 'acquisti@idealtech.it',
+        photo: '/images/team/federica-ciocia.png',
       },
     ],
   },
   {
     title: 'Amministrazione',
-    items: [{ 
-      text: 'Supporto per fatturazione, pratiche amministrative e documentazione.',
-      employee: 'Giusy Scarano',
-      phone: '+39 0362 543041 - interno 4',
-      email: 'amministrazione@idealtech.it',
-    }],
+    items: [
+      {
+        text: 'Supporto per fatturazione, pratiche amministrative e documentazione.',
+        employee: 'Laura Santambrogio',
+        phone: '+39 0362 543041',
+        phoneHref: '+390362543041',
+        extension: 'Interno 4',
+        email: 'amministrazione@idealtech.it',
+      },
+    ],
   },
   {
     title: 'Ufficio tecnico',
-    items: [{ 
-      text: 'Supporto tecnico e consulenza.',
-      employee: 'Giorgio Perego',
-      phone: '+39 0362 543041 - interno 5',
-      email: 'ufficiotecnico1@idealtech.it',
-    }],
+    items: [
+      {
+        text: 'Supporto tecnico e consulenza.',
+        employee: 'Giorgio Perego',
+        phone: '+39 0362 543041',
+        phoneHref: '+390362543041',
+        extension: 'Interno 5',
+        email: 'ufficiotecnico1@idealtech.it',
+      },
+    ],
   },
   {
     title: 'Assistenza tecnica',
-    items: [{ 
-      text: 'Supporto operativo e manutenzione su impianti e linee di incollaggio.',
-      employee: 'Andrea Orlando',
-      phone: '+39 0362 543041 - interno 6',
-      email: 'assistenza@idealtech.it',
-    }],
+    items: [
+      {
+        text: 'Supporto operativo e manutenzione su impianti e linee di incollaggio.',
+        employee: 'Andrea Orlando',
+        phone: '+39 0362 543041',
+        phoneHref: '+390362543041',
+        extension: 'Interno 6',
+        email: 'assistenza@idealtech.it',
+        photo: '/images/team/andrea-orlando.png',
+      },
+    ],
   },
 ]
 
 export default function ContactsPage() {
   const [formData, setFormData] = useState({
-  name: '',
-  email: '',
-  phone: '',
-  message: '',
-  privacyAccepted: false,
-})
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+    privacyAccepted: false,
+  })
 
   const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState({ type: '', text: '' })
@@ -138,7 +160,10 @@ export default function ContactsPage() {
               <h2>Servizio assistenza clienti</h2>
               <p>
                 Per informazioni o assistenza ti preghiamo di contattarci al seguente
-                numero telefonico: <strong>+39 0362 543041</strong>
+                numero telefonico:{' '}
+                <a className="contacts-link contacts-link--phone" href="tel:+390362543041">
+                  +39 0362 543041
+                </a>
               </p>
             </div>
 
@@ -152,23 +177,66 @@ export default function ContactsPage() {
                   <summary>{section.title}</summary>
 
                   <div className="contacts-office__content">
-                    {section.items.map((item, index) =>
-                      item.text && !item.office ? (
-                        <div key={index}>
-                          <p>{item.text}</p>
-                          {item.employee && <p>{item.employee}</p>}
-                          {item.phone && <p>{item.phone}</p>}
-                          {item.email && <p>{item.email}</p>}
+                    {section.items.map((item, index) => (
+                      <div key={index} className="contacts-office-person">
+                        <div className="contacts-office-person__info">
+                          {item.office && (
+                            <p className="contacts-office-name">
+                              {item.office}
+                              {item.extension ? ` - ${item.extension}` : ''}
+                            </p>
+                          )}
+
+                          {item.text && (
+                            <p className="contacts-office-text">{item.text}</p>
+                          )}
+
+                          {item.employee && (
+                            <p className="contacts-office-employee">{item.employee}</p>
+                          )}
+
+                          {(item.phone || item.extension) && (
+                            <div className="contacts-contact-row">
+                              {item.phone && (
+                                <a
+                                  className="contacts-link contacts-link--phone"
+                                  href={`tel:${item.phoneHref || item.phone.replace(/\s+/g, '')}`}
+                                >
+                                  {item.phone}
+                                </a>
+                              )}
+
+                              {item.extension && !item.office && (
+                                <span className="contacts-extension">
+                                  {item.extension}
+                                </span>
+                              )}
+                            </div>
+                          )}
+
+                          {item.email && (
+                            <a
+                              className="contacts-link contacts-link--email"
+                              href={`mailto:${item.email}`}
+                            >
+                              {item.email}
+                            </a>
+                          )}
                         </div>
-                      ) : (
-                        <div key={index} className="contacts-office-person">
-                          <p className="contacts-office-name">{item.office}</p>
-                          <p className="contacts-office-employee">{item.employee}</p>
-                          <p>{item.phone}</p>
-                          <p>{item.email}</p>
-                        </div>
-                      )
-                    )}
+
+                        {item.photo ? (
+                          <div className="contacts-office-avatar">
+                            <img
+                              src={item.photo}
+                              alt={item.employee}
+                              onError={(e) => {
+                                e.currentTarget.src = '/images/team/default-avatar.jpg'
+                              }}
+                            />
+                          </div>
+                        ) : null}
+                      </div>
+                    ))}
                   </div>
                 </details>
               ))}
@@ -177,8 +245,17 @@ export default function ContactsPage() {
             <div className="contacts-card">
               <h3>Contattaci</h3>
               <div className="contacts-info-list">
-                <p>+39 0362 543041</p>
-                <p>lucia.bisceglia@idealtech.it</p>
+                <a className="contacts-link contacts-link--phone" href="tel:+390362543041">
+                  +39 0362 543041
+                </a>
+
+                <a
+                  className="contacts-link contacts-link--email"
+                  href="mailto:lucia.bisceglia@idealtech.it"
+                >
+                  lucia.bisceglia@idealtech.it
+                </a>
+
                 <p>Via Sondrio, 11</p>
                 <p>20814 Varedo (MB)</p>
               </div>
@@ -225,7 +302,6 @@ export default function ContactsPage() {
                       onChange={handleChange}
                     />
                   </div>
-
                 </div>
 
                 <div className="contacts-form-group">
@@ -261,7 +337,11 @@ export default function ContactsPage() {
                 ) : null}
 
                 <div className="contacts-form-actions">
-                  <button type="submit" className="contacts-submit-btn" disabled={loading}>
+                  <button
+                    type="submit"
+                    className="contacts-submit-btn"
+                    disabled={loading}
+                  >
                     {loading ? 'Invio in corso...' : 'Invia messaggio'}
                   </button>
                 </div>

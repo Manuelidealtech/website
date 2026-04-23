@@ -98,7 +98,7 @@ const distributors = [
     left: '59.8%',
     popupClass: 'popup-right',
   },
-    {
+  {
     country: 'Greece',
     city: 'Athene',
     name: 'Distributor Greece',
@@ -107,7 +107,7 @@ const distributors = [
     left: '55.8%',
     popupClass: 'popup-right',
   },
-      {
+  {
     country: 'Italy',
     city: 'Milan',
     name: 'Idealtech Italy',
@@ -125,7 +125,7 @@ const distributors = [
     left: '21.0%',
     popupClass: 'popup-bottom',
   },
-    {
+  {
     country: 'USA',
     city: 'Washington',
     name: 'Distributor USA',
@@ -156,20 +156,24 @@ const distributors = [
 
 const strengths = [
   {
-    title: 'Progettazione su misura',
     icon: '/public/icon-progettazione.png',
+    title: 'PROGETTAZIONE SU MISURA',
+    description: 'Soluzioni progettate ad hoc in base alle esigenze del cliente.',
   },
   {
-    title: 'Integrazione in linee produttive',
     icon: '/public/icon-integrazione.png',
+    title: 'INTEGRAZIONE IN LINEE PRODUTTIVE',
+    description: 'Sistemi studiati per integrarsi perfettamente negli impianti esistenti.',
   },
   {
-    title: 'Assistenza tecnica',
     icon: '/public/icon-assistenza.png',
+    title: 'ASSISTENZA TECNICA',
+    description: 'Supporto tecnico specializzato per interventi rapidi ed risolutivi.',
   },
   {
-    title: 'Ricambi compatibili',
-    icon: '/public/icon-spareparts.png',
+    icon: '/public/icon-ricambi.png',
+    title: 'RICAMBI COMPATIBILI',
+    description: 'Ampia gamma di componenti di alta qualità accuratamente selezionati.',
   },
 ]
 
@@ -395,7 +399,8 @@ export default function HomePage() {
             {strengths.map((item, index) => (
               <div key={index} className="home-strength-card">
                 <img src={item.icon} alt={item.title} className="home-strength-icon" />
-                <span>{item.title}</span>
+                <span className="home-strength-title">{item.title}</span>
+                <p className="home-strength-description">{item.description}</p>
               </div>
             ))}
           </div>
