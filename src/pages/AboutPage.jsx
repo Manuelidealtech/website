@@ -84,6 +84,43 @@ export default function AboutPage() {
         </div>
       </section>
 
+      <section className="about-owner-section">
+        <div className="site-container">
+          <div className="about-owner-card">
+            <div className="about-owner-media">
+              <div className="about-owner-image-wrap">
+                <img
+                  src="/images/chi-siamo/titolare.png"
+                  alt="Titolare Idealtech"
+                />
+              </div>
+            </div>
+
+            <div className="about-owner-content">
+              <span className="section-kicker">La guida dell’azienda</span>
+              <h2>Visione, esperienza e attenzione al cliente</h2>
+              <p className="about-owner-name">Enrico Bozza — Titolare Idealtech</p>
+
+              <p>
+                Alla guida di Idealtech c’è una visione imprenditoriale fondata su competenza tecnica,
+                affidabilità e capacità di interpretare concretamente le esigenze del mercato industriale.
+              </p>
+
+              <p>
+                L’azienda è cresciuta nel tempo mantenendo un approccio diretto, serio e orientato alla qualità,
+                costruendo relazioni solide con i clienti e sviluppando soluzioni capaci di unire innovazione,
+                efficienza produttiva e supporto costante.
+              </p>
+
+              <p>
+                Ogni progetto nasce dall’ascolto, dall’esperienza sul campo e dalla volontà di offrire
+                risposte realmente utili, personalizzate e durature.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section className="about-gallery-section">
         <div className="site-container">
           <div className="about-gallery-head">
