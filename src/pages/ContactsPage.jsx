@@ -22,7 +22,7 @@ const officeSections = [
         phoneHref: '+393381382452',
         extension: 'Interno 2',
         email: 'info@idealtech.it',
-        photo: '/images/team/noemi-silvio.png',
+        photo: '/images/team/Noemi.png',
       },
     ],
   },
