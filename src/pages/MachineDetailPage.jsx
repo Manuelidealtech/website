@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedField, getMachineStatusLabel } from '../i18n/contentTranslations'
 import BackButton from '../components/BackButton'
 import '../styles/MachineDetailPage.css'
+import { Link, useParams } from 'react-router-dom'
 
 export default function MachineDetailPage() {
   const { language, locale } = useLanguage()
@@ -126,9 +126,8 @@ export default function MachineDetailPage() {
                 <button
                   type="button"
                   key={image.id}
-                  className={`detail-thumb-btn ${
-                    selectedImage === image.image_url ? 'active' : ''
-                  }`}
+                  className={`detail-thumb-btn ${selectedImage === image.image_url ? 'active' : ''
+                    }`}
                   onClick={() => setSelectedImage(image.image_url)}
                 >
                   <img src={image.image_url} alt={getLocalizedField(machine, 'title', language)} />
@@ -186,9 +185,14 @@ export default function MachineDetailPage() {
           </div>
 
           <div className="detail-actions">
-            <a href="/login" className="auth-button">
+            <Link
+              to={`/contatti?macchinario=${encodeURIComponent(
+                getLocalizedField(machine, 'title', language) || machine.model || ''
+              )}`}
+              className="auth-button"
+            >
               Richiedi informazioni
-            </a>
+            </Link>
           </div>
         </div>
       </div>
