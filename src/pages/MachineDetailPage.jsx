@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useLanguage } from '../i18n/LanguageContext'
+import { getLocalizedField, getMachineStatusLabel } from '../i18n/contentTranslations'
 import BackButton from '../components/BackButton'
 import '../styles/MachineDetailPage.css'
 
 export default function MachineDetailPage() {
+  const { language, locale } = useLanguage()
   const { slug } = useParams()
 
   const [machine, setMachine] = useState(null)
@@ -96,9 +99,9 @@ export default function MachineDetailPage() {
     <div className="site-container machine-detail-page">
       <div className="page-topbar">
         <div>
-          <h1>{machine.title}</h1>
+          <h1>{getLocalizedField(machine, 'title', language)}</h1>
           <p>
-            {machine.brand || '—'} · {machine.model || '—'} · {machine.category || '—'}
+            {machine.brand || '—'} · {machine.model || '—'} · {getLocalizedField(machine, 'category', language) || '—'}
           </p>
         </div>
 
@@ -111,7 +114,7 @@ export default function MachineDetailPage() {
         <div className="content-card">
           <div className="detail-main-image">
             {selectedImage ? (
-              <img src={selectedImage} alt={machine.title} />
+              <img src={selectedImage} alt={getLocalizedField(machine, 'title', language)} />
             ) : (
               <div className="machine-thumb-placeholder">Nessuna immagine</div>
             )}
@@ -128,7 +131,7 @@ export default function MachineDetailPage() {
                   }`}
                   onClick={() => setSelectedImage(image.image_url)}
                 >
-                  <img src={image.image_url} alt={machine.title} />
+                  <img src={image.image_url} alt={getLocalizedField(machine, 'title', language)} />
                 </button>
               ))}
             </div>
@@ -138,15 +141,11 @@ export default function MachineDetailPage() {
         <div className="content-card detail-info-card">
           <div className="detail-price-row">
             <span className={`status-badge status-${machine.status}`}>
-              {machine.status === 'available'
-                ? 'Disponibile'
-                : machine.status === 'reserved'
-                ? 'Riservato'
-                : 'Venduto'}
+              {getMachineStatusLabel(machine.status, language)}
             </span>
 
             <strong className="detail-price">
-              {Number(machine.price || 0).toLocaleString('it-IT', {
+              {Number(machine.price || 0).toLocaleString(locale, {
                 style: 'currency',
                 currency: 'EUR',
               })}
@@ -166,12 +165,12 @@ export default function MachineDetailPage() {
 
             <div className="detail-info-item">
               <span>Categoria</span>
-              <strong>{machine.category || '—'}</strong>
+              <strong>{getLocalizedField(machine, 'category', language) || '—'}</strong>
             </div>
 
             <div className="detail-info-item">
               <span>Condizione</span>
-              <strong>{machine.condition || '—'}</strong>
+              <strong>{getLocalizedField(machine, 'condition', language) || '—'}</strong>
             </div>
 
             <div className="detail-info-item">
@@ -183,7 +182,7 @@ export default function MachineDetailPage() {
 
           <div className="detail-description">
             <h3>Descrizione</h3>
-            <p>{machine.description || 'Nessuna descrizione disponibile.'}</p>
+            <p>{getLocalizedField(machine, 'description', language) || 'Nessuna descrizione disponibile.'}</p>
           </div>
 
           <div className="detail-actions">

@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useLanguage } from '../i18n/LanguageContext'
+import { getLocalizedField, getLocalizedNewsPreview } from '../i18n/contentTranslations'
 import '../styles/NewsPage.css'
 
 export default function NewsPage() {
+  const { language, locale } = useLanguage()
   const [news, setNews] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
@@ -63,17 +66,13 @@ export default function NewsPage() {
 
   function formatDate(date) {
     if (!date) return ''
-    return new Date(date).toLocaleDateString('it-IT', {
+    return new Date(date).toLocaleDateString(locale, {
       day: '2-digit',
       month: 'long',
       year: 'numeric',
     })
   }
 
-  function getPreviewText(item) {
-    const text = item.excerpt || item.content || ''
-    return text.length > 140 ? `${text.slice(0, 140)}...` : text
-  }
 
   return (
     <div className="news-page">
@@ -99,7 +98,7 @@ export default function NewsPage() {
                   <div className="news-page-image">
                     <img
                       src={item.image_url || '/news-1.jpg'}
-                      alt={item.title}
+                      alt={getLocalizedField(item, 'title', language)}
                     />
                   </div>
 
@@ -108,9 +107,9 @@ export default function NewsPage() {
                       {formatDate(item.published_at)}
                     </span>
 
-                    <h2>{item.title}</h2>
+                    <h2>{getLocalizedField(item, 'title', language)}</h2>
 
-                    <p>{getPreviewText(item)}</p>
+                    <p>{getLocalizedNewsPreview(item, language, 140)}</p>
 
                     <div className="news-page-actions">
                       <button
@@ -153,7 +152,7 @@ export default function NewsPage() {
             <div className="news-modal-image">
               <img
                 src={selectedNews.image_url || '/news-1.jpg'}
-                alt={selectedNews.title}
+                alt={getLocalizedField(selectedNews, 'title', language)}
               />
             </div>
 
@@ -162,14 +161,14 @@ export default function NewsPage() {
                 {formatDate(selectedNews.published_at)}
               </span>
 
-              <h2>{selectedNews.title}</h2>
+              <h2>{getLocalizedField(selectedNews, 'title', language)}</h2>
 
-              {selectedNews.excerpt && (
-                <p className="news-modal-excerpt">{selectedNews.excerpt}</p>
+              {getLocalizedField(selectedNews, 'excerpt', language) && (
+                <p className="news-modal-excerpt">{getLocalizedField(selectedNews, 'excerpt', language)}</p>
               )}
 
               <div className="news-modal-text">
-                {selectedNews.content
+                {getLocalizedField(selectedNews, 'content', language)
                   ?.split('\n')
                   .filter(Boolean)
                   .map((paragraph, index) => (

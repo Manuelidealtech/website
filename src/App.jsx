@@ -16,6 +16,7 @@ import ProtectedRoute from './components/ProtectedRoute'
 import PublicLayout from './layouts/PublicLayout'
 import LegalPage from './pages/LegalPage'
 import ScrollToTop from './components/ScrollToTop'
+import AutoTranslate from './i18n/AutoTranslate'
 import DrumLinePage from './products/DrumLinePage'
 import ExtruderLinePage from './products/ExtruderLinePage'
 import AssyLinePage from './products/AssyLinePage'
@@ -32,6 +33,7 @@ import SparePartsPage from './products/SparePartsPage'
 export default function App() {
   return (
     <>
+      <AutoTranslate />
       <ScrollToTop />
 
       <Routes>

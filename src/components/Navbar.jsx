@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useLanguage } from '../i18n/LanguageContext'
 import '../styles/Navbar.css'
 
 const productMenuItems = [
@@ -20,6 +21,7 @@ const productMenuItems = [
 
 export default function Navbar() {
   const { user } = useAuth()
+  const { language, languages, setLanguage } = useLanguage()
   const [menuOpen, setMenuOpen] = useState(false)
   const [productsOpen, setProductsOpen] = useState(false)
 
@@ -30,6 +32,30 @@ export default function Navbar() {
 
   const toggleMenu = () => setMenuOpen((prev) => !prev)
   const toggleProducts = () => setProductsOpen((prev) => !prev)
+
+  const languageSwitcher = (
+    <div className="navbar__language-switcher" aria-label="Language selector" data-no-translate>
+      {languages.map((item) => (
+        <button
+          key={item.code}
+          type="button"
+          className={`navbar__language-btn ${language === item.code ? 'is-active' : ''}`}
+          onClick={() => setLanguage(item.code)}
+          title={item.label}
+          aria-label={item.label}
+          aria-pressed={language === item.code}
+        >
+          <img
+            src={item.flagSrc}
+            alt=""
+            aria-hidden="true"
+            className="navbar__language-flag"
+          />
+          <span className="navbar__language-code">{item.label}</span>
+        </button>
+      ))}
+    </div>
+  )
 
   return (
     <header className="navbar">
@@ -138,6 +164,8 @@ export default function Navbar() {
             Contatti
           </NavLink>
 
+          <div className="navbar__mobile-language">{languageSwitcher}</div>
+
           <div className="navbar__mobile-actions">
             <Link
               to={user ? '/admin' : '/login'}
@@ -150,6 +178,8 @@ export default function Navbar() {
         </nav>
 
         <div className="navbar__actions">
+          {languageSwitcher}
+
           <Link to={user ? '/admin' : '/login'} className="navbar__login-btn">
             {user ? 'Pannello' : 'Login'}
           </Link>

@@ -1,6 +1,8 @@
 import { Link } from 'react-router-dom'
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { useLanguage } from '../i18n/LanguageContext'
+import { getLocalizedField, getLocalizedNewsPreview } from '../i18n/contentTranslations'
 import '../styles/HomePage.css'
 
 const productAreas = [
@@ -229,6 +231,7 @@ function CountUpNumber({
 }
 
 export default function HomePage() {
+  const { language, locale } = useLanguage()
   const [newsItems, setNewsItems] = useState([])
   const [startNumbers, setStartNumbers] = useState(false)
   const numbersSectionRef = useRef(null)
@@ -308,7 +311,7 @@ export default function HomePage() {
             {productAreas.map((item) => (
               <article className="home-product-card" key={item.title}>
                 <div className="home-product-card-icon">
-                  <img src={item.icon} alt={item.title} />
+                  <img src={item.icon} alt={getLocalizedField(item, 'title', language)} />
                 </div>
 
                 <h3>{item.title}</h3>
@@ -398,7 +401,7 @@ export default function HomePage() {
           <div className="home-strengths-grid">
             {strengths.map((item, index) => (
               <div key={index} className="home-strength-card">
-                <img src={item.icon} alt={item.title} className="home-strength-icon" />
+                <img src={item.icon} alt={getLocalizedField(item, 'title', language)} className="home-strength-icon" />
                 <span className="home-strength-title">{item.title}</span>
                 <p className="home-strength-description">{item.description}</p>
               </div>
@@ -471,19 +474,19 @@ export default function HomePage() {
                   <div className="home-news-image">
                     <img
                       src={item.image_url || '/news-1.jpg'}
-                      alt={item.title}
+                      alt={getLocalizedField(item, 'title', language)}
                     />
                   </div>
 
                   <div className="home-news-body">
                     <span className="home-news-date">
                       {item.published_at
-                        ? new Date(item.published_at).toLocaleDateString('it-IT')
+                        ? new Date(item.published_at).toLocaleDateString(locale)
                         : ''}
                     </span>
 
-                    <h3>{item.title}</h3>
-                    <p>{truncateText(item.excerpt || item.content, 135)}</p>
+                    <h3>{getLocalizedField(item, 'title', language)}</h3>
+                    <p>{getLocalizedNewsPreview(item, language, 135)}</p>
 
                     <Link to="/news" className="home-news-link">
                       Leggi di più

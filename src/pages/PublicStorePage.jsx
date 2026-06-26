@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { useLanguage } from '../i18n/LanguageContext'
+import { getLocalizedField, getMachineStatusLabel } from '../i18n/contentTranslations'
 import BackButton from '../components/BackButton'
 import '../styles/PublicStorePage.css'
 
 export default function PublicStorePage() {
+  const { language, locale } = useLanguage()
   const [machines, setMachines] = useState([])
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
@@ -69,32 +72,28 @@ export default function PublicStorePage() {
               >
                 <div className="store-card-image">
                   {machine.cover_image ? (
-                    <img src={machine.cover_image} alt={machine.title} />
+                    <img src={machine.cover_image} alt={getLocalizedField(machine, 'title', language)} />
                   ) : (
                     <div className="machine-thumb-placeholder">No image</div>
                   )}
                 </div>
 
                 <div className="store-card-body">
-                  <h3>{machine.title}</h3>
+                  <h3>{getLocalizedField(machine, 'title', language)}</h3>
                   <p className="store-card-subtitle">
                     {machine.brand || '—'} · {machine.model || '—'}
                   </p>
                   <p className="store-card-subtitle">
-                    {machine.category || '—'} · {machine.location || '—'}
+                    {getLocalizedField(machine, 'category', language) || '—'} · {getLocalizedField(machine, 'location', language) || machine.location || '—'}
                   </p>
 
                   <div className="store-card-footer">
                     <span className={`status-badge status-${machine.status}`}>
-                      {machine.status === 'available'
-                        ? 'Disponibile'
-                        : machine.status === 'reserved'
-                        ? 'Riservato'
-                        : 'Venduto'}
+                      {getMachineStatusLabel(machine.status, language)}
                     </span>
 
                     <strong>
-                      {Number(machine.price || 0).toLocaleString('it-IT', {
+                      {Number(machine.price || 0).toLocaleString(locale, {
                         style: 'currency',
                         currency: 'EUR',
                       })}
