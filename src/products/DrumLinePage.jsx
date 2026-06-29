@@ -11,22 +11,16 @@ const features = [
 ]
 
 const galleryImages = [
-  '/images/products/drum-line/gallery-1.jpg',
-  '/images/products/drum-line/gallery-2.jpg',
-  '/images/products/drum-line/gallery-3.jpg',
-  '/images/products/drum-line/gallery-4.jpg',
-  '/images/products/drum-line/gallery-5.jpg',
-  '/images/products/drum-line/gallery-6.jpg',
-  '/images/products/drum-line/gallery-8.jpg',
-  '/images/products/drum-line/gallery-9.jpg',
-  '/images/products/drum-line/gallery-10.jpg',
-  '/images/products/drum-line/gallery-11.jpg',
-  '/images/products/drum-line/gallery-12.jpg',
-  '/images/products/drum-line/gallery-13.jpg',
-  '/images/products/drum-line/gallery-14.jpg',
-  '/images/products/drum-line/gallery-15.jpg',
-  '/images/products/drum-line/gallery-16.jpg',
-  '/images/products/drum-line/gallery-17.jpg',
+  '/images/products/drum-line/gallery-1.png',
+  '/images/products/drum-line/gallery-2.png',
+  '/images/products/drum-line/gallery-3.png',
+  '/images/products/drum-line/gallery-4.png',
+  '/images/products/drum-line/gallery-5.png',
+  '/images/products/drum-line/gallery-6.png',
+  '/images/products/drum-line/gallery-8.png',
+  '/images/products/drum-line/gallery-9.png',
+  '/images/products/drum-line/gallery-10.png',
+  '/images/products/drum-line/gallery-11.png',
 ]
 
 export default function DrumLinePage() {

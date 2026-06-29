@@ -12,20 +12,15 @@ const features = [
 ]
 
 const galleryImages = [
-  '/images/products/extruder-line/gallery-1.jpg',
-  '/images/products/extruder-line/gallery-2.jpg',
-  '/images/products/extruder-line/gallery-3.jpg',
-  '/images/products/extruder-line/gallery-4.jpg',
-  '/images/products/extruder-line/gallery-5.jpg',
-  '/images/products/extruder-line/gallery-6.jpg',
-  '/images/products/extruder-line/gallery-7.jpg',
-  '/images/products/extruder-line/gallery-8.jpg',
-  '/images/products/extruder-line/gallery-9.jpg',
-  '/images/products/extruder-line/gallery-10.jpg',
-  '/images/products/extruder-line/gallery-11.jpg',
-  '/images/products/extruder-line/gallery-12.jpg',
-  '/images/products/extruder-line/gallery-13.jpg',
-  '/images/products/extruder-line/gallery-14.jpg',
+  '/images/products/extruder-line/gallery-1.png',
+  '/images/products/extruder-line/gallery-2.png',
+  '/images/products/extruder-line/gallery-3.png',
+  '/images/products/extruder-line/gallery-4.png',
+  '/images/products/extruder-line/gallery-5.png',
+  '/images/products/extruder-line/gallery-6.png',
+  '/images/products/extruder-line/gallery-7.png',
+  '/images/products/extruder-line/gallery-8.png',
+  '/images/products/extruder-line/gallery-9.png',
 ]
 
 export default function ExtruderLinePage() {

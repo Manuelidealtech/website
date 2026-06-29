@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import '../styles/ContactsPage.css'
-import { sendContactEmail } from '../lib/emailjs'
+import { sendContactEmail } from '../lib/contactEmail'
 
 const officeSections = [
   {
@@ -120,6 +120,7 @@ export default function ContactsPage() {
         email: formData.email,
         phone: formData.phone || 'Non inserito',
         message: formData.message,
+        privacyAccepted: formData.privacyAccepted,
       })
 
       setFeedback({ type: 'success', text: 'Messaggio inviato correttamente.' })
@@ -131,8 +132,8 @@ export default function ContactsPage() {
         privacyAccepted: false,
       })
     } catch (error) {
-      console.error('Errore EmailJS:', error)
-      setFeedback({ type: 'error', text: 'Errore durante l’invio del messaggio.' })
+      console.error('Errore invio email:', error)
+      setFeedback({ type: 'error', text: error.message || 'Errore durante l’invio del messaggio.' })
     } finally {
       setLoading(false)
     }

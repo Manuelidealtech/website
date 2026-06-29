@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import '../styles/ServicesPage.css'
-import { sendServicesEmail } from '../lib/emailjs'
+import { sendServicesEmail } from '../lib/contactEmail'
 
 const services = [
   'Vendita ed installazione',
@@ -60,6 +60,7 @@ export default function ServicesPage() {
         email: formData.email,
         phone: formData.phone || 'Non inserito',
         message: formData.message,
+        privacyAccepted: formData.privacyAccepted,
       })
 
       setFeedback({ type: 'success', text: 'Richiesta inviata correttamente.' })
@@ -71,8 +72,8 @@ export default function ServicesPage() {
         privacyAccepted: false,
       })
     } catch (error) {
-      console.error('Errore EmailJS:', error)
-      setFeedback({ type: 'error', text: 'Errore durante l’invio della richiesta.' })
+      console.error('Errore invio email:', error)
+      setFeedback({ type: 'error', text: error.message || 'Errore durante l’invio della richiesta.' })
     } finally {
       setLoading(false)
     }
