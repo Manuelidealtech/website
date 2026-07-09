@@ -31,7 +31,7 @@ const officeSections = [
     items: [
       {
         text: 'Contattaci per ordini, forniture e richieste acquisti dedicate.',
-        employee: 'Federica Ciocia',
+        employee: '-',
         phone: '+39 0362 543041',
         phoneHref: '+390362543041',
         extension: 'Interno 3',
@@ -45,7 +45,7 @@ const officeSections = [
     items: [
       {
         text: 'Supporto per fatturazione, pratiche amministrative e documentazione.',
-        employee: 'Laura Santambrogio',
+        employee: 'Federica Ceppi',
         phone: '+39 0362 543041',
         phoneHref: '+390362543041',
         extension: 'Interno 4',
