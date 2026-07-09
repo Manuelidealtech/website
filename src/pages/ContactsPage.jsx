@@ -31,12 +31,12 @@ const officeSections = [
     items: [
       {
         text: 'Contattaci per ordini, forniture e richieste acquisti dedicate.',
-        employee: '-',
+        employee: 'Lucia Bisceglia',
         phone: '+39 0362 543041',
         phoneHref: '+390362543041',
         extension: 'Interno 3',
         email: 'acquisti@idealtech.it',
-        photo: '/images/team/federica-ciocia.png',
+        photo: '/images/team/lucia-bisceglia.png',
       },
     ],
   },
