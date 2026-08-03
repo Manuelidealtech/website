@@ -71,12 +71,12 @@ const officeSections = [
     items: [
       {
         text: 'Supporto operativo e manutenzione su impianti e linee di incollaggio.',
-        employee: 'Andrea Orlando',
+        employee: '-',
         phone: '+39 0362 543041',
         phoneHref: '+390362543041',
         extension: 'Interno 6',
         email: 'assistenza@idealtech.it',
-        photo: '/images/team/andrea-orlando.png',
+        photo: '-',
       },
     ],
   },
