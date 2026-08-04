@@ -112,3 +112,29 @@
     grid-template-columns: 1fr;
   }
 }
+.detail-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.detail-price small {
+  margin-top: 3px;
+  color: #a15b16;
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.detail-price {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 7px;
+  flex-wrap: wrap;
+}
+
+.detail-price small {
+  margin-top: 0;
+}

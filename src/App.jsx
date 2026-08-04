@@ -11,8 +11,11 @@ import MachineFormPage from './pages/MachineFormPage'
 import MachineDetailPage from './pages/MachineDetailPage'
 import AdminMachinesPage from './pages/AdminMachinesPage'
 import AdminNewsPage from './pages/AdminNewsPage'
+import AdminUsersPage from './pages/AdminUsersPage'
+import AdminContactsPage from './pages/AdminContactsPage'
 import NewsPage from './pages/NewsPage'
 import ProtectedRoute from './components/ProtectedRoute'
+import AdminOnlyRoute from './components/AdminOnlyRoute'
 import PublicLayout from './layouts/PublicLayout'
 import LegalPage from './pages/LegalPage'
 import ScrollToTop from './components/ScrollToTop'
@@ -157,6 +160,24 @@ export default function App() {
             <ProtectedRoute>
               <AdminNewsPage />
             </ProtectedRoute>
+          }
+        />
+
+        <Route
+          path="/admin/contatti"
+          element={
+            <AdminOnlyRoute>
+              <AdminContactsPage />
+            </AdminOnlyRoute>
+          }
+        />
+
+        <Route
+          path="/admin/utenti"
+          element={
+            <AdminOnlyRoute>
+              <AdminUsersPage />
+            </AdminOnlyRoute>
           }
         />
         

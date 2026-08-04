@@ -112,3 +112,45 @@
   opacity: 0.6;
   cursor: not-allowed;
 }
+.admin-machines-card {
+  padding: 22px;
+}
+
+.machine-admin-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: #12355b;
+}
+
+.machine-admin-price small {
+  margin-top: 2px;
+  color: #a15b16;
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+@media (max-width: 900px) {
+  .machine-admin-price {
+    align-items: flex-start;
+  }
+}
+
+.machine-admin-price {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.machine-admin-price small {
+  margin-top: 0;
+}
+
+@media (max-width: 900px) {
+  .machine-admin-price {
+    justify-content: flex-start;
+  }
+}

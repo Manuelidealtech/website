@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate } from 'react-router-dom'
-import BackButton from '../components/BackButton'
+import AdminLayout from '../components/AdminLayout'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { uploadNewsImage } from '../lib/newsStorage'
@@ -178,16 +178,11 @@ export default function AdminNewsPage() {
   }
 
   return (
-    <div className="page-shell admin-news-page">
-      <div className="admin-news-header">
-        <div>
-          <h1>Gestione news</h1>
-          <p>Crea, modifica o rimuovi le news mostrate nella homepage e nella pagina news.</p>
-        </div>
-
-        <BackButton fallback="/admin" />
-      </div>
-
+    <AdminLayout
+      title="Gestione news"
+      subtitle="Crea, modifica o rimuovi le news mostrate nella homepage e nella pagina news."
+      actions={<a className="admin-secondary-button" href="/news" target="_blank" rel="noreferrer">Anteprima news ↗</a>}
+    >
       {error && <div className="admin-news-error">{error}</div>}
 
       <div className="admin-news-layout">
@@ -332,6 +327,6 @@ export default function AdminNewsPage() {
           )}
         </div>
       </div>
-    </div>
+    </AdminLayout>
   )
 }

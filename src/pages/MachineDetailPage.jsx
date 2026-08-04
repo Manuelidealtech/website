@@ -16,10 +16,6 @@ export default function MachineDetailPage() {
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
 
-  useEffect(() => {
-    loadMachine()
-  }, [slug])
-
   async function loadMachine() {
     setLoading(true)
     setErrorMessage('')
@@ -67,6 +63,10 @@ export default function MachineDetailPage() {
     }
   }
 
+  useEffect(() => {
+    loadMachine()
+  }, [slug])
+
   if (loading) {
     return (
       <div className="page-shell">
@@ -100,9 +100,10 @@ export default function MachineDetailPage() {
       <div className="page-topbar">
         <div>
           <h1>{getLocalizedField(machine, 'title', language)}</h1>
-          <p>
-            {machine.brand || '—'} · {machine.model || '—'} · {getLocalizedField(machine, 'category', language) || '—'}
-          </p>
+          {[machine.brand, machine.model, getLocalizedField(machine, 'category', language)]
+            .filter(Boolean).length ? (
+            <p>{[machine.brand, machine.model, getLocalizedField(machine, 'category', language)].filter(Boolean).join(' · ')}</p>
+          ) : null}
         </div>
 
         <div className="topbar-actions">
@@ -144,10 +145,13 @@ export default function MachineDetailPage() {
             </span>
 
             <strong className="detail-price">
-              {Number(machine.price || 0).toLocaleString(locale, {
-                style: 'currency',
-                currency: 'EUR',
-              })}
+              <span>
+                {Number(machine.price || 0).toLocaleString(locale, {
+                  style: 'currency',
+                  currency: 'EUR',
+                })}
+              </span>
+              {machine.price_includes_vat === false ? <small>IVA esclusa</small> : null}
             </strong>
           </div>
 

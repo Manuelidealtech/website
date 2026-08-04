@@ -1,88 +1,38 @@
-import { useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import '../styles/ContactsPage.css'
 import { sendContactEmail } from '../lib/contactEmail'
-
-const officeSections = [
-  {
-    title: 'Ufficio commerciale',
-    items: [
-      {
-        office: 'Ufficio commerciale Italia',
-        employee: 'Lucia Bisceglia',
-        phone: '+39 0362 543041',
-        phoneHref: '+390362543041',
-        extension: 'Interno 1',
-        email: 'lucia.bisceglia@idealtech.it',
-        photo: '/images/team/lucia-bisceglia.png',
-      },
-      {
-        office: 'Ufficio commerciale estero',
-        employee: 'Noemi Silvio',
-        phone: '+39 338 1382452',
-        phoneHref: '+393381382452',
-        extension: 'Interno 2',
-        email: 'info@idealtech.it',
-        photo: '/images/team/Noemi.png',
-      },
-    ],
-  },
-  {
-    title: 'Ufficio acquisti',
-    items: [
-      {
-        text: 'Contattaci per ordini, forniture e richieste acquisti dedicate.',
-        employee: 'Lucia Bisceglia',
-        phone: '+39 0362 543041',
-        phoneHref: '+390362543041',
-        extension: 'Interno 3',
-        email: 'acquisti@idealtech.it',
-        photo: '/images/team/lucia-bisceglia.png',
-      },
-    ],
-  },
-  {
-    title: 'Amministrazione',
-    items: [
-      {
-        text: 'Supporto per fatturazione, pratiche amministrative e documentazione.',
-        employee: 'Federica Ceppi',
-        phone: '+39 0362 543041',
-        phoneHref: '+390362543041',
-        extension: 'Interno 4',
-        email: 'amministrazione@idealtech.it',
-      },
-    ],
-  },
-  {
-    title: 'Ufficio tecnico',
-    items: [
-      {
-        text: 'Supporto tecnico e consulenza.',
-        employee: 'Giorgio Perego',
-        phone: '+39 0362 543041',
-        phoneHref: '+390362543041',
-        extension: 'Interno 5',
-        email: 'ufficiotecnico1@idealtech.it',
-      },
-    ],
-  },
-  {
-    title: 'Assistenza tecnica',
-    items: [
-      {
-        text: 'Supporto operativo e manutenzione su impianti e linee di incollaggio.',
-        employee: '-',
-        phone: '+39 0362 543041',
-        phoneHref: '+390362543041',
-        extension: 'Interno 6',
-        email: 'assistenza@idealtech.it',
-        photo: '-',
-      },
-    ],
-  },
-]
+import { supabase } from '../lib/supabase'
+import { defaultContactRows, groupContactRows } from '../lib/contactDefaults'
 
 export default function ContactsPage() {
+  const [contactRows, setContactRows] = useState(defaultContactRows)
+
+  useEffect(() => {
+    let active = true
+
+    async function loadContacts() {
+      const { data, error } = await supabase
+        .from('contact_people')
+        .select('*')
+        .order('sort_order', { ascending: true })
+
+      if (!active) return
+      if (error) {
+        console.warn('Contatti dinamici non disponibili, uso i dati predefiniti:', error.message)
+        return
+      }
+
+      if (data?.length) setContactRows(data)
+    }
+
+    loadContacts()
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const officeSections = useMemo(() => groupContactRows(contactRows), [contactRows])
+
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -173,13 +123,13 @@ export default function ContactsPage() {
                 <details
                   key={section.title}
                   className="contacts-office"
-                  open={section.title === 'Ufficio commerciale'}
+                  defaultOpen={section.title === 'Ufficio commerciale'}
                 >
                   <summary>{section.title}</summary>
 
                   <div className="contacts-office__content">
                     {section.items.map((item, index) => (
-                      <div key={index} className="contacts-office-person">
+                      <div key={item.id || index} className="contacts-office-person">
                         <div className="contacts-office-person__info">
                           {item.office && (
                             <p className="contacts-office-name">
@@ -188,8 +138,8 @@ export default function ContactsPage() {
                             </p>
                           )}
 
-                          {item.text && (
-                            <p className="contacts-office-text">{item.text}</p>
+                          {item.description && (
+                            <p className="contacts-office-text">{item.description}</p>
                           )}
 
                           {item.employee && (
@@ -201,7 +151,7 @@ export default function ContactsPage() {
                               {item.phone && (
                                 <a
                                   className="contacts-link contacts-link--phone"
-                                  href={`tel:${item.phoneHref || item.phone.replace(/\s+/g, '')}`}
+                                  href={`tel:${item.phone_href || item.phone.replace(/\s+/g, '')}`}
                                 >
                                   {item.phone}
                                 </a>
@@ -225,13 +175,13 @@ export default function ContactsPage() {
                           )}
                         </div>
 
-                        {item.photo ? (
+                        {item.photo_url ? (
                           <div className="contacts-office-avatar">
                             <img
-                              src={item.photo}
-                              alt={item.employee}
-                              onError={(e) => {
-                                e.currentTarget.src = '/images/team/default-avatar.jpg'
+                              src={item.photo_url}
+                              alt={item.employee || 'Dipendente Idealtech'}
+                              onError={(event) => {
+                                event.currentTarget.parentElement.style.display = 'none'
                               }}
                             />
                           </div>

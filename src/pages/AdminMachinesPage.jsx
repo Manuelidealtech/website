@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from '../context/AuthContext'
-import BackButton from '../components/BackButton'
+import AdminLayout from '../components/AdminLayout'
 import { getMachineImageUrl } from '../lib/storagePublicUrl'
 import '../styles/AdminMachinesPage.css'
 
@@ -12,11 +12,6 @@ export default function AdminMachinesPage() {
   const [loading, setLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState('')
   const [deletingId, setDeletingId] = useState(null)
-
-  useEffect(() => {
-    if (!profile && !user) return
-    loadMachines()
-  }, [profile, user])
 
   async function loadMachines() {
     setLoading(true)
@@ -43,6 +38,11 @@ export default function AdminMachinesPage() {
       setLoading(false)
     }
   }
+
+  useEffect(() => {
+    if (!profile && !user) return
+    loadMachines()
+  }, [profile, user])
 
   async function handleDelete(machine) {
     const confirmDelete = window.confirm(
@@ -99,22 +99,12 @@ export default function AdminMachinesPage() {
   }
 
   return (
-    <div className="page-shell">
-      <div className="page-topbar">
-        <div>
-          <h1>Macchinari caricati</h1>
-          <p>Gestisci, modifica o elimina le schede inserite nel pannello.</p>
-        </div>
-
-        <div className="topbar-actions">
-          <BackButton fallback="/admin" />
-          <Link to="/admin/macchinari/nuovo" className="auth-button">
-            + Nuovo macchinario
-          </Link>
-        </div>
-      </div>
-
-      <div className="content-card">
+    <AdminLayout
+      title="Macchinari"
+      subtitle="Gestisci le schede dello store, controlla la pubblicazione e aggiorna i prezzi."
+      actions={<Link to="/admin/macchinari/nuovo" className="admin-primary-button">+ Nuovo macchinario</Link>}
+    >
+      <div className="admin-panel-card admin-machines-card">
         {loading ? (
           <p>Caricamento...</p>
         ) : errorMessage ? (
@@ -159,11 +149,12 @@ export default function AdminMachinesPage() {
                     {machine.is_published ? 'Pubblicato' : 'Bozza'}
                   </span>
 
-                  <strong>
+                  <strong className="machine-admin-price">
                     {Number(machine.price || 0).toLocaleString('it-IT', {
                       style: 'currency',
                       currency: 'EUR',
                     })}
+                    {machine.price_includes_vat === false ? <small>IVA esclusa</small> : null}
                   </strong>
 
                   <div className="machine-row-actions">
@@ -189,6 +180,6 @@ export default function AdminMachinesPage() {
           </div>
         )}
       </div>
-    </div>
+    </AdminLayout>
   )
 }

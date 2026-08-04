@@ -1,0 +1,167 @@
+.admin-users-layout {
+  display: grid;
+  grid-template-columns: minmax(300px, 410px) minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.admin-user-form-card,
+.admin-users-list-card {
+  padding: 24px;
+}
+
+.admin-card-heading span {
+  color: #5b91cf;
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.admin-card-heading h2 {
+  margin: 7px 0 8px;
+  color: #103568;
+}
+
+.admin-card-heading p {
+  margin: 0;
+  color: #607089;
+  line-height: 1.6;
+}
+
+.admin-user-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.admin-user-form label {
+  display: grid;
+  gap: 7px;
+  color: #12355b;
+  font-weight: 800;
+  font-size: 0.92rem;
+}
+
+.admin-user-form input {
+  min-height: 49px;
+  padding: 0 14px;
+  border: 1px solid #d6e3f0;
+  border-radius: 13px;
+  background: #f9fbfe;
+  color: #12355b;
+}
+
+.admin-user-form input:focus {
+  outline: none;
+  border-color: #4e96f0;
+  box-shadow: 0 0 0 4px rgba(78, 150, 240, 0.12);
+}
+
+.admin-user-form small {
+  color: #71839a;
+  font-weight: 500;
+}
+
+.admin-users-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.admin-user-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 15px;
+  border: 1px solid #e1eaf4;
+  border-radius: 17px;
+  background: #fbfdff;
+}
+
+.admin-user-avatar {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 44px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: #e5f2ff;
+  color: #0f67d8;
+  font-weight: 900;
+}
+
+.admin-user-details {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.admin-user-details strong {
+  color: #12355b;
+}
+
+.admin-user-details span,
+.admin-user-details small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: #607089;
+}
+
+.admin-user-details small {
+  font-size: 0.76rem;
+}
+
+.admin-user-row-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.admin-role-badge,
+.admin-current-user {
+  padding: 6px 9px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 900;
+}
+
+.admin-role-badge {
+  color: #1762b8;
+  background: #e8f3ff;
+}
+
+.admin-current-user {
+  color: #167240;
+  background: #e8f8ef;
+}
+
+.admin-user-row-actions button {
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 10px;
+  background: #fff0f1;
+  color: #b4233d;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+@media (max-width: 1050px) {
+  .admin-users-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-user-row {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .admin-user-row-actions {
+    width: 100%;
+    margin-left: 58px;
+  }
+}

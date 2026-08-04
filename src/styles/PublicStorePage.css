@@ -79,3 +79,57 @@
     grid-template-columns: 1fr;
   }
 }
+.store-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.store-card-meta span {
+  display: inline-flex;
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #edf5fe;
+  color: #3e6f9f;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+.store-card-description {
+  margin: 0;
+  color: #617087;
+  line-height: 1.62;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.store-card-price {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  color: #12355b;
+}
+
+.store-card-price small {
+  margin-top: 2px;
+  color: #a15b16;
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* IVA mostrata accanto al prezzo */
+.store-card-price {
+  flex-direction: row;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.store-card-price small {
+  margin-top: 0;
+}

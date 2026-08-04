@@ -1,6 +1,8 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import BackButton from '../components/BackButton'
+import { supabase } from '../lib/supabase'
+import AdminLayout from '../components/AdminLayout'
 import '../styles/AdminDashboard.css'
 
 const quickActions = [
@@ -8,132 +10,128 @@ const quickActions = [
     to: '/admin/macchinari/nuovo',
     icon: '＋',
     title: 'Nuovo macchinario',
-    description: 'Crea una nuova scheda da pubblicare nello store.',
+    description: 'Crea una scheda prodotto. La bozza resta salvata anche cambiando pagina.',
     tag: 'Azione rapida',
   },
   {
     to: '/admin/macchinari',
-    icon: '🛠',
-    title: 'Macchinari caricati',
-    description: 'Visualizza, modifica ed elimina i macchinari inseriti.',
-    tag: 'Gestione',
+    icon: '⚙',
+    title: 'Gestisci macchinari',
+    description: 'Modifica prezzi, IVA, immagini e pubblicazione dello store.',
+    tag: 'Store',
   },
   {
     to: '/admin/news',
-    icon: '📰',
+    icon: '✦',
     title: 'Gestione news',
-    description: 'Pubblica, modifica ed elimina le news visibili nel sito.',
+    description: 'Crea e aggiorna le notizie mostrate nel sito.',
     tag: 'Contenuti',
   },
   {
-    to: '/store',
-    icon: '🛒',
-    title: 'Store pubblico',
-    description: 'Controlla la vetrina pubblica dei macchinari online.',
-    tag: 'Preview',
+    to: '/admin/contatti',
+    icon: '☎',
+    title: 'Dipendenti e contatti',
+    description: 'Aggiorna nomi, recapiti e fotografie di tutti gli uffici.',
+    tag: 'Contatti',
+    adminOnly: true,
   },
   {
-    to: '/news',
-    icon: '🌐',
-    title: 'Pagina news',
-    description: 'Verifica come vengono mostrate pubblicamente le notizie.',
+    to: '/admin/utenti',
+    icon: '♙',
+    title: 'Utenti amministratori',
+    description: 'Crea gli accessi per i colleghi che gestiscono il sito.',
+    tag: 'Accessi',
+    adminOnly: true,
+  },
+  {
+    to: '/store',
+    icon: '↗',
+    title: 'Anteprima sito',
+    description: 'Apri lo store pubblico e controlla il risultato finale.',
     tag: 'Preview',
   },
 ]
 
 export default function AdminDashboard() {
-  const { user, profile, signOut } = useAuth()
+  const { profile } = useAuth()
+  const [stats, setStats] = useState({ machines: '—', published: '—', news: '—' })
 
-  async function handleLogout() {
-    const { error } = await signOut()
-    if (error) {
-      alert(error.message)
+  useEffect(() => {
+    let active = true
+
+    async function loadStats() {
+      const [machinesResult, publishedResult, newsResult] = await Promise.all([
+        supabase.from('machines').select('*', { count: 'exact', head: true }),
+        supabase.from('machines').select('*', { count: 'exact', head: true }).eq('is_published', true),
+        supabase.from('news').select('*', { count: 'exact', head: true }),
+      ])
+
+      if (!active) return
+      setStats({
+        machines: machinesResult.count ?? '—',
+        published: publishedResult.count ?? '—',
+        news: newsResult.count ?? '—',
+      })
     }
-  }
+
+    loadStats()
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const isAdmin = profile?.role === 'admin'
 
   return (
-    <div className="admin-dashboard-page">
-      <div className="admin-dashboard-bg admin-dashboard-bg-1" />
-      <div className="admin-dashboard-bg admin-dashboard-bg-2" />
+    <AdminLayout
+      title="Pannello di controllo"
+      subtitle="Gestisci tutto il sito Idealtech da un’unica area, con accessi separati per i colleghi."
+      actions={<Link className="admin-primary-button" to="/admin/macchinari/nuovo">+ Nuovo macchinario</Link>}
+    >
+      <section className="admin-overview-cards">
+        <div className="admin-mini-card">
+          <span className="admin-mini-card-label">Macchinari totali</span>
+          <strong>{stats.machines}</strong>
+          <p>Schede presenti nel gestionale.</p>
+        </div>
+        <div className="admin-mini-card">
+          <span className="admin-mini-card-label">Online nello store</span>
+          <strong>{stats.published}</strong>
+          <p>Macchinari attualmente visibili.</p>
+        </div>
+        <div className="admin-mini-card">
+          <span className="admin-mini-card-label">News</span>
+          <strong>{stats.news}</strong>
+          <p>Contenuti pubblicati o in bozza.</p>
+        </div>
+      </section>
 
-      <div className="page-shell admin-dashboard-shell">
-        <section className="admin-hero">
-          <div className="admin-hero-main">
-            <span className="admin-kicker">Area amministrazione</span>
-            <h1>Pannello di controllo</h1>
-            <p>
-              Gestisci contenuti, macchinari e aggiornamenti del sito da un’unica
-              area riservata.
-            </p>
-
-            <div className="admin-user-meta">
-              <div className="admin-user-chip">
-                <span className="admin-user-label">Utente</span>
-                <strong>{profile?.full_name || user?.email || 'Admin'}</strong>
-              </div>
-
-              <div className="admin-user-chip">
-                <span className="admin-user-label">Ruolo</span>
-                <strong>{profile?.role || 'admin'}</strong>
-              </div>
-            </div>
+      <section className="admin-section">
+        <div className="admin-section-head">
+          <div>
+            <span className="admin-section-kicker">Gestione rapida</span>
+            <h2>Cosa vuoi aggiornare?</h2>
           </div>
+        </div>
 
-          <div className="admin-hero-actions">
-            <BackButton fallback="/" />
-            <button className="admin-logout-button" onClick={handleLogout}>
-              Logout
-            </button>
-          </div>
-        </section>
-
-        <section className="admin-overview-cards">
-          <div className="admin-mini-card">
-            <span className="admin-mini-card-label">Contenuti</span>
-            <strong>News & pagine</strong>
-            <p>Aggiorna la parte pubblica del sito in pochi clic.</p>
-          </div>
-
-          <div className="admin-mini-card">
-            <span className="admin-mini-card-label">Store</span>
-            <strong>Macchinari usati</strong>
-            <p>Gestisci le schede prodotto e la vetrina pubblica.</p>
-          </div>
-
-          <div className="admin-mini-card">
-            <span className="admin-mini-card-label">Controllo</span>
-            <strong>Preview rapida</strong>
-            <p>Verifica subito come i contenuti vengono mostrati online.</p>
-          </div>
-        </section>
-
-        <section className="admin-section">
-          <div className="admin-section-head">
-            <div>
-              <span className="admin-section-kicker">Azioni rapide</span>
-              <h2>Gestione principale</h2>
-            </div>
-          </div>
-
-          <div className="dashboard-grid dashboard-grid-modern">
-            {quickActions.map((item) => (
+        <div className="dashboard-grid dashboard-grid-modern">
+          {quickActions
+            .filter((item) => !item.adminOnly || isAdmin)
+            .map((item) => (
               <Link to={item.to} className="dashboard-card dashboard-card-modern" key={item.to}>
                 <div className="dashboard-card-top">
                   <span className="dashboard-card-icon">{item.icon}</span>
                   <span className="dashboard-card-tag">{item.tag}</span>
                 </div>
-
                 <div className="dashboard-card-content">
                   <h3>{item.title}</h3>
                   <p>{item.description}</p>
                 </div>
-
                 <span className="dashboard-card-link">Apri sezione →</span>
               </Link>
             ))}
-          </div>
-        </section>
-      </div>
-    </div>
+        </div>
+      </section>
+    </AdminLayout>
   )
 }
