@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import '../styles/AdminLayout.css'
@@ -12,6 +13,7 @@ const navItems = [
 
 export default function AdminLayout({ title, subtitle, actions, children }) {
   const { user, profile, signOut } = useAuth()
+  const [menuOpen, setMenuOpen] = useState(false)
   const isAdmin = profile?.role === 'admin'
 
   async function handleLogout() {
@@ -21,13 +23,25 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
 
   return (
     <div className="admin-app-shell">
-      <aside className="admin-sidebar">
+      <aside className={`admin-sidebar ${menuOpen ? 'is-menu-open' : ''}`}>
         <div className="admin-sidebar-brand">
           <img src="/logo-idealtech.png" alt="Idealtech" />
           <div>
             <strong>Idealtech</strong>
             <span>Gestione sito</span>
           </div>
+
+          <button
+            type="button"
+            className="admin-mobile-menu-button"
+            aria-label={menuOpen ? 'Chiudi menu amministrazione' : 'Apri menu amministrazione'}
+            aria-expanded={menuOpen}
+            onClick={() => setMenuOpen((current) => !current)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
 
         <nav className="admin-sidebar-nav" aria-label="Navigazione amministrazione">
@@ -38,12 +52,13 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
                 key={item.to}
                 to={item.to}
                 end={item.end}
+                onClick={() => setMenuOpen(false)}
                 className={({ isActive }) =>
                   `admin-nav-link ${isActive ? 'is-active' : ''}`
                 }
               >
                 <span className="admin-nav-icon" aria-hidden="true">{item.icon}</span>
-                <span>{item.label}</span>
+                <span className="admin-nav-label">{item.label}</span>
               </NavLink>
             ))}
         </nav>
@@ -64,7 +79,7 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
 
       <main className="admin-main">
         <header className="admin-page-header">
-          <div>
+          <div className="admin-page-heading">
             <span className="admin-page-kicker">Area amministrazione</span>
             <h1>{title}</h1>
             {subtitle ? <p>{subtitle}</p> : null}

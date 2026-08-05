@@ -1,6 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate } from 'react-router-dom'
 import AdminLayout from '../components/AdminLayout'
+import FileUploadField from '../components/FileUploadField'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { uploadNewsImage } from '../lib/newsStorage'
@@ -27,6 +29,8 @@ export default function AdminNewsPage() {
   const [error, setError] = useState('')
   const [selectedFile, setSelectedFile] = useState(null)
   const [previewUrl, setPreviewUrl] = useState('')
+  const [duplicatingId, setDuplicatingId] = useState(null)
+  const [operationMessage, setOperationMessage] = useState('')
 
   const canManage = ['admin', 'editor'].includes(profile?.role)
 
@@ -91,6 +95,7 @@ export default function AdminNewsPage() {
 
     setSaving(true)
     setError('')
+    setOperationMessage('')
 
     try {
       let finalImageUrl = form.image_url.trim() || null
@@ -126,6 +131,7 @@ export default function AdminNewsPage() {
       setSelectedFile(null)
       setPreviewUrl('')
       await loadNews()
+      setOperationMessage(editingId ? 'News aggiornata correttamente.' : 'News pubblicata correttamente.')
     } catch (err) {
       setError(err.message || 'Errore durante il salvataggio.')
     } finally {
@@ -164,6 +170,45 @@ export default function AdminNewsPage() {
     loadNews()
   }
 
+
+  async function handleDuplicate(item) {
+    const ok = window.confirm(
+      `Vuoi duplicare "${item.title}"? La copia verrà salvata come bozza.`
+    )
+    if (!ok) return
+
+    try {
+      setDuplicatingId(item.id)
+      setError('')
+      setOperationMessage('')
+
+      const excludedFields = new Set(['id', 'created_at', 'updated_at', 'author_id'])
+      const copyableFields = Object.fromEntries(
+        Object.entries(item).filter(([key]) => !excludedFields.has(key))
+      )
+
+      const copyTitle = `${item.title || 'News'} (copia)`
+      const { error: duplicateError } = await supabase
+        .from('news')
+        .insert({
+          ...copyableFields,
+          title: copyTitle,
+          published: false,
+          published_at: new Date().toISOString(),
+          author_id: user.id,
+        })
+
+      if (duplicateError) throw duplicateError
+
+      await loadNews()
+      setOperationMessage(`Duplicato creato come bozza: ${copyTitle}`)
+    } catch (err) {
+      setError(err.message || 'Errore durante la duplicazione della news.')
+    } finally {
+      setDuplicatingId(null)
+    }
+  }
+
   function handleCancelEdit() {
     setEditingId(null)
     setForm(emptyForm())
@@ -183,6 +228,7 @@ export default function AdminNewsPage() {
       subtitle="Crea, modifica o rimuovi le news mostrate nella homepage e nella pagina news."
       actions={<a className="admin-secondary-button" href="/news" target="_blank" rel="noreferrer">Anteprima news ↗</a>}
     >
+      {operationMessage && <div className="admin-news-success">{operationMessage}</div>}
       {error && <div className="admin-news-error">{error}</div>}
 
       <div className="admin-news-layout">
@@ -211,14 +257,16 @@ export default function AdminNewsPage() {
               />
             </label>
 
-            <label>
-              Carica immagine
-              <input
-                type="file"
+            <div className="admin-news-field">
+              <span className="admin-news-field-label">Carica immagine</span>
+              <FileUploadField
                 accept="image/*"
+                selectedFiles={selectedFile ? [selectedFile] : []}
                 onChange={handleFileChange}
+                buttonText="Scegli immagine"
+                emptyText="Nessuna immagine selezionata"
               />
-            </label>
+            </div>
 
             <label>
               Oppure URL immagine
@@ -314,6 +362,14 @@ export default function AdminNewsPage() {
                   <div className="admin-news-item-actions">
                     <button type="button" onClick={() => handleEdit(item)}>
                       Modifica
+                    </button>
+                    <button
+                      type="button"
+                      className="duplicate"
+                      onClick={() => handleDuplicate(item)}
+                      disabled={duplicatingId === item.id}
+                    >
+                      {duplicatingId === item.id ? 'Duplico...' : 'Duplica'}
                     </button>
                     <button type="button" className="danger" onClick={() => handleDelete(item.id)}>
                       Elimina

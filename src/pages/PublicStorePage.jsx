@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
@@ -28,6 +29,7 @@ export default function PublicStorePage() {
         .from('machines')
         .select('*')
         .eq('is_published', true)
+        .order('display_order', { ascending: true, nullsFirst: false })
         .order('created_at', { ascending: false })
 
       if (error) {

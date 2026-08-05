@@ -8,6 +8,7 @@ import { uploadMachineImage } from '../lib/storage'
 import { getMachineImageUrl } from '../lib/storagePublicUrl'
 import { clearMachineDraftFiles, loadMachineDraftFiles, saveMachineDraftFiles } from '../lib/machineDraft'
 import AdminLayout from '../components/AdminLayout'
+import FileUploadField from '../components/FileUploadField'
 import '../styles/MachineFormPage.css'
 
 const DRAFT_KEY = 'idealtech-new-machine-draft-v2'
@@ -171,6 +172,20 @@ export default function MachineFormPage() {
     return conflict ? `${safeSlug}-${Date.now()}` : safeSlug
   }
 
+
+  async function getNextDisplayOrder() {
+    const { data, error } = await supabase
+      .from('machines')
+      .select('display_order')
+      .order('display_order', { ascending: false, nullsFirst: false })
+      .limit(1)
+
+    if (error) throw new Error(error.message)
+
+    const currentMax = Number(data?.[0]?.display_order)
+    return Number.isFinite(currentMax) ? currentMax + 1 : 0
+  }
+
   async function handleDeleteExistingImage(image) {
     if (!window.confirm('Vuoi eliminare questa immagine?')) return
 
@@ -286,9 +301,14 @@ export default function MachineFormPage() {
         setTimeout(() => navigate('/admin/macchinari', { replace: true }), 600)
       } else {
         const slug = await generateUniqueSlug(form.title)
+        const displayOrder = await getNextDisplayOrder()
         const { data: insertedMachine, error: machineError } = await supabase
           .from('machines')
-          .insert({ ...buildPayload(slug), created_by: user.id })
+          .insert({
+            ...buildPayload(slug),
+            created_by: user.id,
+            display_order: displayOrder,
+          })
           .select()
           .single()
 
@@ -416,7 +436,14 @@ export default function MachineFormPage() {
 
             <div className="form-group form-group-full">
               <label>{isEditMode ? 'Aggiungi nuove immagini' : 'Immagini'}</label>
-              <input type="file" multiple accept="image/*" onChange={handleFilesChange} />
+              <FileUploadField
+                multiple
+                accept="image/*"
+                selectedFiles={files}
+                onChange={handleFilesChange}
+                buttonText={isEditMode ? 'Aggiungi immagini' : 'Scegli immagini'}
+                emptyText="Nessuna immagine selezionata"
+              />
               <small>{isEditMode ? 'Le nuove immagini verranno aggiunte alla galleria.' : 'Anche le immagini selezionate restano nella bozza quando cambi pagina. La prima sarà la copertina.'}</small>
             </div>
 

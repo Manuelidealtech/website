@@ -140,3 +140,63 @@
     min-height: 190px;
   }
 }
+
+.admin-overview-cards,
+.dashboard-grid-modern,
+.admin-mini-card,
+.dashboard-card-modern,
+.dashboard-card-content {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.admin-mini-card p,
+.dashboard-card-content p,
+.dashboard-card-content h3 {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 640px) {
+  .admin-overview-cards,
+  .dashboard-grid-modern {
+    gap: 12px;
+  }
+
+  .admin-mini-card {
+    padding: 17px;
+    border-radius: 17px;
+  }
+
+  .admin-mini-card strong {
+    margin-bottom: 4px;
+    font-size: 1.65rem;
+  }
+
+  .admin-mini-card p {
+    font-size: 0.87rem;
+  }
+
+  .admin-section {
+    margin-top: 22px;
+  }
+
+  .dashboard-card-modern {
+    min-height: 0;
+    padding: 17px;
+    border-radius: 17px;
+  }
+
+  .dashboard-card-icon {
+    width: 45px;
+    height: 45px;
+    border-radius: 13px;
+  }
+
+  .dashboard-card-content h3 {
+    margin-top: 14px;
+  }
+
+  .dashboard-card-link {
+    margin-top: 14px;
+  }
+}

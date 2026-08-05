@@ -1,87 +1,50 @@
-# Invio email modulo contatti tramite SMTP
+# Invio email dei moduli del sito
 
-Il modulo contatti invia una richiesta `POST` a `/api/contact`.
-L'endpoint serverless invia la mail a:
+I moduli **Contatti** e **Servizi** inviano una richiesta `POST` all'endpoint serverless:
+
+```txt
+/api/contact
+```
+
+L'endpoint usa `nodemailer` e invia il messaggio all'indirizzo indicato nella variabile:
+
+```txt
+CONTACT_TO_EMAIL
+```
+
+Se la variabile non è impostata, il destinatario predefinito nel codice è:
 
 ```txt
 info@idealtech.it
 ```
 
-Questa versione usa SMTP con `nodemailer`, quindi non serve verificare il dominio su Resend e non servono record DNS. Devi solo avere i dati SMTP della casella email o del provider di posta.
+## Configurazione Microsoft 365 su Vercel
 
-## Variabili da configurare su Vercel
-
-Nel progetto Vercel aggiungi queste variabili in **Settings → Environment Variables**:
+In **Vercel → progetto Idealtech → Settings → Environment Variables** configura:
 
 ```txt
-SMTP_HOST=smtp.tuo-provider.it
+SMTP_HOST=smtp.office365.com
 SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=info@idealtech.it
-SMTP_PASS=password_o_password_app
+SMTP_PASS=PASSWORD_DELLA_CASELLA_O_PASSWORD_APP
 SMTP_FROM_EMAIL=Sito Idealtech <info@idealtech.it>
 CONTACT_TO_EMAIL=info@idealtech.it
 ```
 
-## Come scegliere porta e sicurezza
+Applica le variabili agli ambienti desiderati, almeno **Production**, quindi esegui un nuovo deployment.
 
-Usa una di queste configurazioni:
+## Importante per Microsoft 365
 
-```txt
-SMTP_PORT=587
-SMTP_SECURE=false
-```
+La casella usata come `SMTP_USER` deve poter effettuare l'invio SMTP autenticato. Se Microsoft 365 restituisce un errore di autenticazione, controlla che **Authenticated SMTP** sia abilitato per la casella oppure utilizza una password/applicazione compatibile con le regole di sicurezza del tenant.
 
-oppure:
+## Verifica pratica
 
-```txt
-SMTP_PORT=465
-SMTP_SECURE=true
-```
+1. Apri la pagina pubblica **Contatti**.
+2. Compila tutti i campi e accetta la privacy.
+3. Invia il messaggio.
+4. Il sito deve mostrare “Messaggio inviato correttamente”.
+5. Controlla la casella `info@idealtech.it`, inclusi posta indesiderata e quarantena.
+6. In caso di errore, consulta i log della funzione `/api/contact` nel deployment Vercel.
 
-Di solito la porta `587` con `SMTP_SECURE=false` è quella più comune.
-
-## Esempi provider
-
-### Gmail / Google Workspace
-
-```txt
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=info@idealtech.it
-SMTP_PASS=password_app_google
-```
-
-Con Google spesso non va inserita la password normale: serve una **password per app**.
-
-### Aruba
-
-```txt
-SMTP_HOST=smtps.aruba.it
-SMTP_PORT=465
-SMTP_SECURE=true
-SMTP_USER=info@idealtech.it
-SMTP_PASS=password_casella
-```
-
-### Register.it / altri provider
-
-Controlla dal pannello della posta i dati SMTP. Di solito servono:
-
-- server SMTP
-- porta
-- SSL/TLS sì/no
-- email completa come username
-- password della casella
-
-## Cosa arriva nella mail
-
-La mail contiene:
-
-- Nome e cognome del cliente
-- Email del cliente
-- Telefono, se inserito
-- Messaggio
-
-La risposta alla mail usa automaticamente l'indirizzo del cliente tramite `replyTo`, quindi quando premi “Rispondi” scrivi direttamente al cliente.
+La mail contiene nome, email, telefono e messaggio del cliente. Il campo `replyTo` è impostato sull'indirizzo del cliente, quindi premendo **Rispondi** la risposta viene indirizzata direttamente a lui.

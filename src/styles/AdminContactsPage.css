@@ -212,3 +212,38 @@
     align-items: stretch;
   }
 }
+
+.admin-contact-sections,
+.admin-contact-section,
+.admin-contact-list,
+.admin-contact-editor,
+.admin-contact-fields,
+.admin-contact-fields > * {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (max-width: 620px) {
+  .admin-contact-section-head {
+    align-items: flex-start;
+  }
+
+  .admin-contact-photo-column {
+    display: grid;
+    grid-template-columns: 92px minmax(0, 1fr);
+    align-items: center;
+  }
+
+  .admin-contact-photo-preview,
+  .admin-contact-photo-empty {
+    width: 92px;
+    height: 92px;
+    grid-row: span 2;
+    border-radius: 18px;
+  }
+
+  .admin-photo-upload,
+  .admin-remove-photo {
+    width: 100%;
+  }
+}

@@ -1,0 +1,109 @@
+.file-upload-field {
+  width: 100%;
+  min-width: 0;
+  min-height: 54px;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: center;
+  gap: 12px;
+  padding: 7px;
+  border: 1px solid #d6e3f0;
+  border-radius: 15px;
+  background: #f8fbff;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.file-upload-field:focus-within {
+  border-color: #4e96f0;
+  background: #fff;
+  box-shadow: 0 0 0 4px rgba(78, 150, 240, 0.12);
+}
+
+.file-upload-field .file-upload-input {
+  position: absolute !important;
+  width: 1px !important;
+  min-width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.file-upload-button {
+  min-height: 40px;
+  display: inline-flex !important;
+  grid-template-columns: none !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px !important;
+  padding: 0 14px;
+  border-radius: 11px;
+  color: #fff !important;
+  background: linear-gradient(135deg, #4297ef, #146bd3);
+  box-shadow: 0 9px 18px rgba(15, 103, 216, 0.18);
+  font-size: 0.86rem !important;
+  font-weight: 800 !important;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.file-upload-button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 22px rgba(15, 103, 216, 0.23);
+}
+
+.file-upload-button svg {
+  width: 19px;
+  height: 19px;
+  flex: 0 0 19px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.file-upload-name {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: #71839a;
+  font-size: 0.86rem;
+  font-weight: 600;
+}
+
+.file-upload-name.has-files {
+  color: #12355b;
+}
+
+.file-upload-field.is-disabled {
+  opacity: 0.65;
+}
+
+.file-upload-field.is-disabled .file-upload-button {
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 560px) {
+  .file-upload-field {
+    grid-template-columns: 1fr;
+    gap: 7px;
+    padding: 7px;
+  }
+
+  .file-upload-button {
+    width: 100%;
+  }
+
+  .file-upload-name {
+    padding: 4px 7px 5px;
+    text-align: center;
+  }
+}

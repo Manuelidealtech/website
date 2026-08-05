@@ -370,3 +370,69 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Prevent form overflow inside the responsive admin shell */
+.machine-form,
+.form-grid,
+.form-group,
+.form-group > *,
+.vat-choice,
+.image-preview-grid,
+.form-actions {
+  min-width: 0;
+  max-width: 100%;
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .form-card {
+    padding: 17px 14px;
+  }
+
+  .form-grid {
+    gap: 15px;
+  }
+
+  .form-group {
+    gap: 7px;
+  }
+
+  .form-group label {
+    font-size: 0.88rem;
+  }
+
+  .form-group input,
+  .form-group select {
+    min-height: 47px;
+    padding: 0 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+
+  .form-group textarea {
+    min-height: 125px;
+    padding: 12px;
+    border-radius: 12px;
+    font-size: 0.9rem;
+  }
+
+  .vat-choice > label {
+    padding: 13px;
+    border-radius: 13px;
+  }
+
+  .machine-draft-status {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .image-preview-grid {
+    grid-template-columns: 1fr;
+  }
+}
