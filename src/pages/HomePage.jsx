@@ -39,27 +39,27 @@ const productAreas = [
 const sectors = [
   {
     title: 'Packaging e industria della carta',
-    image: '/industria-carta.png',
+    image: '/industria-carta-640.webp',
   },
   {
     title: 'Industria materassi e tappeti',
-    image: '/industria-materassi.png',
+    image: '/industria-materassi-640.webp',
   },
   {
     title: 'Lavorazione del legno ed edilizia',
-    image: '/industria-legno.png',
+    image: '/industria-legno-640.webp',
   },
   {
     title: 'Industria tessile',
-    image: '/industria-tessile.png',
+    image: '/industria-tessile-640.webp',
   },
   {
     title: 'Produzione di filtri',
-    image: '/industria-filtri.png',
+    image: '/industria-filtri-640.webp',
   },
   {
     title: 'Industria automobilistica',
-    image: '/industria-automobilistica.png',
+    image: '/industria-automobilistica-640.webp',
   },
 ]
 
@@ -277,6 +277,18 @@ export default function HomePage() {
   return (
     <div className="homepage">
       <section className="home-layout-hero">
+        <picture className="home-layout-hero-media" aria-hidden="true">
+          <source media="(max-width: 768px)" srcSet="/home-hero-768.webp" />
+          <source media="(max-width: 1280px)" srcSet="/home-hero-1280.webp" />
+          <img
+            src="/home-hero-1890.webp"
+            alt=""
+            width="1890"
+            height="850"
+            fetchPriority="high"
+            decoding="async"
+          />
+        </picture>
         <div className="home-layout-hero-overlay" />
 
         <div className="site-container home-layout-hero-inner">
@@ -311,7 +323,7 @@ export default function HomePage() {
             {productAreas.map((item) => (
               <article className="home-product-card" key={item.title}>
                 <div className="home-product-card-icon">
-                  <img src={item.icon} alt={getLocalizedField(item, 'title', language)} />
+                  <img src={item.icon} alt={getLocalizedField(item, 'title', language)} width="72" height="72" decoding="async" />
                 </div>
 
                 <h3>{item.title}</h3>
@@ -341,6 +353,10 @@ export default function HomePage() {
                   <img
                     src={sector.image}
                     alt={sector.title}
+                    width="640"
+                    height="427"
+                    loading="lazy"
+                    decoding="async"
                     onError={(e) => {
                       e.currentTarget.src = '/img1.jpg'
                     }}
@@ -401,7 +417,7 @@ export default function HomePage() {
           <div className="home-strengths-grid">
             {strengths.map((item, index) => (
               <div key={index} className="home-strength-card">
-                <img src={item.icon} alt={getLocalizedField(item, 'title', language)} className="home-strength-icon" />
+                <img src={item.icon} alt={getLocalizedField(item, 'title', language)} className="home-strength-icon" width="90" height="90" loading="lazy" decoding="async" />
                 <span className="home-strength-title">{item.title}</span>
                 <p className="home-strength-description">{item.description}</p>
               </div>
@@ -424,9 +440,13 @@ export default function HomePage() {
           <div className="home-world-map-card">
             <div className="home-world-map-interactive">
               <img
-                src="/world-map.png"
+                src="/world-map-1440.webp"
                 alt="Mappa del mondo con paesi distributori evidenziati"
                 className="home-world-map-image"
+                width="1440"
+                height="759"
+                loading="lazy"
+                decoding="async"
               />
 
               {distributors.map((item) => (
@@ -443,7 +463,7 @@ export default function HomePage() {
 
                   <div className="home-world-distributor-card">
                     <div className="home-world-distributor-logo">
-                      <img src={item.logo} alt={item.name} />
+                      <img src={item.logo} alt={item.name} loading="lazy" decoding="async" />
                     </div>
 
                     <div className="home-world-distributor-info">
@@ -473,8 +493,10 @@ export default function HomePage() {
                 <article className="home-news-card" key={item.id}>
                   <div className="home-news-image">
                     <img
-                      src={item.image_url || '/news-1.jpg'}
+                      src={item.image_url || '/home-hero-1280.webp'}
                       alt={getLocalizedField(item, 'title', language)}
+                      loading="lazy"
+                      decoding="async"
                     />
                   </div>
 

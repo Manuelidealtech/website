@@ -97,7 +97,7 @@ export default function NewsPage() {
                 <article className="news-page-card" key={item.id}>
                   <div className="news-page-image">
                     <img
-                      src={item.image_url || '/news-1.jpg'}
+                      src={item.image_url || '/home-hero-1280.webp'}
                       alt={getLocalizedField(item, 'title', language)}
                     />
                   </div>
@@ -151,7 +151,7 @@ export default function NewsPage() {
 
             <div className="news-modal-image">
               <img
-                src={selectedNews.image_url || '/news-1.jpg'}
+                src={selectedNews.image_url || '/home-hero-1280.webp'}
                 alt={getLocalizedField(selectedNews, 'title', language)}
               />
             </div>

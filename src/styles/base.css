@@ -218,3 +218,15 @@ img {
     width: min(100% - 24px, var(--container));
   }
 }
+/* Campo antispam invisibile ai visitatori, ma presente per intercettare i bot. */
+.form-honeypot {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  clip: rect(0 0 0 0) !important;
+  clip-path: inset(50%) !important;
+  white-space: nowrap !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}

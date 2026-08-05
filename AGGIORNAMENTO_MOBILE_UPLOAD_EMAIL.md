@@ -30,4 +30,4 @@ Il modulo pubblico è collegato a `/api/contact` e il destinatario predefinito n
 info@idealtech.it
 ```
 
-L'invio avviene solamente se su Vercel sono presenti le variabili SMTP descritte in `ISTRUZIONI_EMAIL.md`.
+L'invio avviene tramite Resend e richiede le variabili server descritte in `CONFIGURAZIONE_RESEND.md`.

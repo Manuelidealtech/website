@@ -77,15 +77,29 @@
   display: flex;
   align-items: center;
   overflow: hidden;
-  background:
-    linear-gradient(135deg, rgba(10, 31, 56, 0.82), rgba(18, 67, 126, 0.56)),
-    url('/home-hero.png') center/cover no-repeat;
+  background: #0a1f38;
+}
+
+
+.home-layout-hero-media {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+}
+
+.home-layout-hero-media img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
 }
 
 .home-layout-hero-overlay {
   position: absolute;
   inset: 0;
   background:
+    linear-gradient(135deg, rgba(10, 31, 56, 0.84), rgba(18, 67, 126, 0.58)),
     radial-gradient(circle at 18% 20%, rgba(255, 255, 255, 0.08), transparent 30%),
     radial-gradient(circle at 85% 25%, rgba(255, 255, 255, 0.06), transparent 28%);
   pointer-events: none;
@@ -852,4 +866,15 @@
   line-height: 1.6;
   color: rgba(0, 0, 0, 0.78);
   max-width: 280px;
+}
+
+/* Riduce il lavoro di rendering iniziale delle sezioni sotto la piega. */
+.home-sectors,
+.home-numbers,
+.home-strengths,
+.home-world,
+.home-news,
+.home-bottom-cta {
+  content-visibility: auto;
+  contain-intrinsic-size: 800px;
 }

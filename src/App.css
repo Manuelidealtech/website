@@ -90,3 +90,25 @@ button {
 textarea {
   resize: vertical;
 }
+.route-loader {
+  min-height: 42vh;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 12px;
+  color: #12355b;
+  font-weight: 800;
+}
+
+.route-loader__spinner {
+  width: 34px;
+  height: 34px;
+  border: 3px solid #d7e7f8;
+  border-top-color: #176fdc;
+  border-radius: 50%;
+  animation: route-loader-spin 0.75s linear infinite;
+}
+
+@keyframes route-loader-spin {
+  to { transform: rotate(360deg); }
+}

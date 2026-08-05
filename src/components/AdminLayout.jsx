@@ -8,6 +8,7 @@ const navItems = [
   { to: '/admin/macchinari', label: 'Macchinari', icon: '⚙' },
   { to: '/admin/news', label: 'News', icon: '✦' },
   { to: '/admin/contatti', label: 'Contatti', icon: '☎', adminOnly: true },
+  { to: '/admin/seo', label: 'SEO', icon: '⌕', adminOnly: true },
   { to: '/admin/utenti', label: 'Utenti admin', icon: '♙', adminOnly: true },
 ]
 
@@ -25,7 +26,7 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
     <div className="admin-app-shell">
       <aside className={`admin-sidebar ${menuOpen ? 'is-menu-open' : ''}`}>
         <div className="admin-sidebar-brand">
-          <img src="/logo-idealtech.png" alt="Idealtech" />
+          <img src="/logo-idealtech-900.webp" alt="Idealtech" width="900" height="173" decoding="async" />
           <div>
             <strong>Idealtech</strong>
             <span>Gestione sito</span>

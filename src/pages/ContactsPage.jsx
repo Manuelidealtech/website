@@ -39,6 +39,7 @@ export default function ContactsPage() {
     phone: '',
     message: '',
     privacyAccepted: false,
+    website: '',
   })
 
   const [loading, setLoading] = useState(false)
@@ -71,6 +72,8 @@ export default function ContactsPage() {
         phone: formData.phone || 'Non inserito',
         message: formData.message,
         privacyAccepted: formData.privacyAccepted,
+        website: formData.website,
+        source: 'Pagina Contatti',
       })
 
       setFeedback({ type: 'success', text: 'Messaggio inviato correttamente.' })
@@ -80,6 +83,7 @@ export default function ContactsPage() {
         phone: '',
         message: '',
         privacyAccepted: false,
+        website: '',
       })
     } catch (error) {
       console.error('Errore invio email:', error)
@@ -218,6 +222,18 @@ export default function ContactsPage() {
               <h2>Scrivici</h2>
 
               <form className="contacts-form" onSubmit={handleSubmit}>
+                <div className="form-honeypot" aria-hidden="true">
+                  <label htmlFor="contact-website">Non compilare questo campo</label>
+                  <input
+                    id="contact-website"
+                    type="text"
+                    name="website"
+                    value={formData.website}
+                    onChange={handleChange}
+                    tabIndex="-1"
+                    autoComplete="off"
+                  />
+                </div>
                 <div className="contacts-form-row">
                   <div className="contacts-form-group">
                     <label>Nome Cognome</label>

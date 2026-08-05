@@ -12,24 +12,25 @@ const services = [
 ]
 
 const galleryImages = [
-  './images/servizi/gallery-1.png',
-  './images/servizi/gallery-2.png',
-  './images/servizi/gallery-3.png',
-  './images/servizi/gallery-4.png',
-  './images/servizi/gallery-5.png',
-  './images/servizi/gallery-6.png',
-  './images/servizi/gallery-7.png',
-  './images/servizi/gallery-8.png',
+  { src: '/images/servizi/gallery-1-960.webp', width: 640, height: 427 },
+  { src: '/images/servizi/gallery-2-960.webp', width: 540, height: 960 },
+  { src: '/images/servizi/gallery-3-960.webp', width: 960, height: 960 },
+  { src: '/images/servizi/gallery-4-960.webp', width: 960, height: 640 },
+  { src: '/images/servizi/gallery-5-960.webp', width: 960, height: 640 },
+  { src: '/images/servizi/gallery-6-960.webp', width: 960, height: 640 },
+  { src: '/images/servizi/gallery-7-960.webp', width: 960, height: 640 },
+  { src: '/images/servizi/gallery-8-960.webp', width: 755, height: 960 },
 ]
 
 export default function ServicesPage() {
   const [formData, setFormData] = useState({
-  name: '',
-  email: '',
-  phone: '',
-  message: '',
-  privacyAccepted: false,
-})
+    name: '',
+    email: '',
+    phone: '',
+    message: '',
+    privacyAccepted: false,
+    website: '',
+  })
 
   const [loading, setLoading] = useState(false)
   const [feedback, setFeedback] = useState({ type: '', text: '' })
@@ -61,6 +62,8 @@ export default function ServicesPage() {
         phone: formData.phone || 'Non inserito',
         message: formData.message,
         privacyAccepted: formData.privacyAccepted,
+        website: formData.website,
+        source: 'Pagina Servizi - richiesta preventivo',
       })
 
       setFeedback({ type: 'success', text: 'Richiesta inviata correttamente.' })
@@ -70,6 +73,7 @@ export default function ServicesPage() {
         phone: '',
         message: '',
         privacyAccepted: false,
+        website: '',
       })
     } catch (error) {
       console.error('Errore invio email:', error)
@@ -152,8 +156,15 @@ export default function ServicesPage() {
         <div className="site-container">
           <div className="services-gallery-grid">
             {galleryImages.map((image, index) => (
-              <div className="services-gallery-item" key={`${image}-${index}`}>
-                <img src={image} alt={`Servizio Idealtech ${index + 1}`} />
+              <div className="services-gallery-item" key={image.src}>
+                <img
+                  src={image.src}
+                  alt={`Servizio tecnico Idealtech ${index + 1}`}
+                  width={image.width}
+                  height={image.height}
+                  loading="lazy"
+                  decoding="async"
+                />
               </div>
             ))}
           </div>
@@ -172,6 +183,18 @@ export default function ServicesPage() {
             </div>
 
             <form className="services-contact-form" onSubmit={handleSubmit}>
+              <div className="form-honeypot" aria-hidden="true">
+                <label htmlFor="services-website">Non compilare questo campo</label>
+                <input
+                  id="services-website"
+                  type="text"
+                  name="website"
+                  value={formData.website}
+                  onChange={handleChange}
+                  tabIndex="-1"
+                  autoComplete="off"
+                />
+              </div>
               <div className="services-contact-row">
                 <div className="services-form-group">
                   <label>Nome Cognome</label>
@@ -207,7 +230,6 @@ export default function ServicesPage() {
                     onChange={handleChange}
                   />
                 </div>
-
               </div>
 
               <div className="services-form-group">

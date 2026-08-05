@@ -44,6 +44,14 @@ const quickActions = [
     adminOnly: true,
   },
   {
+    to: '/admin/seo',
+    icon: '⌕',
+    title: 'Gestione SEO',
+    description: 'Ottimizza titoli, descrizioni e anteprime social delle pagine.',
+    tag: 'Visibilità',
+    adminOnly: true,
+  },
+  {
     to: '/store',
     icon: '↗',
     title: 'Anteprima sito',

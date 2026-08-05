@@ -16,9 +16,13 @@ export default function Footer() {
           <div className="footer__logo-col">
             <Link to="/" className="footer__logo-box" aria-label="Torna alla home">
               <img
-                src="/logo-idealtech.png"
+                src="/logo-idealtech-900.webp"
                 alt="Idealtech"
                 className="footer__logo-image"
+                width="900"
+                height="173"
+                loading="lazy"
+                decoding="async"
               />
             </Link>
           </div>
@@ -29,6 +33,7 @@ export default function Footer() {
 
               <div className="footer__info">
                 <p>Idealtech s.r.l.</p>
+                <p>Capitale sociale: € 70.000,00</p>
                 <p>Via Sondrio 11, Varedo (MB)</p>
                 <p>Tel. 0362543041</p>
                 <p>Email: info@idealtech.it</p>
@@ -63,7 +68,7 @@ export default function Footer() {
                 aria-label="Facebook"
                 className="footer__social"
               >
-                <img src="/fb.png" alt="Facebook" />
+                <img src="/fb-96.webp" alt="Facebook" width="96" height="96" loading="lazy" decoding="async" />
               </a>
 
               <a
@@ -73,7 +78,7 @@ export default function Footer() {
                 aria-label="Instagram"
                 className="footer__social"
               >
-                <img src="/ig.png" alt="Instagram" />
+                <img src="/ig-96.webp" alt="Instagram" width="96" height="96" loading="lazy" decoding="async" />
               </a>
 
               <a
@@ -83,7 +88,7 @@ export default function Footer() {
                 aria-label="LinkedIn"
                 className="footer__social"
               >
-                <img src="/in.png" alt="LinkedIn" />
+                <img src="/in-96.webp" alt="LinkedIn" width="96" height="96" loading="lazy" decoding="async" />
               </a>
             </div>
           </div>

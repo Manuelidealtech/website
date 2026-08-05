@@ -16,7 +16,7 @@ const productMenuItems = [
   { label: 'Applicatori per colla a freddo', to: '/prodotti/cold-line' },
   { label: 'Pistole Manuali', to: '/prodotti/hand-gun' },
   { label: 'Ricambi Compatibili', to: '/prodotti/spare-parts' },
-  { label: 'Custom Machines', to: '/prodotti/custom-machines'},
+  { label: 'Custom Machines', to: '/prodotti/custom-machines' },
 ]
 
 export default function Navbar() {
@@ -50,6 +50,9 @@ export default function Navbar() {
             alt=""
             aria-hidden="true"
             className="navbar__language-flag"
+            width="32"
+            height="32"
+            decoding="async"
           />
           <span className="navbar__language-code">{item.label}</span>
         </button>
@@ -67,9 +70,12 @@ export default function Navbar() {
           onClick={closeMenu}
         >
           <img
-            src="/logo-idealtech.png"
+            src="/logo-idealtech-900.webp"
             alt="Idealtech"
             className="navbar__brand-logo"
+            width="900"
+            height="173"
+            decoding="async"
           />
         </Link>
 

@@ -1,21 +1,58 @@
 <!doctype html>
-<html lang="en">
+<html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Idealtech</title>
+    <meta name="theme-color" content="#123b69" />
+    <meta name="description" content="Idealtech progetta, installa e assiste sistemi professionali per l’applicazione di adesivi hot-melt e cold glue nel settore industriale." />
+    <meta name="robots" content="index, follow" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Idealtech" />
+    <meta property="og:title" content="Idealtech | Sistemi industriali di incollaggio" />
+    <meta property="og:description" content="Soluzioni professionali per applicazioni hot-melt e cold glue, progettazione, installazione e assistenza tecnica." />
+    <meta property="og:image" content="/home-hero-1280.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
 
-      <!-- Google tag (gtag.js) -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=G-4Q76CD96DN"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
+    <link rel="icon" href="/favicon.ico" sizes="any" />
+    <link rel="preload" as="image" href="/home-hero-768.webp" imagesrcset="/home-hero-768.webp 768w, /home-hero-1280.webp 1280w, /home-hero-1890.webp 1890w" imagesizes="100vw" type="image/webp" fetchpriority="high" />
 
-  gtag('config', 'G-4Q76CD96DN');
-</script>
+    <title>Idealtech | Sistemi industriali di incollaggio</title>
 
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Idealtech s.r.l.",
+        "url": "https://idealtech.it",
+        "logo": "https://idealtech.it/logo-idealtech-900.webp",
+        "email": "info@idealtech.it",
+        "telephone": "+39 0362 543041",
+        "address": {
+          "@type": "PostalAddress",
+          "streetAddress": "Via Sondrio 11",
+          "addressLocality": "Varedo",
+          "addressRegion": "MB",
+          "postalCode": "20814",
+          "addressCountry": "IT"
+        }
+      }
+    </script>
+
+    <script>
+      window.addEventListener('load', function () {
+        window.setTimeout(function () {
+          var script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-4Q76CD96DN';
+          document.head.appendChild(script);
+
+          window.dataLayer = window.dataLayer || [];
+          window.gtag = function () { window.dataLayer.push(arguments); };
+          window.gtag('js', new Date());
+          window.gtag('config', 'G-4Q76CD96DN');
+        }, 1200);
+      }, { once: true });
+    </script>
   </head>
   <body>
     <div id="root"></div>
