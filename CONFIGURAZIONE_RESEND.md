@@ -6,7 +6,7 @@ Il progetto invia ora le richieste dei moduli **Contatti** e **Servizi** tramite
 
 ```env
 RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxxxxxx
-RESEND_FROM_EMAIL=Idealtech <info@idealtech.it>
+RESEND_FROM_EMAIL=Sito Idealtech <contatti@mail.idealtech.it>
 CONTACT_TO_EMAIL=info@idealtech.it
 ```
 

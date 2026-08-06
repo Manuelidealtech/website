@@ -1,4 +1,5 @@
 export const SITE_NAME = 'Idealtech'
+export const SITE_ORIGIN = 'https://www.idealtech.it'
 export const DEFAULT_OG_IMAGE = '/home-hero-1280.webp'
 
 export const defaultSeoPages = [

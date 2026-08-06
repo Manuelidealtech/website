@@ -4,12 +4,11 @@ import '../styles/Footer.css'
 
 export default function Footer() {
   const { user } = useAuth()
+  const currentYear = new Date().getFullYear()
 
   return (
-    <footer className="footer">
-      <div className="footer__titlebar">
-
-      </div>
+    <footer className="footer" data-nosnippet>
+      <div className="footer__titlebar" />
 
       <div className="site-container">
         <div className="footer__content">
@@ -28,17 +27,17 @@ export default function Footer() {
           </div>
 
           <div className="footer__middle">
-            <div className="footer__section footer__section--contacts">
-              <h3>CONTATTI</h3>
+            <div className="footer__section footer__section--company">
+              <h3>IDEALTECH</h3>
 
               <div className="footer__info">
                 <p>Idealtech s.r.l.</p>
                 <p>Capitale sociale: € 70.000,00</p>
-                <p>Via Sondrio 11, Varedo (MB)</p>
-                <p>Tel. 0362543041</p>
-                <p>Email: info@idealtech.it</p>
-                <p>PEC: direzione.idealtech@pec.it</p>
+                <p>P. IVA e C.F.: 03058520960</p>
+                <p>Via Sondrio 11, 20814 Varedo (MB)</p>
+                <Link to="/contatti">Recapiti e uffici</Link>
                 <Link to="/termini-e-privacy">Privacy e Termini</Link>
+                <p className="footer__copyright">© {currentYear} Idealtech s.r.l.</p>
               </div>
             </div>
 
@@ -52,6 +51,7 @@ export default function Footer() {
                   {user ? 'Vai al pannello' : 'Login'}
                 </Link>
                 <Link to="/prodotti">Prodotti</Link>
+                <Link to="/store">Macchinari usati</Link>
                 <Link to="/servizi">Servizi</Link>
                 <Link to="/contatti">Contatti</Link>
               </div>
@@ -59,8 +59,7 @@ export default function Footer() {
           </div>
 
           <div className="footer__social-col">
-
-            <div className="footer__socials">
+            <div className="footer__socials" aria-label="Canali social Idealtech">
               <a
                 href="https://www.facebook.com/"
                 target="_blank"
@@ -68,7 +67,7 @@ export default function Footer() {
                 aria-label="Facebook"
                 className="footer__social"
               >
-                <img src="/fb-96.webp" alt="Facebook" width="96" height="96" loading="lazy" decoding="async" />
+                <img src="/fb-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" />
               </a>
 
               <a
@@ -78,7 +77,7 @@ export default function Footer() {
                 aria-label="Instagram"
                 className="footer__social"
               >
-                <img src="/ig-96.webp" alt="Instagram" width="96" height="96" loading="lazy" decoding="async" />
+                <img src="/ig-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" />
               </a>
 
               <a
@@ -88,7 +87,7 @@ export default function Footer() {
                 aria-label="LinkedIn"
                 className="footer__social"
               >
-                <img src="/in-96.webp" alt="LinkedIn" width="96" height="96" loading="lazy" decoding="async" />
+                <img src="/in-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" />
               </a>
             </div>
           </div>

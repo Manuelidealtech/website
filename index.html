@@ -21,20 +21,45 @@
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
-        "@type": "Organization",
-        "name": "Idealtech s.r.l.",
-        "url": "https://idealtech.it",
-        "logo": "https://idealtech.it/logo-idealtech-900.webp",
-        "email": "info@idealtech.it",
-        "telephone": "+39 0362 543041",
-        "address": {
-          "@type": "PostalAddress",
-          "streetAddress": "Via Sondrio 11",
-          "addressLocality": "Varedo",
-          "addressRegion": "MB",
-          "postalCode": "20814",
-          "addressCountry": "IT"
-        }
+        "@graph": [
+          {
+            "@type": ["Organization", "LocalBusiness"],
+            "@id": "https://www.idealtech.it/#organization",
+            "name": "Idealtech",
+            "legalName": "Idealtech s.r.l.",
+            "url": "https://www.idealtech.it/",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://www.idealtech.it/logo-idealtech-900.webp",
+              "width": 900,
+              "height": 173
+            },
+            "image": "https://www.idealtech.it/home-hero-1280.webp",
+            "description": "Idealtech progetta, installa e assiste sistemi professionali per l’applicazione industriale di adesivi hot-melt e cold glue.",
+            "foundingDate": "1999",
+            "email": "info@idealtech.it",
+            "telephone": "+39 0362 543041",
+            "taxID": "03058520960",
+            "address": {
+              "@type": "PostalAddress",
+              "streetAddress": "Via Sondrio 11",
+              "addressLocality": "Varedo",
+              "addressRegion": "MB",
+              "postalCode": "20814",
+              "addressCountry": "IT"
+            }
+          },
+          {
+            "@type": "WebSite",
+            "@id": "https://www.idealtech.it/#website",
+            "url": "https://www.idealtech.it/",
+            "name": "Idealtech",
+            "publisher": {
+              "@id": "https://www.idealtech.it/#organization"
+            },
+            "inLanguage": "it-IT"
+          }
+        ]
       }
     </script>
 

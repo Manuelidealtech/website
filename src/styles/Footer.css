@@ -38,7 +38,8 @@
 }
 
 .footer__logo-box {
-  width: 300px;
+  width: 100%;
+  max-width: 300px;
   min-height: 92px;
   border: 0px solid rgba(24, 50, 77, 0.45);
   background: transparent;
@@ -50,10 +51,11 @@
 }
 
 .footer__logo-image {
-  max-width: 130%;
-  max-height: 54px;
-  object-fit: contain;
   display: block;
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .footer__middle {
@@ -116,13 +118,25 @@
 .footer__social {
   width: 42px;
   height: 42px;
+  flex: 0 0 42px;
+  aspect-ratio: 1 / 1;
   border-radius: 999px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
   text-decoration: none;
   background: transparent;
-  transition: 0.2s ease;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.footer__social img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  aspect-ratio: 1 / 1;
+  object-fit: contain;
 }
 
 .footer__social span {
@@ -133,8 +147,13 @@
 
 .footer__social:hover {
   transform: translateY(-2px);
-  border-color: var(--primary-light);
-  color: var(--primary-light);
+  opacity: 0.86;
+}
+
+.footer__copyright {
+  margin-top: 4px !important;
+  color: #607089 !important;
+  font-size: 0.86rem !important;
 }
 
 @media (max-width: 1100px) {
@@ -183,5 +202,6 @@
   .footer__social {
     width: 38px;
     height: 38px;
+    flex-basis: 38px;
   }
 }

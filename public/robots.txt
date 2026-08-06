@@ -3,4 +3,4 @@ Allow: /
 Disallow: /admin/
 Disallow: /login
 
-Sitemap: https://idealtech.it/sitemap.xml
+Sitemap: https://www.idealtech.it/sitemap.xml

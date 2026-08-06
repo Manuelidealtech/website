@@ -67,6 +67,71 @@ export default function MachineDetailPage() {
     loadMachine()
   }, [slug])
 
+  useEffect(() => {
+    if (!machine) return
+
+    const title = getLocalizedField(machine, 'title', language) || machine.model || 'Macchinario usato'
+    const rawDescription =
+      getLocalizedField(machine, 'description', language) ||
+      [machine.brand, machine.model, getLocalizedField(machine, 'category', language)]
+        .filter(Boolean)
+        .join(' · ')
+    const description = String(rawDescription || 'Macchinario usato disponibile presso Idealtech.')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 165)
+    const imageUrls = [
+      ...images.map((image) => image.image_url),
+      machine.cover_image,
+    ].filter(Boolean)
+    const availability =
+      machine.status === 'available'
+        ? 'https://schema.org/InStock'
+        : machine.status === 'reserved'
+          ? 'https://schema.org/LimitedAvailability'
+          : 'https://schema.org/OutOfStock'
+    const price = Number(machine.price || 0)
+
+    const product = {
+      name: title,
+      description,
+      image: imageUrls.length ? [...new Set(imageUrls)] : undefined,
+      sku: machine.id ? String(machine.id) : undefined,
+      model: machine.model || undefined,
+      category: getLocalizedField(machine, 'category', language) || undefined,
+      itemCondition: 'https://schema.org/UsedCondition',
+      brand: machine.brand
+        ? { '@type': 'Brand', name: machine.brand }
+        : { '@type': 'Brand', name: 'Idealtech' },
+      offers: price > 0
+        ? {
+            '@type': 'Offer',
+            priceCurrency: 'EUR',
+            price,
+            availability,
+            itemCondition: 'https://schema.org/UsedCondition',
+            url: `${window.location.origin}/macchinario/${slug}`,
+            seller: { '@id': 'https://www.idealtech.it/#organization' },
+          }
+        : undefined,
+    }
+
+    window.dispatchEvent(
+      new CustomEvent('idealtech:seo-override', {
+        detail: {
+          path: `/macchinario/${slug}`,
+          page_name: title,
+          title: `${title} usato | Idealtech`,
+          description,
+          og_title: `${title} usato | Idealtech`,
+          og_description: description,
+          og_image_url: imageUrls[0] || undefined,
+          product,
+        },
+      })
+    )
+  }, [images, language, machine, slug])
+
   if (loading) {
     return (
       <div className="page-shell">
