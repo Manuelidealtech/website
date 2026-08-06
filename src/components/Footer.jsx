@@ -37,7 +37,7 @@ export default function Footer() {
                 <p>Via Sondrio 11, 20814 Varedo (MB)</p>
                 <Link to="/contatti">Recapiti e uffici</Link>
                 <Link to="/termini-e-privacy">Privacy e Termini</Link>
-                <p className="footer__copyright">© {currentYear} Idealtech s.r.l.</p>
+                <p className="footer__copyright">© {currentYear} Idealtech s.r.l. - Designed by <a href="https://vertex-ita.vercel.app" target="_blank" rel="noreferrer">Vertex</a></p>
               </div>
             </div>
 
