@@ -265,7 +265,7 @@ export default function SeoManager() {
 
   useEffect(() => {
     const origin = window.location.origin
-    const isPrivatePage = location.pathname.startsWith('/admin') || location.pathname === '/login'
+    const isPrivatePage = location.pathname.startsWith('/admin') || location.pathname === '/login' || location.pathname === '/links'
     const title = String(seo.title || SITE_NAME).trim()
     const description = String(seo.description || '').trim()
     const keywords = String(seo.keywords || '').trim()

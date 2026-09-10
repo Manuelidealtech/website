@@ -24,6 +24,8 @@ const AdminNewsPage = lazy(() => import('./pages/AdminNewsPage'))
 const AdminUsersPage = lazy(() => import('./pages/AdminUsersPage'))
 const AdminContactsPage = lazy(() => import('./pages/AdminContactsPage'))
 const AdminSeoPage = lazy(() => import('./pages/AdminSeoPage'))
+const SocialLinksPage = lazy(() => import('./pages/SocialLinksPage'))
+const AdminSocialLinksPage = lazy(() => import('./pages/AdminSocialLinksPage'))
 
 const DrumLinePage = lazy(() => import('./products/DrumLinePage'))
 const ExtruderLinePage = lazy(() => import('./products/ExtruderLinePage'))
@@ -71,6 +73,7 @@ export default function App() {
           <Route path="/termini-e-privacy" element={<LegalPage />} />
           <Route path="/macchinario/:slug" element={<PublicPage><MachineDetailPage /></PublicPage>} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/links" element={<SocialLinksPage />} />
 
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/macchinari" element={<ProtectedRoute><AdminMachinesPage /></ProtectedRoute>} />
@@ -80,6 +83,7 @@ export default function App() {
           <Route path="/admin/contatti" element={<AdminOnlyRoute><AdminContactsPage /></AdminOnlyRoute>} />
           <Route path="/admin/utenti" element={<AdminOnlyRoute><AdminUsersPage /></AdminOnlyRoute>} />
           <Route path="/admin/seo" element={<AdminOnlyRoute><AdminSeoPage /></AdminOnlyRoute>} />
+          <Route path="/admin/link-in-bio" element={<AdminOnlyRoute><AdminSocialLinksPage /></AdminOnlyRoute>} />
 
           <Route path="/prodotti/drum-line" element={<PublicPage><DrumLinePage /></PublicPage>} />
           <Route path="/prodotti/extruder-line" element={<PublicPage><ExtruderLinePage /></PublicPage>} />

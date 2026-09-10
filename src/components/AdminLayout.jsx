@@ -9,6 +9,7 @@ const navItems = [
   { to: '/admin/news', label: 'News', icon: '✦' },
   { to: '/admin/contatti', label: 'Contatti', icon: '☎', adminOnly: true },
   { to: '/admin/seo', label: 'SEO', icon: '⌕', adminOnly: true },
+  { to: '/admin/link-in-bio', label: 'Link page', icon: '↗', adminOnly: true },
   { to: '/admin/utenti', label: 'Utenti admin', icon: '♙', adminOnly: true },
 ]
 
