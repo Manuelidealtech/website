@@ -179,7 +179,7 @@ export default function ShopPage() {
         <div className="site-container shop-hero__inner">
           <div>
             <span className="shop-kicker">Ricambi e accessori Idealtech</span>
-            <h1>Shop Idealtech</h1>
+            <h1>Shop professionale</h1>
             <p>
               Seleziona i prodotti, invia l’ordine e completa il pagamento tramite bonifico bancario.
             </p>
