@@ -44,6 +44,16 @@ export const defaultSeoPages = [
     indexable: true,
   },
   {
+    path: '/shop',
+    page_name: 'Shop',
+    title: 'Shop ricambi e accessori | Idealtech',
+    description:
+      'Acquista ricambi, accessori e componenti Idealtech. Ordine online con pagamento tramite bonifico bancario.',
+    keywords: 'shop Idealtech, ricambi hot melt online, accessori incollaggio industriale',
+    og_image_url: DEFAULT_OG_IMAGE,
+    indexable: true,
+  },
+  {
     path: '/servizi',
     page_name: 'Servizi',
     title: 'Assistenza e servizi tecnici | Idealtech',

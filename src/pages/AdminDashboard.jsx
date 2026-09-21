@@ -7,6 +7,13 @@ import '../styles/AdminDashboard.css'
 
 const quickActions = [
   {
+    to: '/admin/shop',
+    icon: '▣',
+    title: 'Shop e ordini',
+    description: 'Gestisci catalogo, richieste d’ordine, bonifico ed email commerciale.',
+    tag: 'E-commerce',
+  },
+  {
     to: '/admin/macchinari/nuovo',
     icon: '＋',
     title: 'Nuovo macchinario',
@@ -62,16 +69,17 @@ const quickActions = [
 
 export default function AdminDashboard() {
   const { profile } = useAuth()
-  const [stats, setStats] = useState({ machines: '—', published: '—', news: '—' })
+  const [stats, setStats] = useState({ machines: '—', published: '—', news: '—', orders: '—' })
 
   useEffect(() => {
     let active = true
 
     async function loadStats() {
-      const [machinesResult, publishedResult, newsResult] = await Promise.all([
+      const [machinesResult, publishedResult, newsResult, ordersResult] = await Promise.all([
         supabase.from('machines').select('*', { count: 'exact', head: true }),
         supabase.from('machines').select('*', { count: 'exact', head: true }).eq('is_published', true),
         supabase.from('news').select('*', { count: 'exact', head: true }),
+        supabase.from('shop_orders').select('*', { count: 'exact', head: true }).in('status', ['new', 'awaiting_payment']),
       ])
 
       if (!active) return
@@ -79,6 +87,7 @@ export default function AdminDashboard() {
         machines: machinesResult.count ?? '—',
         published: publishedResult.count ?? '—',
         news: newsResult.count ?? '—',
+        orders: ordersResult.count ?? '—',
       })
     }
 
@@ -111,6 +120,11 @@ export default function AdminDashboard() {
           <span className="admin-mini-card-label">News</span>
           <strong>{stats.news}</strong>
           <p>Contenuti pubblicati o in bozza.</p>
+        </div>
+        <div className="admin-mini-card">
+          <span className="admin-mini-card-label">Ordini da gestire</span>
+          <strong>{stats.orders}</strong>
+          <p>Nuovi ordini o in attesa del bonifico.</p>
         </div>
       </section>
 

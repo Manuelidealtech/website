@@ -31,7 +31,6 @@ export default function Navbar() {
   }
 
   const toggleMenu = () => setMenuOpen((prev) => !prev)
-  const toggleProducts = () => setProductsOpen((prev) => !prev)
 
   const languageSwitcher = (
     <div className="navbar__language-switcher" aria-label="Language selector" data-no-translate>
@@ -168,6 +167,16 @@ export default function Navbar() {
             }
           >
             Contatti
+          </NavLink>
+
+          <NavLink
+            to="/shop"
+            onClick={closeMenu}
+            className={({ isActive }) =>
+              isActive ? 'navbar__link navbar__shop-link active' : 'navbar__link navbar__shop-link'
+            }
+          >
+            Shop
           </NavLink>
 
           <div className="navbar__mobile-language">{languageSwitcher}</div>

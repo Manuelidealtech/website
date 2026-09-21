@@ -52,6 +52,19 @@
   color: var(--primary-light);
 }
 
+.navbar__shop-link {
+  padding: 9px 14px;
+  border-radius: 999px;
+  background: #eaf4ff;
+  color: #155fac;
+}
+
+.navbar__shop-link:hover,
+.navbar__shop-link.active {
+  color: #fff;
+  background: linear-gradient(135deg, #4397f2, #0f67d8);
+}
+
 .navbar__actions {
   display: flex;
   align-items: center;
@@ -122,6 +135,11 @@
 
   .navbar__link {
     font-size: 13px;
+  }
+
+  .navbar__shop-link {
+    padding: 12px;
+    border-bottom: 0;
   }
 }
 

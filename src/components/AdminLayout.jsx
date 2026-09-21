@@ -7,6 +7,7 @@ const navItems = [
   { to: '/admin', label: 'Dashboard', icon: '⌂', end: true },
   { to: '/admin/macchinari', label: 'Macchinari', icon: '⚙' },
   { to: '/admin/news', label: 'News', icon: '✦' },
+  { to: '/admin/shop', label: 'Shop e ordini', icon: '▣' },
   { to: '/admin/contatti', label: 'Contatti', icon: '☎', adminOnly: true },
   { to: '/admin/seo', label: 'SEO', icon: '⌕', adminOnly: true },
   { to: '/admin/link-in-bio', label: 'Link page', icon: '↗', adminOnly: true },

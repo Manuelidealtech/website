@@ -11,6 +11,7 @@ const HomePage = lazy(() => import('./pages/HomePage'))
 const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ProductsPage = lazy(() => import('./pages/ProductsPage'))
 const PublicStorePage = lazy(() => import('./pages/PublicStorePage'))
+const ShopPage = lazy(() => import('./pages/ShopPage'))
 const ServicesPage = lazy(() => import('./pages/ServicesPage'))
 const ContactsPage = lazy(() => import('./pages/ContactsPage'))
 const NewsPage = lazy(() => import('./pages/NewsPage'))
@@ -26,6 +27,7 @@ const AdminContactsPage = lazy(() => import('./pages/AdminContactsPage'))
 const AdminSeoPage = lazy(() => import('./pages/AdminSeoPage'))
 const SocialLinksPage = lazy(() => import('./pages/SocialLinksPage'))
 const AdminSocialLinksPage = lazy(() => import('./pages/AdminSocialLinksPage'))
+const AdminShopPage = lazy(() => import('./pages/AdminShopPage'))
 
 const DrumLinePage = lazy(() => import('./products/DrumLinePage'))
 const ExtruderLinePage = lazy(() => import('./products/ExtruderLinePage'))
@@ -69,6 +71,7 @@ export default function App() {
           <Route path="/store" element={<PublicPage><PublicStorePage /></PublicPage>} />
           <Route path="/servizi" element={<PublicPage><ServicesPage /></PublicPage>} />
           <Route path="/contatti" element={<PublicPage><ContactsPage /></PublicPage>} />
+          <Route path="/shop" element={<PublicPage><ShopPage /></PublicPage>} />
           <Route path="/news" element={<PublicPage><NewsPage /></PublicPage>} />
           <Route path="/termini-e-privacy" element={<LegalPage />} />
           <Route path="/macchinario/:slug" element={<PublicPage><MachineDetailPage /></PublicPage>} />
@@ -84,6 +87,7 @@ export default function App() {
           <Route path="/admin/utenti" element={<AdminOnlyRoute><AdminUsersPage /></AdminOnlyRoute>} />
           <Route path="/admin/seo" element={<AdminOnlyRoute><AdminSeoPage /></AdminOnlyRoute>} />
           <Route path="/admin/link-in-bio" element={<AdminOnlyRoute><AdminSocialLinksPage /></AdminOnlyRoute>} />
+          <Route path="/admin/shop" element={<ProtectedRoute><AdminShopPage /></ProtectedRoute>} />
 
           <Route path="/prodotti/drum-line" element={<PublicPage><DrumLinePage /></PublicPage>} />
           <Route path="/prodotti/extruder-line" element={<PublicPage><ExtruderLinePage /></PublicPage>} />
