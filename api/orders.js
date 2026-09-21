@@ -7,6 +7,57 @@ const DEFAULT_SITE_ORIGIN = 'https://www.idealtech.it'
 const MAX_BODY_SIZE = 60_000
 const EMAIL_MAX_ATTEMPTS = 3
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+const ORDER_STATUS_EMAILS = {
+  new: {
+    label: 'Nuovo',
+    title: 'Il tuo ordine è stato registrato',
+    message: 'Abbiamo ricevuto correttamente il tuo ordine. Il nostro ufficio commerciale lo prenderà in carico al più presto.',
+    color: '#1769c2',
+    background: '#e7f2ff',
+  },
+  awaiting_payment: {
+    label: 'In attesa di bonifico',
+    title: 'Siamo in attesa del pagamento',
+    message: 'Il tuo ordine è confermato e rimane in attesa del bonifico bancario. Ricorda di indicare il numero ordine nella causale.',
+    color: '#9a5b00',
+    background: '#fff4d6',
+  },
+  paid: {
+    label: 'Pagato',
+    title: 'Pagamento ricevuto',
+    message: 'Abbiamo registrato il pagamento del tuo ordine. Grazie, procederemo con le attività successive.',
+    color: '#16704a',
+    background: '#e2f7ed',
+  },
+  processing: {
+    label: 'In lavorazione',
+    title: 'Il tuo ordine è in lavorazione',
+    message: 'Il nostro team sta preparando il tuo ordine. Riceverai un nuovo aggiornamento quando sarà spedito.',
+    color: '#6d46b3',
+    background: '#f0e9ff',
+  },
+  shipped: {
+    label: 'Spedito',
+    title: 'Il tuo ordine è stato spedito',
+    message: 'Il tuo ordine è stato affidato per la consegna ed è ora in viaggio verso l’indirizzo indicato.',
+    color: '#075e78',
+    background: '#dff6fc',
+  },
+  completed: {
+    label: 'Completato',
+    title: 'Ordine completato',
+    message: 'L’ordine risulta completato. Grazie per aver scelto Idealtech.',
+    color: '#166534',
+    background: '#dcfce7',
+  },
+  cancelled: {
+    label: 'Annullato',
+    title: 'Ordine annullato',
+    message: 'Il tuo ordine è stato annullato. Per qualsiasi chiarimento puoi rispondere direttamente a questa email.',
+    color: '#b42318',
+    background: '#feeceb',
+  },
+}
 
 function getServerClient() {
   const url = process.env.SUPABASE_URL || process.env.VITE_SUPABASE_URL
@@ -454,6 +505,135 @@ function buildCustomerEmailHtml(order, settings) {
   `
 }
 
+function buildStatusUpdateEmailHtml(order, status, settings) {
+  const statusConfig = ORDER_STATUS_EMAILS[status]
+  const logoUrl = `${getSiteOrigin()}/logo-idealtech-900.webp`
+  const shopUrl = `${getSiteOrigin()}/shop`
+  const deliveryAddress = `${order.address}, ${order.postal_code} ${order.city}${order.province ? ` (${order.province})` : ''}, ${order.country}`
+  const rows = buildProductRows(order)
+  const paymentDetails = status === 'awaiting_payment' ? `
+    <table role="presentation" width="100%" bgcolor="#f5f9fd" style="width:100%;margin-top:24px;background-color:#f5f9fd;border:1px solid #cfe0ef;border-radius:12px;">
+      <tr>
+        <td style="padding:18px 20px;">
+          <p style="margin:0 0 10px;color:#1769c2;font-size:12px;line-height:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Dati per il bonifico</p>
+          <table role="presentation" width="100%" style="width:100%;">
+            ${bankRow('Intestatario', settings.bank_account_holder)}
+            ${bankRow('IBAN', settings.bank_iban, { mono: true })}
+            ${bankRow('BIC / SWIFT', settings.bank_bic, { mono: true })}
+            ${bankRow('Causale', `Ordine ${order.order_number}`, { mono: true })}
+            ${bankRow('Importo', formatMoney(order.grand_total))}
+          </table>
+        </td>
+      </tr>
+    </table>
+  ` : ''
+
+  return `
+    <!doctype html>
+    <html lang="it">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="color-scheme" content="light">
+        <meta name="supported-color-schemes" content="light">
+        <title>Aggiornamento ordine ${escapeHtml(order.order_number)}</title>
+        <style>
+          :root { color-scheme: light only; supported-color-schemes: light; }
+          body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+          table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+          table { border-spacing: 0; border-collapse: collapse; }
+          img { -ms-interpolation-mode: bicubic; border: 0; display: block; }
+          @media only screen and (max-width: 620px) {
+            .email-shell { width: 100% !important; }
+            .email-pad { padding-left: 20px !important; padding-right: 20px !important; }
+            .header-logo { width: 170px !important; height: auto !important; }
+          }
+        </style>
+      </head>
+      <body bgcolor="#eef4fa" style="margin:0;padding:0;background-color:#eef4fa;color:#10243e;font-family:Arial,Helvetica,sans-serif;">
+        <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">Il nuovo stato dell’ordine ${escapeHtml(order.order_number)} è: ${escapeHtml(statusConfig.label)}.</div>
+        <table role="presentation" width="100%" bgcolor="#eef4fa" style="width:100%;background-color:#eef4fa;">
+          <tr>
+            <td align="center" style="padding:28px 12px;">
+              <table role="presentation" class="email-shell" width="680" bgcolor="#ffffff" style="width:680px;max-width:680px;background-color:#ffffff;border:1px solid #d8e3ed;border-radius:18px;overflow:hidden;">
+                <tr>
+                  <td class="email-pad" bgcolor="#ffffff" style="padding:20px 32px;background-color:#ffffff;border-bottom:1px solid #e4ebf2;">
+                    <table role="presentation" width="100%">
+                      <tr>
+                        <td valign="middle"><img class="header-logo" src="${escapeHtml(logoUrl)}" width="190" alt="Idealtech" style="width:190px;max-width:100%;height:auto;"></td>
+                        <td align="right" valign="middle" style="color:#1769c2;font-size:11px;line-height:16px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;">Aggiornamento ordine</td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-pad" bgcolor="#0e3b68" style="padding:30px 32px;background-color:#0e3b68;color:#ffffff;">
+                    <p style="margin:0 0 8px;color:#8dc6ff;font-size:12px;line-height:18px;font-weight:700;letter-spacing:1.4px;text-transform:uppercase;">Ordine ${escapeHtml(order.order_number)}</p>
+                    <h1 style="margin:0;color:#ffffff;font-size:27px;line-height:34px;font-weight:700;">${escapeHtml(statusConfig.title)}</h1>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-pad" bgcolor="#ffffff" style="padding:30px 32px;background-color:#ffffff;">
+                    <p style="margin:0;color:#10243e;font-size:16px;line-height:25px;">Ciao <strong>${escapeHtml(order.full_name)}</strong>,</p>
+                    <p style="margin:10px 0 0;color:#40536a;font-size:14px;line-height:22px;">ti informiamo che lo stato del tuo ordine è stato aggiornato.</p>
+
+                    <table role="presentation" width="100%" bgcolor="${statusConfig.background}" style="width:100%;margin-top:22px;background-color:${statusConfig.background};border-radius:12px;">
+                      <tr>
+                        <td style="padding:20px 22px;">
+                          <p style="margin:0 0 6px;color:${statusConfig.color};font-size:12px;line-height:18px;font-weight:700;letter-spacing:1px;text-transform:uppercase;">Nuovo stato</p>
+                          <p style="margin:0;color:${statusConfig.color};font-size:22px;line-height:29px;font-weight:700;">${escapeHtml(statusConfig.label)}</p>
+                          <p style="margin:9px 0 0;color:#40536a;font-size:14px;line-height:22px;">${escapeHtml(statusConfig.message)}</p>
+                        </td>
+                      </tr>
+                    </table>
+
+                    ${paymentDetails}
+
+                    <table role="presentation" width="100%" style="width:100%;margin-top:28px;">
+                      <tr><td style="padding:0 0 12px;color:#1769c2;font-size:12px;line-height:18px;font-weight:700;letter-spacing:1.1px;text-transform:uppercase;">Riepilogo ordine</td></tr>
+                    </table>
+                    <table role="presentation" width="100%" style="width:100%;border:1px solid #dce6ef;border-radius:10px;overflow:hidden;">
+                      <thead>
+                        <tr>
+                          <th bgcolor="#f1f6fb" style="padding:11px 12px;background-color:#f1f6fb;color:#40536a;font-size:12px;line-height:18px;text-align:left;">Prodotto</th>
+                          <th bgcolor="#f1f6fb" style="padding:11px 8px;background-color:#f1f6fb;color:#40536a;font-size:12px;line-height:18px;text-align:center;">Q.tà</th>
+                          <th bgcolor="#f1f6fb" style="padding:11px 12px;background-color:#f1f6fb;color:#40536a;font-size:12px;line-height:18px;text-align:right;">Totale</th>
+                        </tr>
+                      </thead>
+                      <tbody>${rows}</tbody>
+                    </table>
+
+                    <table role="presentation" width="100%" bgcolor="#f5f9fd" style="width:100%;margin-top:18px;background-color:#f5f9fd;border:1px solid #dce6ef;border-radius:10px;">
+                      <tr>
+                        <td style="padding:15px 18px;color:#64748b;font-size:13px;">Totale ordine</td>
+                        <td align="right" style="padding:15px 18px;color:#0e3b68;font-size:19px;font-weight:700;white-space:nowrap;">${formatMoney(order.grand_total)}</td>
+                      </tr>
+                    </table>
+
+                    <table role="presentation" width="100%" bgcolor="#f8fafc" style="width:100%;margin-top:18px;background-color:#f8fafc;border-left:4px solid #3b8eea;">
+                      <tr><td style="padding:15px 18px;color:#10243e;font-size:14px;line-height:21px;"><strong>Indirizzo di consegna</strong><br><span style="color:#40536a;">${escapeHtml(deliveryAddress)}</span></td></tr>
+                    </table>
+
+                    <p style="margin:26px 0 0;color:#40536a;font-size:13px;line-height:21px;text-align:center;">Per qualsiasi chiarimento puoi rispondere direttamente a questa email.</p>
+                    <table role="presentation" width="100%" style="width:100%;margin-top:16px;">
+                      <tr><td align="center"><table role="presentation"><tr><td bgcolor="#1976d2" style="background-color:#1976d2;border-radius:9px;"><a href="${escapeHtml(shopUrl)}" style="display:inline-block;padding:13px 24px;color:#ffffff;font-size:14px;line-height:20px;font-weight:700;text-decoration:none;">Visita lo shop&nbsp; →</a></td></tr></table></td></tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="email-pad" bgcolor="#f1f6fb" style="padding:18px 32px;background-color:#f1f6fb;border-top:1px solid #dce6ef;color:#6b7c91;font-size:12px;line-height:18px;text-align:center;">
+                    Idealtech s.r.l. · Via Sondrio 11, 20814 Varedo (MB)<br>Messaggio automatico relativo al tuo ordine.
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `
+}
+
 function wait(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds))
 }
@@ -568,6 +748,141 @@ async function sendCustomerEmail(order, settings) {
   }, `shop-${order.order_id}-customer`)
 }
 
+async function sendOrderStatusEmail(order, status, settings) {
+  const recipient = normalizeEmail(order.email)
+  if (!recipient || !EMAIL_PATTERN.test(recipient)) throw new Error('Email cliente non valida.')
+  const commercialEmail = normalizeEmail(settings.commercial_email)
+  const statusConfig = ORDER_STATUS_EMAILS[status]
+  const requestKey = Date.now()
+
+  return sendResendEmail({
+    to: [recipient],
+    ...(EMAIL_PATTERN.test(commercialEmail) ? { reply_to: commercialEmail } : {}),
+    subject: `Ordine ${order.order_number}: ${statusConfig.label} | Idealtech`,
+    html: buildStatusUpdateEmailHtml(order, status, settings),
+    tags: [
+      { name: 'email_type', value: 'status_update' },
+      { name: 'order_number', value: order.order_number },
+      { name: 'order_status', value: status },
+    ],
+    text: [
+      `Aggiornamento ordine ${order.order_number}`,
+      '',
+      `Nuovo stato: ${statusConfig.label}`,
+      statusConfig.message,
+      '',
+      `Totale ordine: ${formatMoney(order.grand_total)}`,
+      `Consegna: ${order.address}, ${order.postal_code} ${order.city} ${order.province || ''} - ${order.country}`,
+      '',
+      ...(status === 'awaiting_payment' ? [
+        'DATI PER IL BONIFICO',
+        `Intestatario: ${settings.bank_account_holder || ''}`,
+        `IBAN: ${settings.bank_iban || ''}`,
+        ...(settings.bank_bic ? [`BIC / SWIFT: ${settings.bank_bic}`] : []),
+        `Causale: Ordine ${order.order_number}`,
+        `Importo: ${formatMoney(order.grand_total)}`,
+        '',
+      ] : []),
+      'Per qualsiasi chiarimento puoi rispondere direttamente a questa email.',
+    ].join('\n'),
+  }, `shop-${order.id}-status-${status}-${requestKey}`)
+}
+
+async function getAuthorizedStaff(req, serviceClient) {
+  const authorization = req.headers.authorization || ''
+  const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : ''
+  if (!token) throw new Error('UNAUTHORIZED')
+
+  const { data, error } = await serviceClient.auth.getUser(token)
+  if (error || !data?.user) throw new Error('UNAUTHORIZED')
+
+  const { data: profile, error: profileError } = await serviceClient
+    .from('profiles')
+    .select('role')
+    .eq('id', data.user.id)
+    .maybeSingle()
+
+  if (profileError || !['admin', 'editor'].includes(profile?.role)) throw new Error('FORBIDDEN')
+  return data.user
+}
+
+async function handleStatusUpdate(req, res, supabase, settings) {
+  try {
+    await getAuthorizedStaff(req, supabase)
+  } catch (error) {
+    if (error.message === 'FORBIDDEN') {
+      return res.status(403).json({ success: false, message: 'Accesso riservato allo staff autorizzato.' })
+    }
+    return res.status(401).json({ success: false, message: 'Sessione non valida o scaduta.' })
+  }
+
+  const body = await getBody(req)
+  const orderId = normalizeText(body.orderId, 64)
+  const nextStatus = normalizeText(body.status, 40)
+
+  if (!orderId) return res.status(400).json({ success: false, message: 'Ordine non specificato.' })
+  if (!ORDER_STATUS_EMAILS[nextStatus]) return res.status(400).json({ success: false, message: 'Stato ordine non valido.' })
+
+  const { data: currentOrder, error: loadError } = await supabase
+    .from('shop_orders')
+    .select('*, shop_order_items(*)')
+    .eq('id', orderId)
+    .maybeSingle()
+
+  if (loadError) return res.status(500).json({ success: false, message: loadError.message })
+  if (!currentOrder) return res.status(404).json({ success: false, message: 'Ordine non trovato.' })
+
+  if (currentOrder.status === nextStatus) {
+    return res.status(200).json({
+      success: true,
+      status: nextStatus,
+      email_sent: false,
+      notification_skipped: true,
+      message: 'Lo stato era già impostato: nessuna email duplicata è stata inviata.',
+    })
+  }
+
+  const { data: updatedOrder, error: updateError } = await supabase
+    .from('shop_orders')
+    .update({ status: nextStatus })
+    .eq('id', orderId)
+    .eq('status', currentOrder.status)
+    .select('*')
+    .maybeSingle()
+
+  if (updateError) return res.status(500).json({ success: false, message: updateError.message })
+  if (!updatedOrder) {
+    return res.status(409).json({ success: false, message: 'Lo stato è stato modificato da un altro utente. Ricarica gli ordini e riprova.' })
+  }
+
+  const orderForEmail = { ...updatedOrder, shop_order_items: currentOrder.shop_order_items || [], items: (currentOrder.shop_order_items || []).map((item) => ({
+    name: item.product_name,
+    sku: item.sku,
+    quantity: item.quantity,
+    line_total: item.line_total,
+  })) }
+
+  try {
+    const emailId = await sendOrderStatusEmail(orderForEmail, nextStatus, settings)
+    return res.status(200).json({
+      success: true,
+      status: nextStatus,
+      status_label: ORDER_STATUS_EMAILS[nextStatus].label,
+      email_sent: true,
+      email_id: emailId,
+    })
+  } catch (emailError) {
+    console.error('Order status email error:', emailError)
+    return res.status(200).json({
+      success: true,
+      status: nextStatus,
+      status_label: ORDER_STATUS_EMAILS[nextStatus].label,
+      email_sent: false,
+      warning: `Stato aggiornato, ma la mail al cliente non è partita: ${emailError.message || 'errore di invio.'}`,
+    })
+  }
+}
+
 async function settleEmail(send) {
   try {
     return { status: 'fulfilled', value: await send() }
@@ -577,14 +892,18 @@ async function settleEmail(send) {
 }
 
 export default async function handler(req, res) {
-  if (!['GET', 'POST'].includes(req.method)) {
-    res.setHeader('Allow', 'GET, POST')
+  if (!['GET', 'POST', 'PATCH'].includes(req.method)) {
+    res.setHeader('Allow', 'GET, POST, PATCH')
     return res.status(405).json({ success: false, message: 'Metodo non consentito.' })
   }
 
   try {
     const supabase = getServerClient()
     const settings = await loadSettings(supabase)
+
+    if (req.method === 'PATCH') {
+      return await handleStatusUpdate(req, res, supabase, settings)
+    }
 
     if (req.method === 'GET') {
       return res.status(200).json({ success: true, config: publicConfig(settings) })

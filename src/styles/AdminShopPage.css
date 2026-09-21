@@ -85,6 +85,7 @@
 }
 
 .shop-admin-filter-row input { width: min(380px, 100%); }
+.shop-order-controls select:disabled { opacity: .65; cursor: wait; background: #eef4f8; }
 .shop-admin-toolbar > span { color: #718095; font-size: .82rem; font-weight: 800; }
 
 .shop-order-list { display: grid; gap: 12px; }

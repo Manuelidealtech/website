@@ -47,7 +47,14 @@ Un prodotto in bozza non è visibile nello shop. Se la giacenza è tracciata, il
 3. Verificare che:
    - compaia nella scheda **Ordini** dell’admin;
    - l’email arrivi all’indirizzo commerciale configurato;
+   - il cliente riceva la conferma con riepilogo ordine, indirizzo di consegna e dati del bonifico;
    - numero ordine, totale e coordinate bancarie siano corretti;
    - l’eventuale giacenza venga scalata.
 
-L’ordine viene salvato prima dell’invio email. Se Resend non è disponibile, resta quindi comunque visibile nell’area admin con l’indicazione dell’errore di notifica.
+Le due email vengono inviate separatamente, quindi la conferma cliente può partire anche se la notifica commerciale incontra un errore, e viceversa. L’ordine viene salvato prima degli invii: se Resend non è disponibile, resta comunque visibile nell’area admin con l’indicazione dell’errore di notifica.
+
+## 6. Email automatiche sullo stato dell’ordine
+
+Quando un amministratore modifica lo **Stato ordine** dal pannello, il salvataggio passa dall’API protetta e il cliente riceve automaticamente una nuova email. Il messaggio contiene il nuovo stato, il riepilogo dei prodotti, il totale e l’indirizzo di consegna. Per lo stato **In attesa di bonifico** vengono mostrate nuovamente anche le coordinate bancarie.
+
+L’email viene inviata soltanto quando lo stato cambia realmente, così la semplice apertura dell’ordine o la selezione dello stesso valore non genera notifiche duplicate. Se il cambio stato riesce ma il servizio email risponde con un errore, l’admin visualizza un avviso esplicito senza perdere l’aggiornamento dell’ordine.

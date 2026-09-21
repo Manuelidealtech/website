@@ -35,7 +35,7 @@ const emptySettings = {
 }
 
 export default function AdminShopPage() {
-  const { user } = useAuth()
+  const { user, session } = useAuth()
   const [activeTab, setActiveTab] = useState('orders')
   const [products, setProducts] = useState([])
   const [orders, setOrders] = useState([])
@@ -51,6 +51,7 @@ export default function AdminShopPage() {
   const [productFile, setProductFile] = useState(null)
   const [savingProduct, setSavingProduct] = useState(false)
   const [savingSettings, setSavingSettings] = useState(false)
+  const [savingOrderStatus, setSavingOrderStatus] = useState(null)
 
   async function loadData(showLoader = true) {
     if (showLoader) setLoading(true)
@@ -116,6 +117,43 @@ export default function AdminShopPage() {
     }
     setOrders((current) => current.map((order) => order.id === orderId ? { ...order, ...payload } : order))
     if (successText) showMessage(successText)
+  }
+
+  async function updateOrderStatus(order, nextStatus) {
+    if (!nextStatus || nextStatus === order.status) return
+
+    setSavingOrderStatus(order.id)
+    setError('')
+
+    try {
+      if (!session?.access_token) throw new Error('Sessione non valida o scaduta. Accedi nuovamente al pannello.')
+
+      const response = await fetch('/api/orders', {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ orderId: order.id, status: nextStatus }),
+      })
+
+      const result = await response.json().catch(() => ({}))
+      if (!response.ok || !result.success) throw new Error(result.message || 'Errore durante l’aggiornamento dello stato.')
+
+      setOrders((current) => current.map((item) => item.id === order.id ? { ...item, status: result.status } : item))
+
+      if (result.email_sent) {
+        showMessage(`Stato aggiornato: email “${result.status_label}” inviata al cliente.`)
+      } else if (result.notification_skipped) {
+        showMessage(result.message || 'Stato già aggiornato.')
+      } else {
+        setError(result.warning || 'Stato aggiornato, ma non è stato possibile inviare la mail al cliente.')
+      }
+    } catch (statusError) {
+      setError(statusError.message || 'Errore durante l’aggiornamento dello stato.')
+    } finally {
+      setSavingOrderStatus(null)
+    }
   }
 
   function openNewProduct() {
@@ -336,7 +374,7 @@ export default function AdminShopPage() {
                           <div><span>Azienda</span><strong>{order.company}</strong><small>P. IVA {order.vat_number}{order.tax_code ? ` · C.F. ${order.tax_code}` : ''}</small></div>
                           <div><span>Contatto</span><strong>{order.full_name}</strong><a href={`mailto:${order.email}`}>{order.email}</a><a href={`tel:${order.phone}`}>{order.phone}</a></div>
                           <div><span>Consegna</span><strong>{order.address}</strong><small>{order.postal_code} {order.city} {order.province || ''}<br />{order.country}</small></div>
-                          <div><span>Notifica commerciale</span><strong>{order.email_sent_at ? 'Email inviata' : 'Email non inviata'}</strong><small>{order.email_sent_at ? new Date(order.email_sent_at).toLocaleString('it-IT') : order.email_error || 'Nessun dettaglio'}</small></div>
+                          <div><span>Notifiche ordine</span><strong>{order.email_error ? 'Invio parziale / non riuscito' : order.email_sent_at ? 'Email inviate' : 'Email non inviate'}</strong><small>{order.email_error || (order.email_sent_at ? new Date(order.email_sent_at).toLocaleString('it-IT') : 'Nessun dettaglio')}</small></div>
                         </div>
 
                         <div className="shop-order-products">
@@ -353,8 +391,13 @@ export default function AdminShopPage() {
 
                         <div className="shop-order-controls">
                           <label>
-                            <span>Stato ordine</span>
-                            <select value={order.status} onChange={(event) => updateOrder(order.id, { status: event.target.value }, 'Stato ordine aggiornato.')}>
+                            <span>{savingOrderStatus === order.id ? 'Aggiornamento e invio email…' : 'Stato ordine'}</span>
+                            <select
+                              value={order.status}
+                              disabled={savingOrderStatus === order.id}
+                              aria-busy={savingOrderStatus === order.id}
+                              onChange={(event) => updateOrderStatus(order, event.target.value)}
+                            >
                               {ORDER_STATUSES.map((status) => <option value={status.value} key={status.value}>{status.label}</option>)}
                             </select>
                           </label>
