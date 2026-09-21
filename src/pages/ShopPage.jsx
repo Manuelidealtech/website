@@ -185,7 +185,10 @@ export default function ShopPage() {
             </p>
           </div>
           <button type="button" className="shop-cart-button" onClick={() => setCartOpen(true)}>
-            <span aria-hidden="true">▣</span>
+            <svg className="shop-cart-button__icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M3 3h2l2.25 10.08a2 2 0 0 0 1.95 1.56h7.65a2 2 0 0 0 1.95-1.55L20.3 6H6" />
+              <path d="M9 19.25h.01M17 19.25h.01" />
+            </svg>
             Carrello
             <strong>{itemCount}</strong>
           </button>
@@ -394,7 +397,7 @@ export default function ShopPage() {
             <span className="shop-confirmation__icon">✓</span>
             <span className="shop-kicker">Ordine registrato</span>
             <h2 id="confirmation-title">Grazie, ordine {confirmation.order_number}</h2>
-            <p>La richiesta è stata registrata e inviata al nostro ufficio commerciale.</p>
+            <p>La richiesta è stata registrata e inviata al nostro ufficio commerciale.{confirmation.customer_email_sent ? ' Ti abbiamo inviato anche una conferma via email.' : ''}</p>
 
             <div className="shop-bank-box">
               <span>Pagamento tramite bonifico</span>
@@ -410,6 +413,10 @@ export default function ShopPage() {
 
             {!confirmation.email_sent ? (
               <div className="shop-message shop-message--warning">L’ordine è salvato correttamente. Il commerciale lo vedrà nel pannello anche se la notifica email non è partita.</div>
+            ) : null}
+
+            {!confirmation.customer_email_sent ? (
+              <div className="shop-message shop-message--warning">L’ordine è confermato, ma non è stato possibile inviare la copia via email. Conserva il numero ordine indicato sopra.</div>
             ) : null}
 
             <button type="button" className="shop-primary-button" onClick={() => setConfirmation(null)}>Chiudi</button>
