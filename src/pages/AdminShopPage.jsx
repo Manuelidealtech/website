@@ -43,7 +43,7 @@ export default function AdminShopPage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
-  const [orderFilter, setOrderFilter] = useState('open')
+  const [orderFilter, setOrderFilter] = useState('all')
   const [orderSearch, setOrderSearch] = useState('')
   const [expandedOrder, setExpandedOrder] = useState(null)
   const [productModal, setProductModal] = useState(false)
@@ -141,6 +141,11 @@ export default function AdminShopPage() {
       if (!response.ok || !result.success) throw new Error(result.message || 'Errore durante l’aggiornamento dello stato.')
 
       setOrders((current) => current.map((item) => item.id === order.id ? { ...item, status: result.status } : item))
+
+      const remainsVisible = orderFilter === 'all'
+        || (orderFilter === 'open' && ['new', 'awaiting_payment'].includes(result.status))
+        || orderFilter === result.status
+      if (!remainsVisible) setOrderFilter('all')
 
       if (result.email_sent) {
         showMessage(`Stato aggiornato: email “${result.status_label}” inviata al cliente.`)
@@ -340,8 +345,8 @@ export default function AdminShopPage() {
           <div className="shop-admin-toolbar">
             <div className="shop-admin-filter-row">
               <select value={orderFilter} onChange={(event) => setOrderFilter(event.target.value)} aria-label="Filtra per stato">
-                <option value="open">Da gestire</option>
                 <option value="all">Tutti gli ordini</option>
+                <option value="open">Da gestire</option>
                 {ORDER_STATUSES.map((status) => <option value={status.value} key={status.value}>{status.label}</option>)}
               </select>
               <input value={orderSearch} onChange={(event) => setOrderSearch(event.target.value)} placeholder="Cerca numero, azienda o email..." />
