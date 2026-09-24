@@ -76,7 +76,7 @@
 .shop-product-main-image {
   min-width: 0;
   width: 100%;
-  min-height: 460px;
+  aspect-ratio: 1 / 1;
   padding: 14px;
   display: grid;
   place-items: center;
@@ -89,11 +89,13 @@
 }
 
 .shop-product-main-image img {
-  width: 100%;
-  height: 100%;
+  display: block;
+  width: auto;
+  height: auto;
   max-width: 100%;
-  max-height: 560px;
+  max-height: 100%;
   object-fit: contain;
+  object-position: center;
 }
 
 .shop-product-zoom-hint {
@@ -375,7 +377,7 @@
   width: min(1120px, 100%);
   max-height: calc(100vh - 40px);
   padding: 24px 24px 18px;
-  overflow: auto;
+  overflow: hidden;
   border-radius: 24px;
   background: #fff;
   box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
@@ -400,7 +402,6 @@
 }
 
 .shop-product-lightbox-stage {
-  min-height: min(70vh, 760px);
   padding: 18px;
   display: grid;
   gap: 14px;
@@ -408,11 +409,25 @@
   justify-items: center;
 }
 
-.shop-product-lightbox-image {
+.shop-product-lightbox-image-frame {
   width: 100%;
+  height: min(64vh, 650px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.shop-product-lightbox-image {
+  display: block;
+  width: auto;
+  height: auto;
   max-width: 100%;
-  max-height: 72vh;
+  max-height: 100%;
   object-fit: contain;
+  object-position: center;
 }
 
 .shop-product-lightbox-meta {
@@ -528,12 +543,19 @@
 
   .shop-product-main-image {
     order: 1;
-    min-height: 320px;
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 1 / 1;
     padding: 12px;
   }
 
   .shop-product-main-image img {
-    max-height: 420px;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
   }
 
   .shop-product-zoom-hint {
@@ -570,12 +592,26 @@
   }
 
   .shop-product-lightbox-stage {
-    min-height: auto;
     padding: 8px 0 0;
   }
 
+  .shop-product-lightbox-image-frame {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+  }
+
   .shop-product-lightbox-image {
-    max-height: 68vh;
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: contain;
+    object-position: center;
   }
 
   .shop-product-lightbox-nav {

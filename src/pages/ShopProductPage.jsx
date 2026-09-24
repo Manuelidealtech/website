@@ -267,7 +267,9 @@ export default function ShopProductPage() {
             ) : null}
 
             <div className="shop-product-lightbox-stage">
-              <img src={currentImage.url} alt={`${product.name} - immagine ${selectedImage + 1}`} className="shop-product-lightbox-image" />
+              <div className="shop-product-lightbox-image-frame">
+                <img src={currentImage.url} alt={`${product.name} - immagine ${selectedImage + 1}`} className="shop-product-lightbox-image" />
+              </div>
               <div className="shop-product-lightbox-meta">
                 <strong>{product.name}</strong>
                 <span>{selectedImage + 1} / {images.length}</span>
