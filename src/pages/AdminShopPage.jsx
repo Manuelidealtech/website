@@ -3,9 +3,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { ORDER_STATUSES, formatMoney, getOrderStatusLabel } from '../lib/shop'
-import { removeShopProductImage, uploadShopProductImage } from '../lib/shopStorage'
+import { removeShopProductImages, uploadShopProductImage } from '../lib/shopStorage'
+import { normalizeProductImages } from '../lib/shopImages'
 import AdminLayout from '../components/AdminLayout'
-import FileUploadField from '../components/FileUploadField'
 import '../styles/AdminShopPage.css'
 
 const emptyProduct = {
@@ -21,6 +21,20 @@ const emptyProduct = {
   is_published: false,
   image_url: '',
   image_path: '',
+  images: [],
+}
+
+
+function LocalProductImage({ file, alt = '' }) {
+  const [src, setSrc] = useState('')
+
+  useEffect(() => {
+    const url = URL.createObjectURL(file)
+    setSrc(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
+
+  return src ? <img src={src} alt={alt} /> : null
 }
 
 const emptySettings = {
@@ -48,7 +62,8 @@ export default function AdminShopPage() {
   const [expandedOrder, setExpandedOrder] = useState(null)
   const [productModal, setProductModal] = useState(false)
   const [productForm, setProductForm] = useState(emptyProduct)
-  const [productFile, setProductFile] = useState(null)
+  const [productImages, setProductImages] = useState([])
+  const [removedImagePaths, setRemovedImagePaths] = useState([])
   const [savingProduct, setSavingProduct] = useState(false)
   const [savingSettings, setSavingSettings] = useState(false)
   const [savingOrderStatus, setSavingOrderStatus] = useState(null)
@@ -163,11 +178,18 @@ export default function AdminShopPage() {
 
   function openNewProduct() {
     setProductForm(emptyProduct)
-    setProductFile(null)
+    setProductImages([])
+    setRemovedImagePaths([])
     setProductModal(true)
   }
 
   function openEditProduct(product) {
+    const savedImages = normalizeProductImages(product).map((image) => ({
+      ...image,
+      source: 'saved',
+      key: image.path || image.url,
+    }))
+
     setProductForm({
       ...emptyProduct,
       ...product,
@@ -176,8 +198,10 @@ export default function AdminShopPage() {
       description: product.description || '',
       image_url: product.image_url || '',
       image_path: product.image_path || '',
+      images: savedImages.map(({ url, path }) => ({ url, path })),
     })
-    setProductFile(null)
+    setProductImages(savedImages)
+    setRemovedImagePaths([])
     setProductModal(true)
   }
 
@@ -185,28 +209,79 @@ export default function AdminShopPage() {
     setProductForm((current) => ({ ...current, [name]: value }))
   }
 
+  function addProductImages(files) {
+    const nextFiles = Array.from(files || []).filter((file) => file?.type?.startsWith('image/'))
+    if (!nextFiles.length) return
+
+    setProductImages((current) => [
+      ...current,
+      ...nextFiles.map((file) => ({
+        source: 'new',
+        file,
+        key: `${file.name}-${file.size}-${file.lastModified}-${Math.random().toString(36).slice(2)}`,
+      })),
+    ])
+  }
+
+  function removeProductImage(index) {
+    setProductImages((current) => {
+      const image = current[index]
+      if (image?.source === 'saved' && image.path) {
+        setRemovedImagePaths((paths) => [...new Set([...paths, image.path])])
+      }
+      return current.filter((_, imageIndex) => imageIndex !== index)
+    })
+  }
+
+  function moveProductImage(index, direction) {
+    setProductImages((current) => {
+      const targetIndex = index + direction
+      if (targetIndex < 0 || targetIndex >= current.length) return current
+      const next = [...current]
+      const [image] = next.splice(index, 1)
+      next.splice(targetIndex, 0, image)
+      return next
+    })
+  }
+
+  function setCoverImage(index) {
+    if (index <= 0) return
+    setProductImages((current) => {
+      const next = [...current]
+      const [image] = next.splice(index, 1)
+      next.unshift(image)
+      return next
+    })
+  }
+
   async function saveProduct(event) {
     event.preventDefault()
     setSavingProduct(true)
     setError('')
 
+    const uploadedPaths = []
+
     try {
       if (!productForm.name.trim()) throw new Error('Il nome prodotto è obbligatorio.')
       if (productForm.price === '' || Number(productForm.price) < 0) throw new Error('Inserisci un prezzo valido.')
 
-      let imageUrl = productForm.image_url || null
-      let imagePath = productForm.image_path || null
+      const resolvedImages = []
+      for (const image of productImages) {
+        if (image.source === 'saved') {
+          resolvedImages.push({ url: image.url, path: image.path || null })
+          continue
+        }
 
-      if (productFile) {
         const uploaded = await uploadShopProductImage({
-          file: productFile,
+          file: image.file,
           userId: user.id,
           productId: productForm.id || 'new',
         })
-        imageUrl = uploaded.imageUrl
-        imagePath = uploaded.imagePath
+        uploadedPaths.push(uploaded.imagePath)
+        resolvedImages.push({ url: uploaded.imageUrl, path: uploaded.imagePath })
       }
 
+      const primaryImage = resolvedImages[0] || null
       const payload = {
         sku: String(productForm.sku || '').trim() || null,
         name: productForm.name.trim(),
@@ -217,17 +292,15 @@ export default function AdminShopPage() {
         track_stock: Boolean(productForm.track_stock),
         stock_quantity: productForm.track_stock ? Math.max(0, Number(productForm.stock_quantity || 0)) : 0,
         is_published: Boolean(productForm.is_published),
-        image_url: imageUrl,
-        image_path: imagePath,
+        images: resolvedImages,
+        image_url: primaryImage?.url || null,
+        image_path: primaryImage?.path || null,
       }
 
       if (productForm.id) {
-        const oldImagePath = productForm.image_path
         const { error: updateError } = await supabase.from('shop_products').update(payload).eq('id', productForm.id)
         if (updateError) throw new Error(updateError.message)
-        if (productFile && oldImagePath && oldImagePath !== imagePath) {
-          await removeShopProductImage(oldImagePath).catch(() => {})
-        }
+        await removeShopProductImages(removedImagePaths).catch(() => {})
         showMessage('Prodotto aggiornato.')
       } else {
         const maxOrder = products.reduce((max, item) => Math.max(max, Number(item.sort_order || 0)), -1)
@@ -241,9 +314,15 @@ export default function AdminShopPage() {
       }
 
       setProductModal(false)
+      setProductImages([])
+      setRemovedImagePaths([])
       await loadData(false)
     } catch (saveError) {
-      setError(saveError.message || 'Errore durante il salvataggio del prodotto.')
+      if (uploadedPaths.length) await removeShopProductImages(uploadedPaths).catch(() => {})
+      const message = saveError.message || 'Errore durante il salvataggio del prodotto.'
+      setError(/images/i.test(message) && /column|schema cache|does not exist/i.test(message)
+        ? 'Prima di usare le foto multiple esegui SUPABASE_SHOP_MULTIFOTO.sql nel SQL Editor di Supabase.'
+        : message)
     } finally {
       setSavingProduct(false)
     }
@@ -261,7 +340,7 @@ export default function AdminShopPage() {
       return
     }
 
-    await removeShopProductImage(product.image_path).catch(() => {})
+    await removeShopProductImages(normalizeProductImages(product).map((image) => image.path)).catch(() => {})
     setProducts((current) => current.filter((item) => item.id !== product.id))
     showMessage('Prodotto eliminato.')
   }
@@ -440,7 +519,7 @@ export default function AdminShopPage() {
               {products.map((product) => (
                 <article className="shop-product-admin-row" key={product.id}>
                   <div className="shop-product-admin-image">
-                    {product.image_url ? <img src={product.image_url} alt="" /> : <span>IT</span>}
+                    {normalizeProductImages(product)[0]?.url ? <img src={normalizeProductImages(product)[0].url} alt="" /> : <span>IT</span>}
                   </div>
                   <div className="shop-product-admin-copy">
                     <span>{product.sku || 'Senza codice'}{product.category ? ` · ${product.category}` : ''}</span>
@@ -516,10 +595,44 @@ export default function AdminShopPage() {
                 <label className="shop-admin-field"><span>Prezzo imponibile *</span><div className="shop-price-input"><span>€</span><input type="number" min="0" step="0.01" value={productForm.price} onChange={(event) => updateProductField('price', event.target.value)} required /></div></label>
                 <label className="shop-admin-field"><span>IVA %</span><input type="number" min="0" max="100" step="0.01" value={productForm.vat_rate} onChange={(event) => updateProductField('vat_rate', event.target.value)} /></label>
                 <label className="shop-admin-field shop-admin-field--wide"><span>Descrizione</span><textarea rows="4" value={productForm.description || ''} onChange={(event) => updateProductField('description', event.target.value)} maxLength="3000" /></label>
-                <div className="shop-admin-field shop-admin-field--wide">
-                  <span>Immagine prodotto</span>
-                  {productForm.image_url ? <img className="shop-product-form-preview" src={productForm.image_url} alt="Anteprima prodotto" /> : null}
-                  <FileUploadField accept="image/*" selectedFiles={productFile ? [productFile] : []} onChange={(event) => setProductFile(event.target.files?.[0] || null)} buttonText="Scegli immagine" />
+                <div className="shop-admin-field shop-admin-field--wide shop-product-images-field">
+                  <span>Foto prodotto</span>
+                  <small className="shop-product-images-help">Puoi caricare più foto. La prima è la copertina. Ordinale come preferisci con le frecce; le nuove immagini vengono ridimensionate e compresse automaticamente in WebP prima dell’upload.</small>
+
+                  {productImages.length ? (
+                    <div className="shop-product-images-editor">
+                      {productImages.map((image, index) => (
+                        <div className={`shop-product-image-tile ${index === 0 ? 'is-cover' : ''}`} key={image.key}>
+                          <div className="shop-product-image-preview">
+                            {image.source === 'new'
+                              ? <LocalProductImage file={image.file} alt={`Nuova foto ${index + 1}`} />
+                              : <img src={image.url} alt={`Foto prodotto ${index + 1}`} />}
+                            {index === 0 ? <span className="shop-product-cover-badge">Copertina</span> : null}
+                          </div>
+                          <div className="shop-product-image-actions">
+                            <button type="button" disabled={index === 0} onClick={() => moveProductImage(index, -1)} aria-label="Sposta foto a sinistra">←</button>
+                            <button type="button" disabled={index === productImages.length - 1} onClick={() => moveProductImage(index, 1)} aria-label="Sposta foto a destra">→</button>
+                            {index > 0 ? <button type="button" onClick={() => setCoverImage(index)}>Copertina</button> : null}
+                            <button type="button" className="danger" onClick={() => removeProductImage(index)}>Rimuovi</button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : <div className="shop-product-images-empty">Nessuna foto caricata.</div>}
+
+                  <label className="shop-product-images-upload">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(event) => {
+                        addProductImages(event.target.files)
+                        event.target.value = ''
+                      }}
+                    />
+                    <span>+ Aggiungi foto</span>
+                    <small>JPG, PNG, HEIC/WebP supportati dal browser · max 1600 px · compressione automatica</small>
+                  </label>
                 </div>
                 <label className="shop-admin-switch-row"><span><strong>Traccia giacenza</strong><small>Blocca gli ordini oltre la quantità disponibile.</small></span><input type="checkbox" checked={productForm.track_stock} onChange={(event) => updateProductField('track_stock', event.target.checked)} /></label>
                 {productForm.track_stock ? <label className="shop-admin-field"><span>Quantità disponibile</span><input type="number" min="0" step="1" value={productForm.stock_quantity} onChange={(event) => updateProductField('stock_quantity', event.target.value)} /></label> : null}

@@ -12,6 +12,7 @@ const AboutPage = lazy(() => import('./pages/AboutPage'))
 const ProductsPage = lazy(() => import('./pages/ProductsPage'))
 const PublicStorePage = lazy(() => import('./pages/PublicStorePage'))
 const ShopPage = lazy(() => import('./pages/ShopPage'))
+const ShopProductPage = lazy(() => import('./pages/ShopProductPage'))
 const ServicesPage = lazy(() => import('./pages/ServicesPage'))
 const ContactsPage = lazy(() => import('./pages/ContactsPage'))
 const NewsPage = lazy(() => import('./pages/NewsPage'))
@@ -72,6 +73,7 @@ export default function App() {
           <Route path="/servizi" element={<PublicPage><ServicesPage /></PublicPage>} />
           <Route path="/contatti" element={<PublicPage><ContactsPage /></PublicPage>} />
           <Route path="/shop" element={<PublicPage><ShopPage /></PublicPage>} />
+          <Route path="/shop/:productId" element={<PublicPage><ShopProductPage /></PublicPage>} />
           <Route path="/news" element={<PublicPage><NewsPage /></PublicPage>} />
           <Route path="/termini-e-privacy" element={<LegalPage />} />
           <Route path="/macchinario/:slug" element={<PublicPage><MachineDetailPage /></PublicPage>} />

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../i18n/LanguageContext'
@@ -31,6 +31,28 @@ export default function Navbar() {
   }
 
   const toggleMenu = () => setMenuOpen((prev) => !prev)
+  const toggleProducts = () => setProductsOpen((prev) => !prev)
+
+  useEffect(() => {
+    const previousOverflow = document.body.style.overflow
+
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = previousOverflow || ''
+    }
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') closeMenu()
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [menuOpen])
 
   const languageSwitcher = (
     <div className="navbar__language-switcher" aria-label="Language selector" data-no-translate>
@@ -78,7 +100,12 @@ export default function Navbar() {
           />
         </Link>
 
-        <nav className={`navbar__nav ${menuOpen ? 'is-open' : ''}`}>
+        <nav className={`navbar__nav ${menuOpen ? 'is-open' : ''}`} aria-label="Navigazione principale">
+          <div className="navbar__mobile-panel-header">
+            <span>Menu</span>
+            <button type="button" className="navbar__mobile-close" onClick={closeMenu} aria-label="Chiudi menu">×</button>
+          </div>
+
           <NavLink
             to="/"
             onClick={closeMenu}
@@ -101,19 +128,30 @@ export default function Navbar() {
 
           <div
             className={`navbar__dropdown ${productsOpen ? 'is-open' : ''}`}
-            onMouseEnter={() => setProductsOpen(true)}
-            onMouseLeave={() => setProductsOpen(false)}
+            onMouseEnter={() => !menuOpen && setProductsOpen(true)}
+            onMouseLeave={() => !menuOpen && setProductsOpen(false)}
           >
-            <NavLink
-              to="/prodotti"
-              onClick={closeMenu}
-              className={({ isActive }) =>
-                isActive ? 'navbar__link active' : 'navbar__link'
-              }
-            >
-              Prodotti
-              <span className="navbar__dropdown-arrow">⌄</span>
-            </NavLink>
+            <div className="navbar__dropdown-top">
+              <NavLink
+                to="/prodotti"
+                onClick={closeMenu}
+                className={({ isActive }) =>
+                  isActive ? 'navbar__link active' : 'navbar__link'
+                }
+              >
+                Prodotti
+              </NavLink>
+
+              <button
+                type="button"
+                className="navbar__dropdown-toggle"
+                onClick={toggleProducts}
+                aria-label={productsOpen ? 'Chiudi elenco prodotti' : 'Apri elenco prodotti'}
+                aria-expanded={productsOpen}
+              >
+                <span className="navbar__dropdown-arrow">⌄</span>
+              </button>
+            </div>
 
             <div className="navbar__dropdown-menu">
               {productMenuItems.map((item) => (

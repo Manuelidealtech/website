@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../i18n/LanguageContext'
 import { calculateCartTotals, formatMoney, getProductAvailability } from '../lib/shop'
+import { getPrimaryProductImage } from '../lib/shopImages'
 import '../styles/ShopPage.css'
 
 const CART_KEY = 'idealtech-shop-cart-v1'
@@ -51,22 +52,37 @@ export default function ShopPage() {
 
     async function loadShop() {
       try {
-        const [productsResult, configResponse] = await Promise.all([
-          supabase
-            .from('shop_products')
-            .select('*')
-            .eq('is_published', true)
-            .order('sort_order', { ascending: true })
-            .order('created_at', { ascending: false }),
-          fetch('/api/orders?config=1'),
-        ])
+        // Il catalogo non deve dipendere dalla disponibilità dell'API ordini.
+        // In locale (Vite) /api/orders può essere servito come sorgente JS invece
+        // che come funzione Vercel: in quel caso ignoriamo la configurazione e
+        // continuiamo a mostrare normalmente i prodotti.
+        const productsResult = await supabase
+          .from('shop_products')
+          .select('*')
+          .eq('is_published', true)
+          .order('sort_order', { ascending: true })
+          .order('created_at', { ascending: false })
 
         if (productsResult.error) throw new Error(productsResult.error.message)
-        const configData = configResponse.ok ? await configResponse.json() : null
 
         if (!active) return
         setProducts(productsResult.data || [])
-        if (configData?.config) setConfig(configData.config)
+
+        try {
+          const configResponse = await fetch('/api/orders?config=1', {
+            headers: { Accept: 'application/json' },
+          })
+          const contentType = configResponse.headers.get('content-type') || ''
+
+          if (configResponse.ok && contentType.includes('application/json')) {
+            const configData = await configResponse.json()
+            if (active && configData?.config) setConfig(configData.config)
+          } else {
+            console.warn('Configurazione shop non disponibile: risposta API non JSON.')
+          }
+        } catch (configError) {
+          console.warn('Configurazione shop non disponibile:', configError)
+        }
       } catch (loadError) {
         if (active) setError(loadError.message || 'Impossibile caricare lo shop.')
       } finally {
@@ -158,9 +174,20 @@ export default function ShopPage() {
           items: cartItems.map((item) => ({ productId: item.id, quantity: item.quantity })),
         }),
       })
-      const result = await response.json().catch(() => ({}))
+      const contentType = response.headers.get('content-type') || ''
+      let result = null
 
-      if (!response.ok) throw new Error(result.message || 'Non è stato possibile registrare l’ordine.')
+      if (contentType.includes('application/json')) {
+        result = await response.json().catch(() => null)
+      }
+
+      if (!response.ok) {
+        throw new Error(result?.message || 'Non è stato possibile registrare l’ordine.')
+      }
+
+      if (!result?.success || !result?.order_number) {
+        throw new Error('Il servizio ordini non sta rispondendo correttamente. Se stai provando il sito in locale, avvialo con Vercel Dev; sul sito online verifica il deployment delle funzioni /api.')
+      }
 
       setConfirmation(result)
       setCart([])
@@ -218,21 +245,23 @@ export default function ShopPage() {
             {products.map((product) => {
               const availability = getProductAvailability(product)
               const grossPrice = Number(product.price) * (1 + Number(product.vat_rate || 0) / 100)
+              const primaryImage = getPrimaryProductImage(product)
 
               return (
                 <article className="shop-product-card" key={product.id}>
-                  <div className="shop-product-card__image">
-                    {product.image_url ? (
-                      <img src={product.image_url} alt={product.name} loading="lazy" />
+                  <Link className="shop-product-card__image" to={`/shop/${product.id}`} aria-label={`Apri ${product.name}`}>
+                    {primaryImage?.url ? (
+                      <img src={primaryImage.url} alt={product.name} loading="lazy" />
                     ) : (
                       <div className="shop-product-placeholder">Idealtech</div>
                     )}
                     {product.category ? <span className="shop-product-category">{product.category}</span> : null}
-                  </div>
+                  </Link>
                   <div className="shop-product-card__body">
                     {product.sku ? <span className="shop-product-sku">Cod. {product.sku}</span> : null}
-                    <h2>{product.name}</h2>
+                    <h2><Link to={`/shop/${product.id}`}>{product.name}</Link></h2>
                     {product.description ? <p>{product.description}</p> : null}
+                    <Link className="shop-product-detail-link" to={`/shop/${product.id}`}>Vedi dettagli e descrizione completa →</Link>
                     <span className={`shop-availability ${availability.available ? '' : 'is-empty'}`}>
                       {availability.label}
                     </span>

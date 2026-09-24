@@ -32,6 +32,7 @@ create table if not exists public.shop_products (
   vat_rate numeric(5,2) not null default 22 check (vat_rate >= 0 and vat_rate <= 100),
   image_url text,
   image_path text,
+  images jsonb not null default '[]'::jsonb check (jsonb_typeof(images) = 'array'),
   track_stock boolean not null default false,
   stock_quantity integer not null default 0 check (stock_quantity >= 0),
   is_published boolean not null default false,
@@ -43,6 +44,16 @@ create table if not exists public.shop_products (
 
 create index if not exists shop_products_public_idx
   on public.shop_products (is_published, sort_order, created_at desc);
+
+-- Upgrade compatibile per database shop già esistenti: galleria immagini ordinata.
+alter table public.shop_products
+  add column if not exists images jsonb not null default '[]'::jsonb;
+
+update public.shop_products
+set images = jsonb_build_array(jsonb_build_object('url', image_url, 'path', image_path))
+where image_url is not null
+  and image_url <> ''
+  and coalesce(jsonb_array_length(images), 0) = 0;
 
 -- Impostazioni modificabili dal pannello. È prevista una sola riga (id = 1).
 create table if not exists public.shop_settings (

@@ -602,3 +602,16 @@
   .shop-cart-drawer { padding: 18px; }
   .shop-checkout-modal { padding: 18px; }
 }
+
+/* Accesso alla scheda prodotto */
+.shop-product-card__image { display: block; text-decoration: none; }
+.shop-product-card h2 a { color: inherit; text-decoration: none; }
+.shop-product-card h2 a:hover { color: #176bc2; }
+.shop-product-detail-link {
+  margin: -5px 0 16px;
+  color: #176bc2;
+  font-size: .78rem;
+  font-weight: 900;
+  text-decoration: none;
+}
+.shop-product-detail-link:hover { text-decoration: underline; }
