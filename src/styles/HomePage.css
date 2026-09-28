@@ -878,3 +878,137 @@
   content-visibility: auto;
   contain-intrinsic-size: 800px;
 }
+
+
+/* Recensioni clienti */
+.home-reviews {
+  padding: 10px 0 95px;
+}
+
+.home-reviews-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.home-review-card {
+  min-width: 0;
+  padding: 26px;
+  display: flex;
+  flex-direction: column;
+  border: 1px solid #e1e9f1;
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(47, 126, 219, .08), transparent 34%),
+    #fff;
+  box-shadow: 0 16px 38px rgba(18, 53, 91, .08);
+}
+
+.home-review-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.home-review-quote {
+  color: #d8e8f8;
+  font-family: Georgia, serif;
+  font-size: 4.3rem;
+  line-height: .65;
+  font-weight: 700;
+}
+
+.home-review-stars {
+  display: inline-flex;
+  gap: 2px;
+  color: #e2a21c;
+  font-size: 1.05rem;
+  letter-spacing: .04em;
+}
+
+.home-review-card blockquote {
+  flex: 1;
+  margin: 16px 0 24px;
+  color: #4e6479;
+  font-size: .98rem;
+  line-height: 1.78;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.home-review-author {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  padding-top: 18px;
+  border-top: 1px solid #edf1f5;
+}
+
+.home-review-author img,
+.home-review-initial {
+  width: 54px;
+  height: 54px;
+  flex: 0 0 54px;
+  border-radius: 16px;
+}
+
+.home-review-author img {
+  object-fit: contain;
+  border: 1px solid #e0e8f0;
+  background: #fff;
+}
+
+.home-review-initial {
+  display: grid;
+  place-items: center;
+  color: #1768b8;
+  background: linear-gradient(135deg, #eaf5ff, #dceeff);
+  font-size: 1.2rem;
+  font-weight: 900;
+}
+
+.home-review-author div {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.home-review-author strong {
+  color: #173c60;
+  font-size: .96rem;
+}
+
+.home-review-author span {
+  color: #82909e;
+  font-size: .78rem;
+  line-height: 1.45;
+}
+
+@media (max-width: 1050px) {
+  .home-reviews-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 700px) {
+  .home-reviews {
+    padding-bottom: 70px;
+  }
+
+  .home-reviews-grid {
+    display: flex;
+    gap: 14px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding: 2px 2px 14px;
+    margin-inline: -2px;
+  }
+
+  .home-review-card {
+    flex: 0 0 min(88vw, 340px);
+    padding: 21px;
+    border-radius: 20px;
+    scroll-snap-align: start;
+  }
+}

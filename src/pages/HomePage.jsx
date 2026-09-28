@@ -233,11 +233,13 @@ function CountUpNumber({
 export default function HomePage() {
   const { language, locale } = useLanguage()
   const [newsItems, setNewsItems] = useState([])
+  const [reviews, setReviews] = useState([])
   const [startNumbers, setStartNumbers] = useState(false)
   const numbersSectionRef = useRef(null)
 
   useEffect(() => {
     loadHomeNews()
+    loadReviews()
   }, [])
 
   useEffect(() => {
@@ -271,6 +273,20 @@ export default function HomePage() {
 
     if (!error) {
       setNewsItems(data || [])
+    }
+  }
+
+  async function loadReviews() {
+    const { data, error } = await supabase
+      .from('customer_reviews')
+      .select('*')
+      .eq('published', true)
+      .order('sort_order', { ascending: true })
+      .order('created_at', { ascending: false })
+      .limit(6)
+
+    if (!error) {
+      setReviews(data || [])
     }
   }
 
@@ -479,6 +495,67 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {reviews.length > 0 ? (
+        <section className="home-reviews" id="recensioni">
+          <div className="site-container">
+            <div className="home-section-heading">
+              <span className="home-section-label">Recensioni clienti</span>
+              <h2>La fiducia di chi lavora con Idealtech</h2>
+              <p>
+                Esperienze reali di aziende e professionisti che hanno scelto le nostre
+                soluzioni e il nostro supporto tecnico.
+              </p>
+            </div>
+
+            <div className="home-reviews-grid">
+              {reviews.map((review) => {
+                const rating = Math.max(1, Math.min(5, Number(review.rating) || 5))
+                const secondary = [review.reviewer_role, review.company].filter(Boolean).join(' · ')
+
+                return (
+                  <article className="home-review-card" key={review.id}>
+                    <div className="home-review-card-top">
+                      <span className="home-review-quote" aria-hidden="true">“</span>
+                      <div className="home-review-stars" aria-label={`${rating} stelle su 5`}>
+                        {Array.from({ length: 5 }, (_, index) => (
+                          <span key={index} aria-hidden="true">
+                            {index < rating ? '★' : '☆'}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+
+                    <blockquote>{review.review_text}</blockquote>
+
+                    <div className="home-review-author">
+                      {review.avatar_url ? (
+                        <img
+                          src={review.avatar_url}
+                          alt=""
+                          width="56"
+                          height="56"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                      ) : (
+                        <span className="home-review-initial" aria-hidden="true">
+                          {(review.reviewer_name || '?').trim().charAt(0).toUpperCase()}
+                        </span>
+                      )}
+
+                      <div>
+                        <strong>{review.reviewer_name}</strong>
+                        <span>{secondary || 'Cliente Idealtech'}</span>
+                      </div>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="home-news">
         <div className="site-container">

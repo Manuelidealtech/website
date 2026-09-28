@@ -29,6 +29,7 @@ const AdminSeoPage = lazy(() => import('./pages/AdminSeoPage'))
 const SocialLinksPage = lazy(() => import('./pages/SocialLinksPage'))
 const AdminSocialLinksPage = lazy(() => import('./pages/AdminSocialLinksPage'))
 const AdminShopPage = lazy(() => import('./pages/AdminShopPage'))
+const AdminReviewsPage = lazy(() => import('./pages/AdminReviewsPage'))
 
 const DrumLinePage = lazy(() => import('./products/DrumLinePage'))
 const ExtruderLinePage = lazy(() => import('./products/ExtruderLinePage'))
@@ -90,6 +91,7 @@ export default function App() {
           <Route path="/admin/seo" element={<AdminOnlyRoute><AdminSeoPage /></AdminOnlyRoute>} />
           <Route path="/admin/link-in-bio" element={<AdminOnlyRoute><AdminSocialLinksPage /></AdminOnlyRoute>} />
           <Route path="/admin/shop" element={<ProtectedRoute><AdminShopPage /></ProtectedRoute>} />
+          <Route path="/admin/recensioni" element={<ProtectedRoute><AdminReviewsPage /></ProtectedRoute>} />
 
           <Route path="/prodotti/drum-line" element={<PublicPage><DrumLinePage /></PublicPage>} />
           <Route path="/prodotti/extruder-line" element={<PublicPage><ExtruderLinePage /></PublicPage>} />
