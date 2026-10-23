@@ -1,4 +1,5 @@
 import '../styles/AboutPage.css'
+import { useSiteContent } from '../context/SiteContentContext'
 
 const galleryImages = [
   '/images/chi-siamo/gallery-1.png',
@@ -15,17 +16,18 @@ const galleryImages = [
 ]
 
 export default function AboutPage() {
+  const { get } = useSiteContent()
+  const card1Paragraphs = String(get('about.card1.text', '')).split(/\n\n+/).filter(Boolean)
+  const card2Paragraphs = String(get('about.card2.text', '')).split(/\n\n+/).filter(Boolean)
+
   return (
     <div className="about-page">
       <section className="about-hero">
         <div className="site-container">
           <div className="about-hero__content">
-            <span className="section-kicker">Chi siamo</span>
-            <h1>Esperienza industriale, innovazione continua</h1>
-            <p>
-              Idealtech sviluppa soluzioni per l’incollaggio industriale con un approccio tecnico,
-              moderno e orientato alle reali esigenze dei clienti.
-            </p>
+            <span className="section-kicker">{get('about.hero.kicker', 'Chi siamo')}</span>
+            <h1>{get('about.hero.title', 'Esperienza industriale, innovazione continua')}</h1>
+            <p>{get('about.hero.text', 'Idealtech sviluppa soluzioni per l’incollaggio industriale con un approccio tecnico, moderno e orientato alle reali esigenze dei clienti.')}</p>
           </div>
         </div>
       </section>
@@ -33,31 +35,13 @@ export default function AboutPage() {
       <section className="about-section">
         <div className="site-container about-grid about-grid--text">
           <div className="about-card">
-            <h2>Una realtà solida, da 25 anni</h2>
-            <p>
-              Da oltre vent’anni, Idealtech opera con successo nel mercato italiano e internazionale,
-              maturando una solida esperienza nelle tecnologie di incollaggio, nella progettazione e nell’automazione industriale.
-            </p>
-            <p>
-              Oggi l’azienda si distingue per competenze consolidate nel settore della gluing technology,
-              offrendo una gamma completa di soluzioni: fusori, sistemi di dosaggio, pistole, linee automatiche e impianti di incollaggio integrati.
-            </p>
+            <h2>{get('about.card1.title', 'Una realtà solida, da 25 anni')}</h2>
+            {card1Paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>
 
           <div className="about-card">
-            <h2>Sempre al passo con l’evoluzione</h2>
-            <p>
-              Fin dalla sua nascita, Idealtech si è posta l’obiettivo di rispondere con puntualità,
-              efficienza e flessibilità alle esigenze in continua evoluzione del mercato.
-            </p>
-            <p>
-              Propone un’ampia gamma di prodotti e garantisce un supporto tecnico costante,
-              accompagnando il cliente in ogni fase del progetto.
-            </p>
-            <p>
-              Solidità costruttiva, efficienza operativa e semplicità d’uso sono i principi alla base degli impianti Idealtech,
-              progettati per assicurare prestazioni elevate e affidabilità nel tempo.
-            </p>
+            <h2>{get('about.card2.title', 'Sempre al passo con l’evoluzione')}</h2>
+            {card2Paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>
         </div>
       </section>
@@ -66,7 +50,7 @@ export default function AboutPage() {
         <div className="site-container about-grid about-grid--media">
           <div className="about-media">
             <img
-              src="/images/chi-siamo/idealtech-chi-siamo-img1.png"
+              src={get('about.mainImage', '/images/chi-siamo/idealtech-chi-siamo-img1.png')}
               alt="Ufficio tecnico Idealtech"
             />
           </div>
@@ -90,7 +74,7 @@ export default function AboutPage() {
             <div className="about-owner-media">
               <div className="about-owner-image-wrap">
                 <img
-                  src="/images/chi-siamo/titolare.png"
+                  src={get('about.ownerImage', '/images/chi-siamo/titolare.png')}
                   alt="Titolare Idealtech"
                 />
               </div>
@@ -98,8 +82,8 @@ export default function AboutPage() {
 
             <div className="about-owner-content">
               <span className="section-kicker">La guida dell’azienda</span>
-              <h2>Visione, esperienza e attenzione al cliente</h2>
-              <p className="about-owner-name">Enrico Bozza — Titolare Idealtech</p>
+              <h2>{get('about.ownerTitle', 'Visione, esperienza e attenzione al cliente')}</h2>
+              <p className="about-owner-name">{get('about.ownerName', 'Enrico Bozza — Titolare Idealtech')}</p>
 
               <p>
                 Alla guida di Idealtech c’è una visione imprenditoriale fondata su competenza tecnica,

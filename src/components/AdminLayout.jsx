@@ -5,6 +5,7 @@ import '../styles/AdminLayout.css'
 
 const navItems = [
   { to: '/admin', label: 'Dashboard', icon: '⌂', end: true },
+  { to: '/admin/gestione-sito', label: 'Gestione sito', icon: '✎' },
   { to: '/admin/macchinari', label: 'Macchinari', icon: '⚙' },
   { to: '/admin/news', label: 'News', icon: '✦' },
   { to: '/admin/recensioni', label: 'Recensioni', icon: '★' },

@@ -1,0 +1,260 @@
+export const defaultNavbarItems = [
+  { id: 'home', label: 'Home', to: '/', visible: true },
+  { id: 'about', label: 'Chi siamo', to: '/chi-siamo', visible: true },
+  { id: 'products', label: 'Prodotti', to: '/prodotti', visible: true, hasDropdown: true },
+  { id: 'store', label: 'Usato', to: '/store', visible: true },
+  { id: 'news', label: 'News', to: '/news', visible: true },
+  { id: 'services', label: 'Servizi', to: '/servizi', visible: true },
+  { id: 'contacts', label: 'Contatti', to: '/contatti', visible: true },
+  { id: 'shop', label: 'Shop', to: '/shop', visible: true, shop: true },
+]
+
+export const defaultProductMenuItems = [
+  { id: 'drum-line', label: 'Piatti Prementi', to: '/prodotti/drum-line', visible: true },
+  { id: 'extruder-line', label: 'Estrusori', to: '/prodotti/extruder-line', visible: true },
+  { id: 'assy-line', label: 'Fusori per Hot-Melt', to: '/prodotti/assy-line', visible: true },
+  { id: 'coating-heads', label: 'Teste di Spalmatura', to: '/prodotti/coating-heads', visible: true },
+  { id: 'idm-gp-plug', label: 'Fusori Plug & Work', to: '/prodotti/idm-gp', visible: true },
+  { id: 'idm-gp', label: 'Fusori DM-GO', to: '/prodotti/idm-gp', visible: true },
+  { id: 'gun-line', label: 'Applicatori Hot-melt', to: '/prodotti/gun-line', visible: true },
+  { id: 'hose-line', label: 'Tubi elettroriscaldati', to: '/prodotti/hose-line', visible: true },
+  { id: 'cold-line', label: 'Applicatori per colla a freddo', to: '/prodotti/cold-line', visible: true },
+  { id: 'hand-gun', label: 'Pistole Manuali', to: '/prodotti/hand-gun', visible: true },
+  { id: 'spare-parts', label: 'Ricambi Compatibili', to: '/prodotti/spare-parts', visible: true },
+  { id: 'custom-machines', label: 'Custom Machines', to: '/prodotti/custom-machines', visible: true },
+]
+
+export const defaultProductCards = [
+  { id: 'drum-line', title: 'Drum Line', subtitle: 'Piatti prementi', description: 'Progettati per la fusione e il dosaggio di svariati materiali termoplastici come hot melt EVA, pressure sensitive, poliammidi, poliuretano e mastici.', image: '/images/products/drum-line.jpg', cta: 'Scopri di più', slug: '/prodotti/drum-line', visible: true },
+  { id: 'extruder-line', title: 'Extruder Line', subtitle: 'Estrusori', description: 'L’uso di un estrusore è indicato soprattutto nelle applicazioni che richiedono un’elevata capacità di fusione.', image: '/images/products/extruder-line.jpg', cta: 'Scopri di più', slug: '/prodotti/extruder-line', visible: true },
+  { id: 'assy-line', title: 'Assy Line', subtitle: 'Fusori per Adesivi Hot Melt', description: 'Applicatori hot melt modulari, robusti e flessibili, progettati per linee produttive industriali continue.', image: '/images/products/assy-line.jpg', cta: 'Scopri di più', slug: '/prodotti/assy-line', visible: true },
+  { id: 'coating-heads', title: 'Coating Heads', subtitle: 'Teste di spalmatura', description: 'Teste di spalmatura per adesivizzare o accoppiare tessuti, pannelli e altri materiali in applicazioni industriali.', image: '/images/products/coating-heads.jpg', cta: 'Scopri di più', slug: '/prodotti/coating-heads', visible: true },
+  { id: 'custom-machines', title: 'Custom Machines', subtitle: 'Macchine speciali su misura', description: 'Progetti custom per piccole e medie automazioni, sviluppati attorno alle esigenze produttive del cliente.', image: '/images/products/custom-machines.png', cta: 'Scopri di più', slug: '/prodotti/custom-machines', visible: true },
+  { id: 'ideal-melt', title: 'Ideal Melt', subtitle: 'Fusore per Hot Melt', description: 'Incollatori hot melt particolarmente indicati per produzioni con bassi consumi di colla.', image: '/images/products/ideal-melt.jpg', cta: 'Scopri di più', slug: '/prodotti/ideal-melt', visible: true },
+  { id: 'idm-gp', title: 'Fusori', subtitle: 'Fusori a vasca IDM-GP', description: 'Fusori a vasca disponibili in versione 6, 9 e 12 litri, progettati per garantire dosatura precisa e costi contenuti.', image: '/images/products/idm-gp.jpg', cta: 'Scopri di più', slug: '/prodotti/idm-gp', visible: true },
+  { id: 'gun-line', title: 'Gun Line', subtitle: 'Applicatori Hot Melt', description: 'Pistole automatiche modulari per applicare adesivo in cordoli, punti o strisce di varia larghezza.', image: '/images/products/gun-line.jpg', cta: 'Scopri di più', slug: '/prodotti/gun-line', visible: true },
+  { id: 'hose-line', title: 'Hose Line', subtitle: 'Tubi Elettroriscaldati', description: 'Tubi elettroriscaldati robusti e flessibili, compatibili con i principali impianti di applicazione hot melt.', image: '/images/products/hose-line.jpg', cta: 'Scopri di più', slug: '/prodotti/hose-line', visible: true },
+  { id: 'cold-line', title: 'Cold Line', subtitle: 'Applicatori per colla a freddo', description: 'Applicatori per colle a freddo con elevate prestazioni, alta precisione, affidabilità e manutenzione ridotta.', image: '/images/products/cold-line.png', cta: 'Scopri di più', slug: '/prodotti/cold-line', visible: true },
+  { id: 'hand-gun', title: 'Hand Guns', subtitle: 'Pistola per Colla Manuale', description: 'Pistole manuali ergonomiche e flessibili per applicazioni a punto, cordolo, spirale o spray.', image: '/images/products/hand-gun.jpg', cta: 'Scopri di più', slug: '/prodotti/hand-gun', visible: true },
+  { id: 'spare-parts', title: 'Spare Parts', subtitle: 'Ricambi per Hot Melt', description: 'Ugelli, filtri e moduli compatibili per applicatori hot melt, studiati per garantire precisione e affidabilità.', image: '/images/products/spare-parts.jpg', cta: 'Scopri di più', slug: '/prodotti/spare-parts', visible: true },
+]
+
+export const defaultProductGalleries = {
+  "assy-line": [
+    "/images/products/assy-line/gallery-1.png",
+    "/images/products/assy-line/gallery-2.png",
+    "/images/products/assy-line/gallery-3.png",
+    "/images/products/assy-line/gallery-4.png",
+    "/images/products/assy-line/gallery-5.jpg",
+    "/images/products/assy-line/gallery-6.png",
+    "/images/products/assy-line/gallery-7.jpg",
+    "/images/products/assy-line/gallery-8.jpg",
+    "/images/products/assy-line/gallery-9.jpg"
+  ],
+  "coating-heads": [
+    "/images/products/coating-heads/gallery-1.jpg",
+    "/images/products/coating-heads/gallery-2.jpg",
+    "/images/products/coating-heads/gallery-3.jpg",
+    "/images/products/coating-heads/gallery-4.jpg",
+    "/images/products/coating-heads/gallery-5.jpg",
+    "/images/products/coating-heads/gallery-6.jpg",
+    "/images/products/coating-heads/gallery-7.jpg",
+    "/images/products/coating-heads/gallery-8.jpg",
+    "/images/products/coating-heads/gallery-9.jpg",
+    "/images/products/coating-heads/gallery-10.jpg",
+    "/images/products/coating-heads/gallery-11.jpg",
+    "/images/products/coating-heads/gallery-12.jpg",
+    "/images/products/coating-heads/gallery-13.jpg",
+    "/images/products/coating-heads/gallery-14.jpg",
+    "/images/products/coating-heads/gallery-15.jpg",
+    "/images/products/coating-heads/gallery-16.jpg"
+  ],
+  "cold-line": [
+    "/images/products/cold-line/gallery-1.png",
+    "/images/products/cold-line/gallery-2.png",
+    "/images/products/cold-line/gallery-3.png"
+  ],
+  "custom-machines": [
+    "/images/products/custom-machines/gallery-1.jpg",
+    "/images/products/custom-machines/gallery-2.png",
+    "/images/products/custom-machines/gallery-3.png",
+    "/images/products/custom-machines/gallery-4.jpg",
+    "/images/products/custom-machines/gallery-5.jpg",
+    "/images/products/custom-machines/gallery-6.jpg",
+    "/images/products/custom-machines/gallery-7.jpg",
+    "/images/products/custom-machines/gallery-8.jpg",
+    "/images/products/custom-machines/gallery-9.jpg",
+    "/images/products/custom-machines/gallery-10.jpg",
+    "/images/products/custom-machines/gallery-11.jpg",
+    "/images/products/custom-machines/gallery-12.jpg",
+    "/images/products/custom-machines/gallery-13.jpg",
+    "/images/products/custom-machines/gallery-14.jpg",
+    "/images/products/custom-machines/gallery-15.jpg",
+    "/images/products/custom-machines/gallery-16.jpg",
+    "/images/products/custom-machines/gallery-17.jpg",
+    "/images/products/custom-machines/gallery-18.jpg",
+    "/images/products/custom-machines/gallery-19.jpg",
+    "/images/products/custom-machines/gallery-20.jpg"
+  ],
+  "drum-line": [
+    "/images/products/drum-line/gallery-1.png",
+    "/images/products/drum-line/gallery-2.png",
+    "/images/products/drum-line/gallery-3.png",
+    "/images/products/drum-line/gallery-4.png",
+    "/images/products/drum-line/gallery-5.png",
+    "/images/products/drum-line/gallery-6.png",
+    "/images/products/drum-line/gallery-8.png",
+    "/images/products/drum-line/gallery-9.png",
+    "/images/products/drum-line/gallery-10.png",
+    "/images/products/drum-line/gallery-11.png"
+  ],
+  "extruder-line": [
+    "/images/products/extruder-line/gallery-1.png",
+    "/images/products/extruder-line/gallery-2.png",
+    "/images/products/extruder-line/gallery-3.png",
+    "/images/products/extruder-line/gallery-4.png",
+    "/images/products/extruder-line/gallery-5.png",
+    "/images/products/extruder-line/gallery-6.png",
+    "/images/products/extruder-line/gallery-7.png",
+    "/images/products/extruder-line/gallery-8.png",
+    "/images/products/extruder-line/gallery-9.png"
+  ],
+  "gun-line": [
+    "/images/products/gun-line/gallery-1.jpg",
+    "/images/products/gun-line/gallery-2.jpg",
+    "/images/products/gun-line/gallery-3.jpg",
+    "/images/products/gun-line/gallery-4.jpg",
+    "/images/products/gun-line/gallery-5.jpg",
+    "/images/products/gun-line/gallery-6.jpg",
+    "/images/products/gun-line/gallery-7.jpg",
+    "/images/products/gun-line/gallery-8.jpg",
+    "/images/products/gun-line/gallery-9.jpg",
+    "/images/products/gun-line/gallery-10.jpg",
+    "/images/products/gun-line/gallery-11.jpg",
+    "/images/products/gun-line/gallery-12.jpg",
+    "/images/products/gun-line/gallery-13.jpg",
+    "/images/products/gun-line/gallery-14.jpg",
+    "/images/products/gun-line/gallery-15.jpg",
+    "/images/products/gun-line/gallery-16.jpg",
+    "/images/products/gun-line/gallery-17.jpg",
+    "/images/products/gun-line/gallery-18.jpg"
+  ],
+  "hand-gun": [
+    "/images/products/hand-gun/gallery-1.jpg"
+  ],
+  "hose-line": [
+    "/images/products/hose-line/gallery-1.jpg",
+    "/images/products/hose-line/gallery-2.jpg",
+    "/images/products/hose-line/gallery-3.jpg",
+    "/images/products/hose-line/gallery-4.jpg",
+    "/images/products/hose-line/gallery-5.jpg",
+    "/images/products/hose-line/gallery-6.jpg",
+    "/images/products/hose-line/gallery-7.jpg"
+  ],
+  "ideal-melt": [
+    "/images/products/ideal-melt/gallery-1.jpg",
+    "/images/products/ideal-melt/gallery-2.jpg",
+    "/images/products/ideal-melt/gallery-3.jpg",
+    "/images/products/ideal-melt/gallery-4.jpg",
+    "/images/products/ideal-melt/gallery-5.jpg",
+    "/images/products/ideal-melt/gallery-6.jpg",
+    "/images/products/ideal-melt/gallery-7.jpg"
+  ],
+  "idm-gp": [
+    "/images/products/idm-gp/gallery-1.jpg",
+    "/images/products/idm-gp/gallery-2.jpg",
+    "/images/products/idm-gp/gallery-3.jpg"
+  ],
+  "spare-parts": [
+    "/images/products/spare-parts/gallery-1.jpg",
+    "/images/products/spare-parts/gallery-2.jpg",
+    "/images/products/spare-parts/gallery-3.jpg",
+    "/images/products/spare-parts/gallery-4.jpg",
+    "/images/products/spare-parts/gallery-5.jpg",
+    "/images/products/spare-parts/gallery-6.jpg",
+    "/images/products/spare-parts/gallery-7.jpg",
+    "/images/products/spare-parts/gallery-8.jpg"
+  ]
+}
+
+export const SITE_CONTENT_FIELDS = [
+  { key: 'navbar.items', section: 'navbar', label: 'Voci menu principale', type: 'navigation', defaultValue: defaultNavbarItems },
+  { key: 'navbar.products', section: 'navbar', label: 'Prodotti nel menu', type: 'navigation', defaultValue: defaultProductMenuItems },
+
+  { key: 'home.hero.kicker', section: 'home', label: 'Etichetta hero', type: 'text', defaultValue: 'Gluing Technology' },
+  { key: 'home.hero.title', section: 'home', label: 'Titolo hero', type: 'text', defaultValue: 'Soluzioni industriali per l’incollaggio professionale' },
+  { key: 'home.hero.text', section: 'home', label: 'Testo hero', type: 'textarea', defaultValue: 'Idealtech sviluppa, installa e supporta impianti e sistemi per l’applicazione di adesivi hot-melt e cold glue, offrendo competenza tecnica, affidabilità e soluzioni su misura per il settore industriale.' },
+  { key: 'home.hero.primaryLabel', section: 'home', label: 'Pulsante principale', type: 'text', defaultValue: 'Chiedi una consulenza' },
+  { key: 'home.hero.secondaryLabel', section: 'home', label: 'Pulsante secondario', type: 'text', defaultValue: 'Scopri i prodotti' },
+  { key: 'home.hero.imageDesktop', section: 'home', label: 'Immagine hero desktop', type: 'image', defaultValue: '/home-hero-1890.webp' },
+  { key: 'home.hero.imageTablet', section: 'home', label: 'Immagine hero tablet', type: 'image', defaultValue: '/home-hero-1280.webp' },
+  { key: 'home.hero.imageMobile', section: 'home', label: 'Immagine hero mobile', type: 'image', defaultValue: '/home-hero-768.webp' },
+  { key: 'home.sectors.kicker', section: 'home', label: 'Etichetta settori', type: 'text', defaultValue: 'Settori applicativi' },
+  { key: 'home.sectors.title', section: 'home', label: 'Titolo settori', type: 'text', defaultValue: 'Dove operano le nostre soluzioni' },
+  { key: 'home.numbers.title', section: 'home', label: 'Titolo numeri', type: 'text', defaultValue: 'La nostra esperienza in numeri' },
+  { key: 'home.strengths.title', section: 'home', label: 'Titolo punti di forza', type: 'text', defaultValue: 'Competenze tecniche e supporto concreto' },
+  { key: 'home.world.title', section: 'home', label: 'Titolo rete internazionale', type: 'text', defaultValue: 'Partner e presenza internazionale' },
+  { key: 'home.reviews.title', section: 'home', label: 'Titolo recensioni', type: 'text', defaultValue: 'La fiducia di chi lavora con Idealtech' },
+  { key: 'home.news.title', section: 'home', label: 'Titolo news', type: 'text', defaultValue: 'Aggiornamenti, fiere e novità aziendali' },
+  { key: 'home.cta.title', section: 'home', label: 'Titolo CTA finale', type: 'text', defaultValue: 'Hai bisogno di una soluzione di incollaggio?' },
+  { key: 'home.cta.button', section: 'home', label: 'Pulsante CTA finale', type: 'text', defaultValue: 'Richiedi consulenza tecnica' },
+
+  { key: 'about.hero.kicker', section: 'about', label: 'Etichetta hero', type: 'text', defaultValue: 'Chi siamo' },
+  { key: 'about.hero.title', section: 'about', label: 'Titolo hero', type: 'text', defaultValue: 'Esperienza industriale, innovazione continua' },
+  { key: 'about.hero.text', section: 'about', label: 'Testo hero', type: 'textarea', defaultValue: 'Idealtech sviluppa soluzioni per l’incollaggio industriale con un approccio tecnico, moderno e orientato alle reali esigenze dei clienti.' },
+  { key: 'about.card1.title', section: 'about', label: 'Titolo primo blocco', type: 'text', defaultValue: 'Una realtà solida, da 25 anni' },
+  { key: 'about.card1.text', section: 'about', label: 'Testo primo blocco', type: 'textarea', defaultValue: 'Da oltre vent’anni, Idealtech opera con successo nel mercato italiano e internazionale, maturando una solida esperienza nelle tecnologie di incollaggio, nella progettazione e nell’automazione industriale.\n\nOggi l’azienda si distingue per competenze consolidate nel settore della gluing technology, offrendo una gamma completa di soluzioni: fusori, sistemi di dosaggio, pistole, linee automatiche e impianti di incollaggio integrati.' },
+  { key: 'about.card2.title', section: 'about', label: 'Titolo secondo blocco', type: 'text', defaultValue: 'Sempre al passo con l’evoluzione' },
+  { key: 'about.card2.text', section: 'about', label: 'Testo secondo blocco', type: 'textarea', defaultValue: 'Fin dalla sua nascita, Idealtech si è posta l’obiettivo di rispondere con puntualità, efficienza e flessibilità alle esigenze in continua evoluzione del mercato.\n\nPropone un’ampia gamma di prodotti e garantisce un supporto tecnico costante, accompagnando il cliente in ogni fase del progetto.\n\nSolidità costruttiva, efficienza operativa e semplicità d’uso sono i principi alla base degli impianti Idealtech, progettati per assicurare prestazioni elevate e affidabilità nel tempo.' },
+  { key: 'about.mainImage', section: 'about', label: 'Immagine sezione azienda', type: 'image', defaultValue: '/images/chi-siamo/idealtech-chi-siamo-img1.png' },
+  { key: 'about.ownerImage', section: 'about', label: 'Foto titolare', type: 'image', defaultValue: '/images/chi-siamo/titolare.png' },
+  { key: 'about.ownerTitle', section: 'about', label: 'Titolo sezione titolare', type: 'text', defaultValue: 'Visione, esperienza e attenzione al cliente' },
+  { key: 'about.ownerName', section: 'about', label: 'Nome e ruolo', type: 'text', defaultValue: 'Enrico Bozza — Titolare Idealtech' },
+
+  { key: 'products.hero.kicker', section: 'products', label: 'Etichetta hero', type: 'text', defaultValue: 'Prodotti' },
+  { key: 'products.hero.title', section: 'products', label: 'Titolo hero', type: 'text', defaultValue: 'Soluzioni e impianti per il gluing industriale' },
+  { key: 'products.hero.text', section: 'products', label: 'Testo hero', type: 'textarea', defaultValue: 'Una gamma completa di sistemi hot melt e macchine industriali per ottimizzare funzionalità, prestazioni, consumi energetici e continuità produttiva.' },
+  { key: 'products.catalog', section: 'products', label: 'Catalogo prodotti', type: 'products', defaultValue: defaultProductCards },
+  { key: 'products.gallery.assy-line', section: 'products', label: 'Galleria Assy Line', type: 'image-list', defaultValue: defaultProductGalleries['assy-line'] },
+  { key: 'products.gallery.coating-heads', section: 'products', label: 'Galleria Coating Heads', type: 'image-list', defaultValue: defaultProductGalleries['coating-heads'] },
+  { key: 'products.gallery.cold-line', section: 'products', label: 'Galleria Cold Line', type: 'image-list', defaultValue: defaultProductGalleries['cold-line'] },
+  { key: 'products.gallery.custom-machines', section: 'products', label: 'Galleria Custom Machines', type: 'image-list', defaultValue: defaultProductGalleries['custom-machines'] },
+  { key: 'products.gallery.drum-line', section: 'products', label: 'Galleria Drum Line', type: 'image-list', defaultValue: defaultProductGalleries['drum-line'] },
+  { key: 'products.gallery.extruder-line', section: 'products', label: 'Galleria Extruder Line', type: 'image-list', defaultValue: defaultProductGalleries['extruder-line'] },
+  { key: 'products.gallery.gun-line', section: 'products', label: 'Galleria Gun Line', type: 'image-list', defaultValue: defaultProductGalleries['gun-line'] },
+  { key: 'products.gallery.hand-gun', section: 'products', label: 'Galleria Hand Guns', type: 'image-list', defaultValue: defaultProductGalleries['hand-gun'] },
+  { key: 'products.gallery.hose-line', section: 'products', label: 'Galleria Hose Line', type: 'image-list', defaultValue: defaultProductGalleries['hose-line'] },
+  { key: 'products.gallery.ideal-melt', section: 'products', label: 'Galleria Ideal Melt', type: 'image-list', defaultValue: defaultProductGalleries['ideal-melt'] },
+  { key: 'products.gallery.idm-gp', section: 'products', label: 'Galleria IDM-GP', type: 'image-list', defaultValue: defaultProductGalleries['idm-gp'] },
+  { key: 'products.gallery.spare-parts', section: 'products', label: 'Galleria Spare Parts', type: 'image-list', defaultValue: defaultProductGalleries['spare-parts'] },
+
+  { key: 'services.hero.kicker', section: 'services', label: 'Etichetta hero', type: 'text', defaultValue: 'Servizi' },
+  { key: 'services.hero.title', section: 'services', label: 'Titolo hero', type: 'text', defaultValue: 'I nostri servizi a vostra disposizione' },
+  { key: 'services.hero.text', section: 'services', label: 'Testo hero', type: 'textarea', defaultValue: 'Supporto tecnico, progettazione, consulenza e assistenza operativa per accompagnare ogni cliente prima, durante e dopo l’installazione.' },
+  { key: 'services.list', section: 'services', label: 'Elenco servizi', type: 'string-list', defaultValue: ['Vendita ed installazione', 'Automazioni - Special Machines', 'Consulenza tecnica e progettazione', 'Assistenza tecnica e manutenzione', 'Assistenza software', 'Ricambi compatibili'] },
+  { key: 'services.copy.title', section: 'services', label: 'Titolo assistenza', type: 'text', defaultValue: 'Assistenza Tecnica ed Operativa' },
+  { key: 'services.contact.title', section: 'services', label: 'Titolo richiesta preventivo', type: 'text', defaultValue: 'Per un preventivo' },
+  { key: 'services.contact.text', section: 'services', label: 'Testo richiesta preventivo', type: 'textarea', defaultValue: 'Saremo lieti di fissare un appuntamento nel più breve tempo possibile.' },
+
+  { key: 'footer.heading', section: 'footer', label: 'Titolo azienda', type: 'text', defaultValue: 'IDEALTECH' },
+  { key: 'footer.company', section: 'footer', label: 'Ragione sociale', type: 'text', defaultValue: 'Idealtech s.r.l.' },
+  { key: 'footer.capital', section: 'footer', label: 'Capitale sociale', type: 'text', defaultValue: 'Capitale sociale: € 70.000,00' },
+  { key: 'footer.vat', section: 'footer', label: 'P. IVA e C.F.', type: 'text', defaultValue: 'P. IVA e C.F.: 03058520960' },
+  { key: 'footer.address', section: 'footer', label: 'Indirizzo', type: 'text', defaultValue: 'Via Sondrio 11, 20814 Varedo (MB)' },
+  { key: 'footer.facebook', section: 'footer', label: 'Link Facebook', type: 'url', defaultValue: 'https://www.facebook.com/' },
+  { key: 'footer.instagram', section: 'footer', label: 'Link Instagram', type: 'url', defaultValue: 'https://www.instagram.com/' },
+  { key: 'footer.linkedin', section: 'footer', label: 'Link LinkedIn', type: 'url', defaultValue: 'https://www.linkedin.com/' },
+]
+
+export const SITE_CONTENT_DEFAULTS = Object.fromEntries(
+  SITE_CONTENT_FIELDS.map((field) => [field.key, field.defaultValue])
+)
+
+export const SITE_SECTIONS = [
+  { id: 'navbar', label: 'Navbar', description: 'Menu principale e voci del menu Prodotti.' },
+  { id: 'home', label: 'Home', description: 'Hero, titoli principali e immagini della homepage.' },
+  { id: 'about', label: 'Chi siamo', description: 'Testi e immagini principali della pagina aziendale.' },
+  { id: 'products', label: 'Prodotti', description: 'Hero e schede del catalogo prodotti.' },
+  { id: 'services', label: 'Servizi', description: 'Testi, elenco servizi e call to action.' },
+  { id: 'footer', label: 'Footer', description: 'Dati societari e collegamenti social.' },
+]

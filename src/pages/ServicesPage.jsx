@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import '../styles/ServicesPage.css'
 import { sendServicesEmail } from '../lib/contactEmail'
+import { useSiteContent } from '../context/SiteContentContext'
 
 const services = [
   'Vendita ed installazione',
@@ -23,6 +24,8 @@ const galleryImages = [
 ]
 
 export default function ServicesPage() {
+  const { get } = useSiteContent()
+  const editableServices = get('services.list', services) || services
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -88,12 +91,9 @@ export default function ServicesPage() {
       <section className="services-hero">
         <div className="site-container">
           <div className="services-hero__content">
-            <span className="section-kicker">Servizi</span>
-            <h1>I nostri servizi a vostra disposizione</h1>
-            <p>
-              Supporto tecnico, progettazione, consulenza e assistenza operativa per
-              accompagnare ogni cliente prima, durante e dopo l’installazione.
-            </p>
+            <span className="section-kicker">{get('services.hero.kicker', 'Servizi')}</span>
+            <h1>{get('services.hero.title', 'I nostri servizi a vostra disposizione')}</h1>
+            <p>{get('services.hero.text', 'Supporto tecnico, progettazione, consulenza e assistenza operativa per accompagnare ogni cliente prima, durante e dopo l’installazione.')}</p>
           </div>
         </div>
       </section>
@@ -104,7 +104,7 @@ export default function ServicesPage() {
             <h2>I nostri servizi a vostra disposizione</h2>
 
             <div className="services-list-grid">
-              {services.map((service) => (
+              {editableServices.map((service) => (
                 <div key={service} className="services-list-item">
                   <span className="services-list-item__dot" />
                   <span>{service}</span>
@@ -118,7 +118,7 @@ export default function ServicesPage() {
       <section className="services-copy-section">
         <div className="site-container">
           <div className="services-copy-card">
-            <h2>Assistenza Tecnica ed Operativa</h2>
+            <h2>{get('services.copy.title', 'Assistenza Tecnica ed Operativa')}</h2>
 
             <p>
               Per garantire continuità nel rapporto e massima fiducia, Idealtech è
@@ -176,10 +176,8 @@ export default function ServicesPage() {
           <div className="services-contact-box">
             <div className="services-contact-copy">
               <span className="section-kicker">Contattaci</span>
-              <h2>Per un preventivo</h2>
-              <p>
-                Saremo lieti di fissare un appuntamento nel più breve tempo possibile.
-              </p>
+              <h2>{get('services.contact.title', 'Per un preventivo')}</h2>
+              <p>{get('services.contact.text', 'Saremo lieti di fissare un appuntamento nel più breve tempo possibile.')}</p>
             </div>
 
             <form className="services-contact-form" onSubmit={handleSubmit}>

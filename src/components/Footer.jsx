@@ -1,55 +1,43 @@
 import { Link } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useSiteContent } from '../context/SiteContentContext'
 import '../styles/Footer.css'
 
 export default function Footer() {
   const { user } = useAuth()
+  const { get } = useSiteContent()
   const currentYear = new Date().getFullYear()
 
   return (
     <footer className="footer" data-nosnippet>
       <div className="footer__titlebar" />
-
       <div className="site-container">
         <div className="footer__content">
           <div className="footer__logo-col">
             <Link to="/" className="footer__logo-box" aria-label="Torna alla home">
-              <img
-                src="/logo-idealtech-900.webp"
-                alt="Idealtech"
-                className="footer__logo-image"
-                width="900"
-                height="173"
-                loading="lazy"
-                decoding="async"
-              />
+              <img src="/logo-idealtech-900.webp" alt="Idealtech" className="footer__logo-image" width="900" height="173" loading="lazy" decoding="async" />
             </Link>
           </div>
 
           <div className="footer__middle">
             <div className="footer__section footer__section--company">
-              <h3>IDEALTECH</h3>
-
+              <h3>{get('footer.heading', 'IDEALTECH')}</h3>
               <div className="footer__info">
-                <p>Idealtech s.r.l.</p>
-                <p>Capitale sociale: € 70.000,00</p>
-                <p>P. IVA e C.F.: 03058520960</p>
-                <p>Via Sondrio 11, 20814 Varedo (MB)</p>
+                <p>{get('footer.company', 'Idealtech s.r.l.')}</p>
+                <p>{get('footer.capital', 'Capitale sociale: € 70.000,00')}</p>
+                <p>{get('footer.vat', 'P. IVA e C.F.: 03058520960')}</p>
+                <p>{get('footer.address', 'Via Sondrio 11, 20814 Varedo (MB)')}</p>
                 <Link to="/contatti">Recapiti e uffici</Link>
-                <Link to="/termini-e-privacy">Privacy e Termini</Link>
+                <Link to="/termini-e-privacy">Termini, Condizioni e Privacy</Link>
                 <p className="footer__copyright">© {currentYear} Idealtech s.r.l. - Designed by <a href="https://vertex-ita.vercel.app" target="_blank" rel="noreferrer">Vertex</a></p>
               </div>
             </div>
 
             <div className="footer__divider" />
-
             <div className="footer__section footer__section--private">
               <h3>AREA PERSONALE</h3>
-
               <div className="footer__links">
-                <Link to={user ? '/admin' : '/login'}>
-                  {user ? 'Vai al pannello' : 'Login'}
-                </Link>
+                <Link to={user ? '/admin' : '/login'}>{user ? 'Vai al pannello' : 'Login'}</Link>
                 <Link to="/prodotti">Prodotti</Link>
                 <Link to="/store">Macchinari usati</Link>
                 <Link to="/servizi">Servizi</Link>
@@ -60,35 +48,9 @@ export default function Footer() {
 
           <div className="footer__social-col">
             <div className="footer__socials" aria-label="Canali social Idealtech">
-              <a
-                href="https://www.facebook.com/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Facebook"
-                className="footer__social"
-              >
-                <img src="/fb-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" />
-              </a>
-
-              <a
-                href="https://www.instagram.com/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="Instagram"
-                className="footer__social"
-              >
-                <img src="/ig-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" />
-              </a>
-
-              <a
-                href="https://www.linkedin.com/"
-                target="_blank"
-                rel="noreferrer"
-                aria-label="LinkedIn"
-                className="footer__social"
-              >
-                <img src="/in-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" />
-              </a>
+              <a href={get('footer.facebook', 'https://www.facebook.com/')} target="_blank" rel="noreferrer" aria-label="Facebook" className="footer__social"><img src="/fb-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" /></a>
+              <a href={get('footer.instagram', 'https://www.instagram.com/')} target="_blank" rel="noreferrer" aria-label="Instagram" className="footer__social"><img src="/ig-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" /></a>
+              <a href={get('footer.linkedin', 'https://www.linkedin.com/')} target="_blank" rel="noreferrer" aria-label="LinkedIn" className="footer__social"><img src="/in-96.webp" alt="" width="96" height="96" loading="lazy" decoding="async" /></a>
             </div>
           </div>
         </div>

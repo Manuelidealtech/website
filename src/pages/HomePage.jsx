@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../i18n/LanguageContext'
 import { getLocalizedField, getLocalizedNewsPreview } from '../i18n/contentTranslations'
+import { useSiteContent } from '../context/SiteContentContext'
 import '../styles/HomePage.css'
 
 const productAreas = [
@@ -232,6 +233,7 @@ function CountUpNumber({
 
 export default function HomePage() {
   const { language, locale } = useLanguage()
+  const { get } = useSiteContent()
   const [newsItems, setNewsItems] = useState([])
   const [reviews, setReviews] = useState([])
   const [startNumbers, setStartNumbers] = useState(false)
@@ -294,10 +296,10 @@ export default function HomePage() {
     <div className="homepage">
       <section className="home-layout-hero">
         <picture className="home-layout-hero-media" aria-hidden="true">
-          <source media="(max-width: 768px)" srcSet="/home-hero-768.webp" />
-          <source media="(max-width: 1280px)" srcSet="/home-hero-1280.webp" />
+          <source media="(max-width: 768px)" srcSet={get('home.hero.imageMobile', '/home-hero-768.webp')} />
+          <source media="(max-width: 1280px)" srcSet={get('home.hero.imageTablet', '/home-hero-1280.webp')} />
           <img
-            src="/home-hero-1890.webp"
+            src={get('home.hero.imageDesktop', '/home-hero-1890.webp')}
             alt=""
             width="1890"
             height="850"
@@ -309,24 +311,19 @@ export default function HomePage() {
 
         <div className="site-container home-layout-hero-inner">
           <div className="home-layout-hero-content">
-            <span className="home-section-label">Gluing Technology</span>
+            <span className="home-section-label">{get('home.hero.kicker', 'Gluing Technology')}</span>
 
-            <h1>Soluzioni industriali per l’incollaggio professionale</h1>
+            <h1>{get('home.hero.title', 'Soluzioni industriali per l’incollaggio professionale')}</h1>
 
-            <p>
-              Idealtech sviluppa, installa e supporta impianti e sistemi per
-              l’applicazione di adesivi hot-melt e cold glue, offrendo
-              competenza tecnica, affidabilità e soluzioni su misura per il
-              settore industriale.
-            </p>
+            <p>{get('home.hero.text', 'Idealtech sviluppa, installa e supporta impianti e sistemi per l’applicazione di adesivi hot-melt e cold glue, offrendo competenza tecnica, affidabilità e soluzioni su misura per il settore industriale.')}</p>
 
             <div className="home-layout-hero-actions">
               <Link to="/contatti" className="home-primary-btn">
-                Chiedi una consulenza
+                {get('home.hero.primaryLabel', 'Chiedi una consulenza')}
               </Link>
 
               <Link to="/prodotti" className="home-secondary-btn">
-                Scopri i prodotti
+                {get('home.hero.secondaryLabel', 'Scopri i prodotti')}
               </Link>
             </div>
           </div>
@@ -354,8 +351,8 @@ export default function HomePage() {
       <section className="home-sectors">
         <div className="site-container">
           <div className="home-section-heading">
-            <span className="home-section-label">Settori applicativi</span>
-            <h2>Dove operano le nostre soluzioni</h2>
+            <span className="home-section-label">{get('home.sectors.kicker', 'Settori applicativi')}</span>
+            <h2>{get('home.sectors.title', 'Dove operano le nostre soluzioni')}</h2>
             <p>
               Tecnologie di incollaggio pensate per integrarsi in diversi
               contesti industriali e ottimizzare i processi produttivi.
@@ -390,7 +387,7 @@ export default function HomePage() {
           <div className="home-numbers-grid">
             <div className="home-numbers-title">
               <span className="home-section-label">Esperienza</span>
-              <h2>La nostra esperienza in numeri</h2>
+              <h2>{get('home.numbers.title', 'La nostra esperienza in numeri')}</h2>
             </div>
 
             <div className="home-number-card">
@@ -427,7 +424,7 @@ export default function HomePage() {
         <div className="site-container">
           <div className="home-section-heading">
             <span className="home-section-label">Perché sceglierci</span>
-            <h2>Competenze tecniche e supporto concreto</h2>
+            <h2>{get('home.strengths.title', 'Competenze tecniche e supporto concreto')}</h2>
           </div>
 
           <div className="home-strengths-grid">
@@ -446,7 +443,7 @@ export default function HomePage() {
         <div className="site-container">
           <div className="home-section-heading">
             <span className="home-section-label">La nostra rete nel mondo</span>
-            <h2>Partner e presenza internazionale</h2>
+            <h2>{get('home.world.title', 'Partner e presenza internazionale')}</h2>
             <p>
               Passa il mouse sui paesi evidenziati per visualizzare il distributore
               di riferimento.
@@ -501,7 +498,7 @@ export default function HomePage() {
           <div className="site-container">
             <div className="home-section-heading">
               <span className="home-section-label">Recensioni clienti</span>
-              <h2>La fiducia di chi lavora con Idealtech</h2>
+              <h2>{get('home.reviews.title', 'La fiducia di chi lavora con Idealtech')}</h2>
               <p>
                 Esperienze reali di aziende e professionisti che hanno scelto le nostre
                 soluzioni e il nostro supporto tecnico.
@@ -561,7 +558,7 @@ export default function HomePage() {
         <div className="site-container">
           <div className="home-section-heading">
             <span className="home-section-label">News</span>
-            <h2>Aggiornamenti, fiere e novità aziendali</h2>
+            <h2>{get('home.news.title', 'Aggiornamenti, fiere e novità aziendali')}</h2>
           </div>
 
           <div className="home-news-grid">
@@ -627,9 +624,9 @@ export default function HomePage() {
       <section className="home-bottom-cta">
         <div className="site-container">
           <div className="home-bottom-cta-box">
-            <h2>Hai bisogno di una soluzione di incollaggio?</h2>
+            <h2>{get('home.cta.title', 'Hai bisogno di una soluzione di incollaggio?')}</h2>
             <Link to="/contatti" className="home-primary-btn">
-              Richiedi consulenza tecnica
+              {get('home.cta.button', 'Richiedi consulenza tecnica')}
             </Link>
           </div>
         </div>

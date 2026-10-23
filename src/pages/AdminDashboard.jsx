@@ -7,6 +7,13 @@ import '../styles/AdminDashboard.css'
 
 const quickActions = [
   {
+    to: '/admin/gestione-sito',
+    icon: '✎',
+    title: 'Gestione sito',
+    description: 'Modifica navbar, testi, prodotti, immagini e footer con anteprima e pubblicazione controllata.',
+    tag: 'Website editor',
+  },
+  {
     to: '/admin/shop',
     icon: '▣',
     title: 'Shop e ordini',
