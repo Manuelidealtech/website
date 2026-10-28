@@ -23,9 +23,10 @@ Prima di ogni nuova pubblicazione viene salvato uno snapshot della versione onli
 - Navbar: nomi, visibilità e ordine delle voci.
 - Menu Prodotti: nomi, visibilità e ordine.
 - Home: hero, immagini responsive e principali titoli di sezione.
-- Chi siamo: hero, blocchi principali, immagine azienda, foto e titolo titolare.
-- Prodotti: hero e catalogo con nome, titolo, descrizione, foto, visibilità e ordine.
-- Gallerie prodotto: aggiunta, eliminazione e riordino delle foto delle schede prodotto.
+- Chi siamo: hero, tutti e quattro i blocchi testuali, foto esterna Idealtech e sezione completa di Enrico Bozza.
+- Prodotti: hero, riquadro “Applicatori Hot Melt”, riquadro “Your Partner for Glueing”, settori e catalogo con nome, titolo, descrizione, foto, visibilità e ordine.
+- Pagine prodotto: titolo, linea, introduzione, blocchi descrittivi, caratteristiche, sottosezioni, elenchi puntati e titoli galleria per ogni singolo prodotto.
+- Gallerie prodotto: aggiunta, eliminazione e riordino delle foto delle singole pagine prodotto.
 - Servizi: hero, elenco servizi, titoli e call to action.
 - Footer: dati societari e link social.
 - SEO: resta disponibile nella sezione SEO già presente nel pannello.
@@ -33,3 +34,7 @@ Prima di ogni nuova pubblicazione viene salvato uno snapshot della versione onli
 ## Immagini
 
 Le immagini caricate dal Website Editor vengono automaticamente ridimensionate e convertite in WebP e salvate nel bucket pubblico Supabase `site-assets`.
+
+## Aggiornamento editor esteso
+
+Se `SUPABASE_WEBSITE_CMS.sql` era già stato eseguito in precedenza, per queste nuove sezioni **non serve eseguire altro SQL**: i nuovi campi vengono creati automaticamente alla prima bozza/pubblicazione dal pannello.

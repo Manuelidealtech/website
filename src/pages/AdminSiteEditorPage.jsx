@@ -17,6 +17,7 @@ const previewRoutes = {
   home: '/',
   about: '/chi-siamo',
   products: '/prodotti',
+  productDetails: '/prodotti/drum-line',
   services: '/servizi',
   footer: '/',
 }
@@ -33,6 +34,7 @@ export default function AdminSiteEditorPage() {
   const [error, setError] = useState('')
   const [message, setMessage] = useState('')
   const [dirty, setDirty] = useState(false)
+  const [openProductId, setOpenProductId] = useState('drum-line')
 
   const sectionFields = useMemo(
     () => SITE_CONTENT_FIELDS.filter((field) => field.section === activeSection),
@@ -249,6 +251,106 @@ export default function AdminSiteEditorPage() {
     )
   }
 
+  function renderProductPagesEditor(field) {
+    const pages = values[field.key] && typeof values[field.key] === 'object' ? values[field.key] : field.defaultValue
+
+    function mutatePages(mutator) {
+      const next = JSON.parse(JSON.stringify(pages || {}))
+      mutator(next)
+      setValue(field.key, next)
+    }
+
+    function paragraphsFromText(text) {
+      return String(text || '').split(/\n\s*\n+/).map((item) => item.trim()).filter(Boolean)
+    }
+
+    const productOrder = ['drum-line', 'extruder-line', 'assy-line', 'coating-heads', 'custom-machines', 'ideal-melt', 'idm-gp', 'gun-line', 'hose-line', 'cold-line', 'hand-gun', 'spare-parts']
+    const pageEntries = Object.entries(pages || {}).sort(([a], [b]) => productOrder.indexOf(a) - productOrder.indexOf(b))
+
+    return (
+      <div className="cms-product-pages-editor">
+        <div className="cms-product-pages-help">
+          <strong>Come funziona</strong>
+          <span>Apri un prodotto e modifica solo i campi che ti servono. I paragrafi si separano lasciando una riga vuota.</span>
+        </div>
+
+        {pageEntries.map(([productId, page]) => (
+          <details
+            className="cms-product-page"
+            key={productId}
+            open={openProductId === productId}
+            onToggle={(event) => {
+              if (event.currentTarget.open) setOpenProductId(productId)
+              else if (openProductId === productId) setOpenProductId('')
+            }}
+          >
+            <summary>
+              <div>
+                <strong>{page.name || page.kicker || page.title || productId}</strong>
+                <span>{page.title}</span>
+              </div>
+              <span className="cms-product-page__path">/prodotti/{productId}</span>
+            </summary>
+
+            <div className="cms-product-page__body">
+              <div className="cms-product-page__hero-fields">
+                <label><span>Nome nel breadcrumb</span><input value={page.name || ''} onChange={(e) => mutatePages((next) => { next[productId].name = e.target.value })} /></label>
+                <label><span>Etichetta / linea</span><input value={page.kicker || ''} onChange={(e) => mutatePages((next) => { next[productId].kicker = e.target.value })} /></label>
+                <label className="cms-full"><span>Titolo principale</span><input value={page.title || ''} onChange={(e) => mutatePages((next) => { next[productId].title = e.target.value })} /></label>
+                <label className="cms-full"><span>Testo introduttivo</span><textarea rows="4" value={page.intro || ''} onChange={(e) => mutatePages((next) => { next[productId].intro = e.target.value })} /></label>
+              </div>
+
+              <div className="cms-product-page__sections">
+                {(page.sections || []).map((section, sectionIndex) => (
+                  <div className="cms-product-page__section" key={`${productId}-section-${sectionIndex}`}>
+                    <div className="cms-product-page__section-head">
+                      <strong>Blocco {sectionIndex + 1}</strong>
+                      <button type="button" className="cms-mini-danger" onClick={() => mutatePages((next) => { next[productId].sections.splice(sectionIndex, 1) })}>Rimuovi blocco</button>
+                    </div>
+
+                    <label><span>Titolo del blocco</span><input value={section.label || ''} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].label = e.target.value })} /></label>
+                    <label><span>Testo del blocco</span><textarea rows="5" value={(section.paragraphs || []).join('\n\n')} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].paragraphs = paragraphsFromText(e.target.value) })} placeholder="Scrivi un paragrafo. Lascia una riga vuota per iniziarne un altro." /></label>
+
+                    {(section.groups || []).map((group, groupIndex) => (
+                      <div className="cms-product-page__group" key={`${productId}-section-${sectionIndex}-group-${groupIndex}`}>
+                        <div className="cms-product-page__group-head">
+                          <strong>Sottosezione / elenco {groupIndex + 1}</strong>
+                          <button type="button" className="cms-mini-danger" onClick={() => mutatePages((next) => { next[productId].sections[sectionIndex].groups.splice(groupIndex, 1) })}>Rimuovi</button>
+                        </div>
+                        <label><span>Titolo sottosezione (facoltativo)</span><input value={group.title || ''} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].title = e.target.value })} /></label>
+                        <label><span>Testo sottosezione (facoltativo)</span><textarea rows="4" value={(group.paragraphs || []).join('\n\n')} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].paragraphs = paragraphsFromText(e.target.value) })} /></label>
+
+                        <div className="cms-product-page__items">
+                          <span className="cms-product-page__items-label">Elenco puntato</span>
+                          {(group.items || []).map((item, itemIndex) => (
+                            <div className="cms-product-page__item" key={`${productId}-${sectionIndex}-${groupIndex}-${itemIndex}`}>
+                              <input value={item || ''} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].items[itemIndex] = e.target.value })} />
+                              <button type="button" className="cms-mini-danger" aria-label="Elimina voce" onClick={() => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].items.splice(itemIndex, 1) })}>×</button>
+                            </div>
+                          ))}
+                          <button type="button" className="admin-secondary-button cms-small-action" onClick={() => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].items.push('Nuova voce') })}>+ Aggiungi voce</button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <button type="button" className="admin-secondary-button cms-small-action" onClick={() => mutatePages((next) => { next[productId].sections[sectionIndex].groups.push({ title: '', paragraphs: [], items: [] }) })}>+ Aggiungi sottosezione o elenco</button>
+                  </div>
+                ))}
+
+                <button type="button" className="admin-secondary-button cms-small-action" onClick={() => mutatePages((next) => { next[productId].sections.push({ label: 'Nuovo blocco', paragraphs: [], groups: [] }) })}>+ Aggiungi blocco di testo</button>
+              </div>
+
+              <div className="cms-product-page__footer-fields">
+                <label><span>Titolo galleria</span><input value={page.galleryLabel || ''} onChange={(e) => mutatePages((next) => { next[productId].galleryLabel = e.target.value })} /></label>
+                <a className="admin-secondary-button cms-product-page__preview" href={`/prodotti/${productId}?cms_preview=1`} target="_blank" rel="noreferrer">Apri anteprima prodotto ↗</a>
+              </div>
+            </div>
+          </details>
+        ))}
+      </div>
+    )
+  }
+
   function renderProductsEditor(field) {
     const items = Array.isArray(values[field.key]) ? values[field.key] : []
     return (
@@ -299,6 +401,7 @@ export default function AdminSiteEditorPage() {
 
     if (field.type === 'navigation') return renderNavigationEditor(field)
     if (field.type === 'products') return renderProductsEditor(field)
+    if (field.type === 'product-pages') return renderProductPagesEditor(field)
 
     if (field.type === 'string-list') {
       const items = Array.isArray(value) ? value : []
@@ -314,6 +417,7 @@ export default function AdminSiteEditorPage() {
               <div className="cms-list-order">
                 <button type="button" onClick={() => moveArrayItem(field.key, index, -1)} disabled={index === 0}>↑</button>
                 <button type="button" onClick={() => moveArrayItem(field.key, index, 1)} disabled={index === items.length - 1}>↓</button>
+                <button type="button" className="cms-list-delete" onClick={() => setValue(field.key, items.filter((_, itemIndex) => itemIndex !== index))} aria-label="Elimina voce">×</button>
               </div>
             </div>
           ))}

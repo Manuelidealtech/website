@@ -19,6 +19,8 @@ export default function AboutPage() {
   const { get } = useSiteContent()
   const card1Paragraphs = String(get('about.card1.text', '')).split(/\n\n+/).filter(Boolean)
   const card2Paragraphs = String(get('about.card2.text', '')).split(/\n\n+/).filter(Boolean)
+  const card3Paragraphs = String(get('about.card3.text', 'Grazie alla produzione interna e a un’organizzazione flessibile, l’azienda è in grado di sviluppare soluzioni su misura, studiando insieme al cliente la risposta più adatta a ogni esigenza applicativa.\n\nIdealtech realizza inoltre progetti personalizzati che spaziano dai sistemi di applicazione colla fino a macchine speciali per imballaggio e incollaggio, con l’obiettivo di offrire soluzioni precise, efficaci e perfettamente integrate nei processi produttivi.')).split(/\n\n+/).filter(Boolean)
+  const ownerParagraphs = String(get('about.ownerText', 'Alla guida di Idealtech c’è una visione imprenditoriale fondata su competenza tecnica, affidabilità e capacità di interpretare concretamente le esigenze del mercato industriale.\n\nL’azienda è cresciuta nel tempo mantenendo un approccio diretto, serio e orientato alla qualità, costruendo relazioni solide con i clienti e sviluppando soluzioni capaci di unire innovazione, efficienza produttiva e supporto costante.\n\nOgni progetto nasce dall’ascolto, dall’esperienza sul campo e dalla volontà di offrire risposte realmente utili, personalizzate e durature.')).split(/\n\n+/).filter(Boolean)
 
   return (
     <div className="about-page">
@@ -56,14 +58,7 @@ export default function AboutPage() {
           </div>
 
           <div className="about-copy">
-            <p>
-              Grazie alla produzione interna e a un’organizzazione flessibile, l’azienda è in grado di sviluppare soluzioni su misura,
-              studiando insieme al cliente la risposta più adatta a ogni esigenza applicativa.
-            </p>
-            <p>
-              Idealtech realizza inoltre progetti personalizzati che spaziano dai sistemi di applicazione colla fino a macchine speciali per imballaggio e incollaggio,
-              con l’obiettivo di offrire soluzioni precise, efficaci e perfettamente integrate nei processi produttivi.
-            </p>
+            {card3Paragraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>
         </div>
       </section>
@@ -81,25 +76,11 @@ export default function AboutPage() {
             </div>
 
             <div className="about-owner-content">
-              <span className="section-kicker">La guida dell’azienda</span>
+              <span className="section-kicker">{get('about.ownerKicker', 'La guida dell’azienda')}</span>
               <h2>{get('about.ownerTitle', 'Visione, esperienza e attenzione al cliente')}</h2>
               <p className="about-owner-name">{get('about.ownerName', 'Enrico Bozza — Titolare Idealtech')}</p>
 
-              <p>
-                Alla guida di Idealtech c’è una visione imprenditoriale fondata su competenza tecnica,
-                affidabilità e capacità di interpretare concretamente le esigenze del mercato industriale.
-              </p>
-
-              <p>
-                L’azienda è cresciuta nel tempo mantenendo un approccio diretto, serio e orientato alla qualità,
-                costruendo relazioni solide con i clienti e sviluppando soluzioni capaci di unire innovazione,
-                efficienza produttiva e supporto costante.
-              </p>
-
-              <p>
-                Ogni progetto nasce dall’ascolto, dall’esperienza sul campo e dalla volontà di offrire
-                risposte realmente utili, personalizzate e durature.
-              </p>
+              {ownerParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
             </div>
           </div>
         </div>

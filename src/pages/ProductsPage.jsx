@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useSiteContent } from '../context/SiteContentContext'
 import { defaultProductCards } from '../lib/siteContentDefaults'
 
-const sectors = ['Tessile e Non-woven', 'Legno e paper converting', 'Automobilistico', 'Produzione filtri aria', 'Igienico-sanitario', 'Produzione materassi', 'Edilizia', 'Grafica', 'Packaging']
+const defaultSectors = ['Tessile e Non-woven', 'Legno e paper converting', 'Automobilistico', 'Produzione filtri aria', 'Igienico-sanitario', 'Produzione materassi', 'Edilizia', 'Grafica', 'Packaging']
 
 export default function ProductsPage() {
   const navigate = useNavigate()
   const { get } = useSiteContent()
   const productCards = (get('products.catalog', defaultProductCards) || []).filter((product) => product.visible !== false)
+  const applicatorsParagraphs = String(get('products.intro.applicators.text', 'L’intera gamma di hot melt è stata ideata per ottimizzare funzionalità e prestazioni, ridurre la carbonizzazione dell’adesivo, minimizzare i consumi energetici e massimizzare la produzione.\n\nImportante è stata anche l’introduzione di sistemi software e hardware che consentono di tracciare lo scarico dei dati di consumo e di produzione, oltre a garantire un servizio di ricerca guasti in remoto.\n\nTecnologia e innovazione sono in continuo sviluppo e oggi rappresentano uno dei nostri focus principali.')).split(/\n\n+/).filter(Boolean)
+  const sectors = get('products.intro.partner.sectors', defaultSectors) || defaultSectors
 
   const handleProductClick = (product) => {
     if (product.slug) return navigate(product.slug)
@@ -30,14 +32,12 @@ export default function ProductsPage() {
       <section className="products-intro">
         <div className="site-container products-intro__grid">
           <div className="products-intro__card">
-            <h2>Applicatori Hot Melt</h2>
-            <p>L’intera gamma di hot melt è stata ideata per ottimizzare funzionalità e prestazioni, ridurre la carbonizzazione dell’adesivo, minimizzare i consumi energetici e massimizzare la produzione.</p>
-            <p>Importante è stata anche l’introduzione di sistemi software e hardware che consentono di tracciare lo scarico dei dati di consumo e di produzione, oltre a garantire un servizio di ricerca guasti in remoto.</p>
-            <p>Tecnologia e innovazione sono in continuo sviluppo e oggi rappresentano uno dei nostri focus principali.</p>
+            <h2>{get('products.intro.applicators.title', 'Applicatori Hot Melt')}</h2>
+            {applicatorsParagraphs.map((paragraph, index) => <p key={index}>{paragraph}</p>)}
           </div>
           <div className="products-intro__card">
-            <h3>Your Partner for Glueing</h3>
-            <p>Ovunque ci sia un’esigenza in materia di incollaggio, Idealtech è presente e attiva per ricercare e garantire la soluzione migliore e più adatta alle richieste tecniche ed economiche del cliente.</p>
+            <h3>{get('products.intro.partner.title', 'Your Partner for Glueing')}</h3>
+            <p>{get('products.intro.partner.text', 'Ovunque ci sia un’esigenza in materia di incollaggio, Idealtech è presente e attiva per ricercare e garantire la soluzione migliore e più adatta alle richieste tecniche ed economiche del cliente.')}</p>
             <div className="products-sectors">
               {sectors.map((sector) => <div key={sector} className="products-sector"><span className="products-sector__dot" /><span>{sector}</span></div>)}
             </div>
