@@ -5,6 +5,7 @@
   <url><loc>https://www.idealtech.it/prodotti</loc><changefreq>monthly</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.idealtech.it/store</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.idealtech.it/servizi</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
+  <url><loc>https://www.idealtech.it/assistenza</loc><changefreq>monthly</changefreq><priority>0.8</priority></url>
   <url><loc>https://www.idealtech.it/contatti</loc><changefreq>yearly</changefreq><priority>0.7</priority></url>
   <url><loc>https://www.idealtech.it/shop</loc><changefreq>weekly</changefreq><priority>0.9</priority></url>
   <url><loc>https://www.idealtech.it/news</loc><changefreq>weekly</changefreq><priority>0.7</priority></url>

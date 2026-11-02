@@ -7,6 +7,7 @@ export const defaultNavbarItems = [
   { id: 'store', label: 'Usato', to: '/store', visible: true },
   { id: 'news', label: 'News', to: '/news', visible: true },
   { id: 'services', label: 'Servizi', to: '/servizi', visible: true },
+  { id: 'support', label: 'Assistenza', to: '/assistenza', visible: true },
   { id: 'contacts', label: 'Contatti', to: '/contatti', visible: true },
   { id: 'shop', label: 'Shop', to: '/shop', visible: true, shop: true },
 ]
@@ -181,7 +182,8 @@ export const defaultProductGalleries = {
 
 export const SITE_CONTENT_FIELDS = [
   { key: 'navbar.items', section: 'navbar', label: 'Voci menu principale', type: 'navigation', defaultValue: defaultNavbarItems },
-  { key: 'navbar.products', section: 'navbar', label: 'Prodotti nel menu', type: 'navigation', defaultValue: defaultProductMenuItems },
+  { key: 'navbar.products', section: 'navbar', label: 'Prodotti nel menu', type: 'product-navigation', defaultValue: defaultProductMenuItems },
+  { key: 'support.enabled', section: 'support', label: 'Pubblica area assistenza online', type: 'boolean', defaultValue: true },
 
   { key: 'home.hero.kicker', section: 'home', label: 'Etichetta hero', type: 'text', defaultValue: 'Gluing Technology' },
   { key: 'home.hero.title', section: 'home', label: 'Titolo hero', type: 'text', defaultValue: 'Soluzioni industriali per l’incollaggio professionale' },
@@ -275,5 +277,6 @@ export const SITE_SECTIONS = [
   { id: 'products', label: 'Prodotti', description: 'Hero, riquadri introduttivi e schede del catalogo prodotti.' },
   { id: 'productDetails', label: 'Pagine prodotto', description: 'Testi, caratteristiche, elenchi e gallerie delle singole pagine prodotto.' },
   { id: 'services', label: 'Servizi', description: 'Testi, elenco servizi e call to action.' },
+  { id: 'support', label: 'Assistenza', description: 'Pubblica o nascondi online il portale assistenza clienti.' },
   { id: 'footer', label: 'Footer', description: 'Dati societari e collegamenti social.' },
 ]

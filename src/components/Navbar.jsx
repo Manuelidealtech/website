@@ -7,13 +7,39 @@ import { defaultNavbarItems, defaultProductMenuItems } from '../lib/siteContentD
 import '../styles/Navbar.css'
 
 export default function Navbar() {
-  const { user } = useAuth()
+  const { user, role } = useAuth()
   const { language, languages, setLanguage } = useLanguage()
   const { get } = useSiteContent()
   const [menuOpen, setMenuOpen] = useState(false)
   const [productsOpen, setProductsOpen] = useState(false)
 
-  const navItems = (get('navbar.items', defaultNavbarItems) || []).filter((item) => item.visible !== false)
+  const supportEnabled = get('support.enabled', true) !== false
+  const panelPath = !user
+    ? '/login'
+    : role === 'technician'
+      ? '/admin/assistenza'
+      : role === 'customer' || !role
+        ? (supportEnabled ? '/assistenza/portale' : '/')
+        : '/admin'
+  const panelLabel = !user
+    ? 'Login'
+    : role === 'technician'
+      ? 'Assistenza'
+      : role === 'customer' || !role
+        ? (supportEnabled ? 'Assistenza' : 'Home')
+        : 'Pannello'
+
+  const storedNavItems = get('navbar.items', defaultNavbarItems) || []
+  const contactsIndex = storedNavItems.findIndex((item) => item.id === 'contacts')
+  const supportInsertIndex = contactsIndex >= 0 ? contactsIndex : storedNavItems.length
+  const navItemsWithSupport = storedNavItems.some((item) => item.id === 'support' || item.to === '/assistenza')
+    ? storedNavItems
+    : [
+        ...storedNavItems.slice(0, supportInsertIndex),
+        { id: 'support', label: 'Assistenza', to: '/assistenza', visible: true },
+        ...storedNavItems.slice(supportInsertIndex),
+      ]
+  const navItems = navItemsWithSupport.filter((item) => item.visible !== false && !((item.id === 'support' || item.to === '/assistenza') && !supportEnabled))
   const productMenuItems = (get('navbar.products', defaultProductMenuItems) || []).filter((item) => item.visible !== false)
 
   const closeMenu = () => {
@@ -121,15 +147,15 @@ export default function Navbar() {
 
           <div className="navbar__mobile-language">{languageSwitcher}</div>
           <div className="navbar__mobile-actions">
-            <Link to={user ? '/admin' : '/login'} className="navbar__login-btn" onClick={closeMenu}>
-              {user ? 'Pannello' : 'Login'}
+            <Link to={panelPath} className="navbar__login-btn" onClick={closeMenu}>
+              {panelLabel}
             </Link>
           </div>
         </nav>
 
         <div className="navbar__actions">
           {languageSwitcher}
-          <Link to={user ? '/admin' : '/login'} className="navbar__login-btn">{user ? 'Pannello' : 'Login'}</Link>
+          <Link to={panelPath} className="navbar__login-btn">{panelLabel}</Link>
         </div>
 
         <button className={`navbar__toggle ${menuOpen ? 'is-open' : ''}`} type="button" aria-label={menuOpen ? 'Chiudi menu' : 'Apri menu'} aria-expanded={menuOpen} onClick={toggleMenu}>

@@ -2,6 +2,9 @@ import { lazy, Suspense } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './components/ProtectedRoute'
 import AdminOnlyRoute from './components/AdminOnlyRoute'
+import SupportStaffRoute from './components/SupportStaffRoute'
+import CustomerSupportRoute from './components/CustomerSupportRoute'
+import SupportPublishedRoute from './components/SupportPublishedRoute'
 import ScrollToTop from './components/ScrollToTop'
 import SeoManager from './components/SeoManager'
 import AutoTranslate from './i18n/AutoTranslate'
@@ -31,6 +34,10 @@ const AdminSocialLinksPage = lazy(() => import('./pages/AdminSocialLinksPage'))
 const AdminShopPage = lazy(() => import('./pages/AdminShopPage'))
 const AdminReviewsPage = lazy(() => import('./pages/AdminReviewsPage'))
 const AdminSiteEditorPage = lazy(() => import('./pages/AdminSiteEditorPage'))
+const SupportLandingPage = lazy(() => import('./pages/SupportLandingPage'))
+const SupportAuthPage = lazy(() => import('./pages/SupportAuthPage'))
+const SupportPortalPage = lazy(() => import('./pages/SupportPortalPage'))
+const AdminSupportPage = lazy(() => import('./pages/AdminSupportPage'))
 
 const DrumLinePage = lazy(() => import('./products/DrumLinePage'))
 const ExtruderLinePage = lazy(() => import('./products/ExtruderLinePage'))
@@ -44,6 +51,7 @@ const HoseLinePage = lazy(() => import('./products/HoseLinePage'))
 const ColdLinePage = lazy(() => import('./products/ColdLinePage'))
 const HandGunPage = lazy(() => import('./products/HandGunPage'))
 const SparePartsPage = lazy(() => import('./products/SparePartsPage'))
+const DynamicProductPage = lazy(() => import('./products/DynamicProductPage'))
 
 function PublicPage({ children }) {
   return <PublicLayout>{children}</PublicLayout>
@@ -81,6 +89,11 @@ export default function App() {
           <Route path="/macchinario/:slug" element={<PublicPage><MachineDetailPage /></PublicPage>} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/links" element={<SocialLinksPage />} />
+          <Route path="/assistenza" element={<SupportPublishedRoute><PublicPage><SupportLandingPage /></PublicPage></SupportPublishedRoute>} />
+          <Route path="/assistenza/login" element={<SupportPublishedRoute><SupportAuthPage /></SupportPublishedRoute>} />
+          <Route path="/assistenza/registrazione" element={<SupportPublishedRoute><SupportAuthPage /></SupportPublishedRoute>} />
+          <Route path="/assistenza/portale" element={<SupportPublishedRoute><CustomerSupportRoute><SupportPortalPage /></CustomerSupportRoute></SupportPublishedRoute>} />
+          <Route path="/assistenza/portale/:ticketId" element={<SupportPublishedRoute><CustomerSupportRoute><SupportPortalPage /></CustomerSupportRoute></SupportPublishedRoute>} />
 
           <Route path="/admin" element={<ProtectedRoute><AdminDashboard /></ProtectedRoute>} />
           <Route path="/admin/macchinari" element={<ProtectedRoute><AdminMachinesPage /></ProtectedRoute>} />
@@ -94,6 +107,8 @@ export default function App() {
           <Route path="/admin/shop" element={<ProtectedRoute><AdminShopPage /></ProtectedRoute>} />
           <Route path="/admin/recensioni" element={<ProtectedRoute><AdminReviewsPage /></ProtectedRoute>} />
           <Route path="/admin/gestione-sito" element={<ProtectedRoute><AdminSiteEditorPage /></ProtectedRoute>} />
+          <Route path="/admin/assistenza" element={<SupportStaffRoute><AdminSupportPage /></SupportStaffRoute>} />
+          <Route path="/admin/assistenza/:ticketId" element={<SupportStaffRoute><AdminSupportPage /></SupportStaffRoute>} />
 
           <Route path="/prodotti/drum-line" element={<PublicPage><DrumLinePage /></PublicPage>} />
           <Route path="/prodotti/extruder-line" element={<PublicPage><ExtruderLinePage /></PublicPage>} />
@@ -107,6 +122,7 @@ export default function App() {
           <Route path="/prodotti/cold-line" element={<PublicPage><ColdLinePage /></PublicPage>} />
           <Route path="/prodotti/hand-gun" element={<PublicPage><HandGunPage /></PublicPage>} />
           <Route path="/prodotti/spare-parts" element={<PublicPage><SparePartsPage /></PublicPage>} />
+          <Route path="/prodotti/:productSlug" element={<PublicPage><DynamicProductPage /></PublicPage>} />
 
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

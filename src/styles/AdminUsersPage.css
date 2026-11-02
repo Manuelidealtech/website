@@ -195,3 +195,27 @@
     margin-left: 0;
   }
 }
+
+.admin-user-form select {
+  width: 100%;
+  min-height: 49px;
+  padding: 0 14px;
+  border: 1px solid #d6e3f0;
+  border-radius: 13px;
+  background: #f9fbfe;
+  color: #12355b;
+  font: inherit;
+  font-weight: 700;
+  outline: none;
+}
+.admin-user-form select:focus { border-color: #4e96f0; box-shadow: 0 0 0 4px rgba(78,150,240,.12); }
+.admin-users-groups { display: grid; gap: 24px; margin-top: 20px; }
+.admin-users-group { display: grid; gap: 8px; }
+.admin-users-group__title { display: flex; align-items: center; justify-content: space-between; padding-bottom: 8px; border-bottom: 1px solid #e4edf5; }
+.admin-users-group__title strong { color: #234867; }
+.admin-users-group__title span { min-width: 27px; height: 27px; display: grid; place-items: center; border-radius: 999px; background: #edf4fb; color: #52718e; font-size: .75rem; font-weight: 900; }
+.admin-user-avatar.is-technician { background: #e9f8ef; color: #14804d; }
+.admin-role-badge.is-technician { background: #e9f8ef; color: #14804d; }
+.admin-user-form .auth-message { padding: 11px 12px; border-radius: 11px; font-size: .82rem; font-weight: 800; line-height: 1.45; }
+.admin-user-form .auth-message.error { border: 1px solid #efc8ce; background: #fff1f3; color: #a22e3e; }
+.admin-user-form .auth-message.success { border: 1px solid #bfe3ce; background: #effaf4; color: #1b7243; }

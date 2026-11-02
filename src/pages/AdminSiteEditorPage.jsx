@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
 import { SITE_CONTENT_DEFAULTS, SITE_CONTENT_FIELDS, SITE_SECTIONS } from '../lib/siteContentDefaults'
 import { uploadSiteAsset } from '../lib/siteAssetStorage'
+import { slugify } from '../lib/slugify'
 import '../styles/AdminSiteEditorPage.css'
 
 function rowsToMap(rows = []) {
@@ -19,6 +20,7 @@ const previewRoutes = {
   products: '/prodotti',
   productDetails: '/prodotti/drum-line',
   services: '/servizi',
+  support: '/assistenza',
   footer: '/',
 }
 
@@ -60,11 +62,18 @@ export default function AdminSiteEditorPage() {
         throw new Error(`CMS non configurato nel database. Esegui prima il file SUPABASE_WEBSITE_CMS.sql. Dettaglio: ${dbError.message}`)
       }
 
-      setValues({
+      const mergedValues = {
         ...SITE_CONTENT_DEFAULTS,
         ...rowsToMap(publishedResult.data),
         ...rowsToMap(draftResult.data),
-      })
+      }
+      if (Array.isArray(mergedValues['navbar.items']) && !mergedValues['navbar.items'].some((item) => item.id === 'support' || item.to === '/assistenza')) {
+        const nextNav = [...mergedValues['navbar.items']]
+        const contactsIndex = nextNav.findIndex((item) => item.id === 'contacts')
+        nextNav.splice(contactsIndex >= 0 ? contactsIndex : nextNav.length, 0, { id: 'support', label: 'Assistenza', to: '/assistenza', visible: true })
+        mergedValues['navbar.items'] = nextNav
+      }
+      setValues(mergedValues)
       setVersions(versionsResult.data || [])
       setDirty(false)
     } catch (err) {
@@ -251,6 +260,68 @@ export default function AdminSiteEditorPage() {
     )
   }
 
+
+  function renderProductNavigationEditor(field) {
+    const items = Array.isArray(values[field.key]) ? values[field.key] : []
+    const availablePages = Object.entries(values['products.details'] || {}).map(([productId, page]) => ({
+      label: page?.name || page?.title || productId,
+      url: `/prodotti/${page?.slug || productId}`,
+    }))
+
+    function addMenuItem() {
+      const nextNumber = items.length + 1
+      setValue(field.key, [
+        ...items,
+        {
+          id: `menu-prodotto-${nextNumber}`,
+          label: 'Nuovo prodotto',
+          to: '/prodotti/nuovo-prodotto',
+          visible: true,
+        },
+      ])
+    }
+
+    return (
+      <div className="cms-product-menu-editor">
+        <div className="cms-product-pages-help">
+          <strong>Prima crea la pagina prodotto</strong>
+          <span>Vai in “Pagine prodotto”, crea la nuova pagina e poi inserisci qui il suo URL, per esempio /prodotti/nuovo-prodotto.</span>
+        </div>
+        <div className="cms-list-editor">
+          {items.map((item, index) => (
+            <div className="cms-product-menu-row" key={item.id || `${field.key}-${index}`}>
+              <div className="cms-list-order">
+                <button type="button" onClick={() => moveArrayItem(field.key, index, -1)} disabled={index === 0} aria-label="Sposta su">↑</button>
+                <button type="button" onClick={() => moveArrayItem(field.key, index, 1)} disabled={index === items.length - 1} aria-label="Sposta giù">↓</button>
+              </div>
+              <div className="cms-product-menu-fields">
+                <label>
+                  <span>Nome nel sottomenu</span>
+                  <input value={item.label || ''} onChange={(e) => updateArrayItem(field.key, index, { label: e.target.value })} />
+                </label>
+                <label>
+                  <span>Redirect URL</span>
+                  <input list="cms-product-page-urls" value={item.to || ''} onChange={(e) => updateArrayItem(field.key, index, { to: e.target.value })} placeholder="/prodotti/nome-prodotto" />
+                </label>
+              </div>
+              <div className="cms-product-menu-actions">
+                <label className="cms-switch">
+                  <input type="checkbox" checked={item.visible !== false} onChange={(e) => updateArrayItem(field.key, index, { visible: e.target.checked })} />
+                  <span>Visibile</span>
+                </label>
+                <button type="button" className="cms-mini-danger" onClick={() => setValue(field.key, items.filter((_, itemIndex) => itemIndex !== index))}>Elimina</button>
+              </div>
+            </div>
+          ))}
+        </div>
+        <datalist id="cms-product-page-urls">
+          {availablePages.map((page) => <option key={page.url} value={page.url}>{page.label}</option>)}
+        </datalist>
+        <button type="button" className="admin-secondary-button cms-add-line" onClick={addMenuItem}>+ Aggiungi voce al sottomenu</button>
+      </div>
+    )
+  }
+
   function renderProductPagesEditor(field) {
     const pages = values[field.key] && typeof values[field.key] === 'object' ? values[field.key] : field.defaultValue
 
@@ -264,15 +335,53 @@ export default function AdminSiteEditorPage() {
       return String(text || '').split(/\n\s*\n+/).map((item) => item.trim()).filter(Boolean)
     }
 
+    function createProductPage() {
+      let counter = Object.keys(pages || {}).length + 1
+      let productId = `nuovo-prodotto-${counter}`
+      while (pages?.[productId]) {
+        counter += 1
+        productId = `nuovo-prodotto-${counter}`
+      }
+
+      mutatePages((next) => {
+        next[productId] = {
+          slug: productId,
+          name: 'Nuovo prodotto',
+          kicker: 'Nuova linea',
+          title: 'Titolo nuovo prodotto',
+          intro: 'Inserisci qui una breve introduzione del prodotto.',
+          sections: [
+            { label: 'Descrizione', paragraphs: ['Inserisci qui la descrizione del prodotto.'], groups: [] },
+            { label: 'Caratteristiche', paragraphs: [], groups: [{ title: '', paragraphs: [], items: ['Prima caratteristica'] }] },
+          ],
+          galleryLabel: 'Galleria prodotto',
+        }
+      })
+      setOpenProductId(productId)
+    }
+
+    function deleteProductPage(productId) {
+      mutatePages((next) => { delete next[productId] })
+      if (openProductId === productId) setOpenProductId('')
+    }
+
     const productOrder = ['drum-line', 'extruder-line', 'assy-line', 'coating-heads', 'custom-machines', 'ideal-melt', 'idm-gp', 'gun-line', 'hose-line', 'cold-line', 'hand-gun', 'spare-parts']
-    const pageEntries = Object.entries(pages || {}).sort(([a], [b]) => productOrder.indexOf(a) - productOrder.indexOf(b))
+    const pageEntries = Object.entries(pages || {}).sort(([a], [b]) => {
+      const ai = productOrder.indexOf(a)
+      const bi = productOrder.indexOf(b)
+      if (ai === -1 && bi === -1) return 0
+      if (ai === -1) return 1
+      if (bi === -1) return -1
+      return ai - bi
+    })
 
     return (
       <div className="cms-product-pages-editor">
         <div className="cms-product-pages-help">
           <strong>Come funziona</strong>
-          <span>Apri un prodotto e modifica solo i campi che ti servono. I paragrafi si separano lasciando una riga vuota.</span>
+          <span>Crea qui prima la pagina prodotto. Ogni pagina genera un URL /prodotti/slug che puoi poi usare nel catalogo e nel sottomenu Prodotti.</span>
         </div>
+        <button type="button" className="admin-primary-button cms-create-product-page" onClick={createProductPage}>+ Crea nuova pagina prodotto</button>
 
         {pageEntries.map(([productId, page]) => (
           <details
@@ -289,11 +398,19 @@ export default function AdminSiteEditorPage() {
                 <strong>{page.name || page.kicker || page.title || productId}</strong>
                 <span>{page.title}</span>
               </div>
-              <span className="cms-product-page__path">/prodotti/{productId}</span>
+              <span className="cms-product-page__path">/prodotti/{page.slug || productId}</span>
             </summary>
 
             <div className="cms-product-page__body">
+              <div className="cms-product-page__top-actions">
+                <div>
+                  <strong>Impostazioni pagina</strong>
+                  <span>Lo slug definisce l'indirizzo pubblico della pagina.</span>
+                </div>
+                {!productOrder.includes(productId) ? <button type="button" className="cms-mini-danger" onClick={() => deleteProductPage(productId)}>Elimina pagina</button> : null}
+              </div>
               <div className="cms-product-page__hero-fields">
+                <label className="cms-full"><span>URL pagina prodotto</span><div className="cms-slug-field"><span>/prodotti/</span><input value={page.slug || productId} onChange={(e) => mutatePages((next) => { next[productId].slug = slugify(e.target.value) })} placeholder="nome-prodotto" /></div></label>
                 <label><span>Nome nel breadcrumb</span><input value={page.name || ''} onChange={(e) => mutatePages((next) => { next[productId].name = e.target.value })} /></label>
                 <label><span>Etichetta / linea</span><input value={page.kicker || ''} onChange={(e) => mutatePages((next) => { next[productId].kicker = e.target.value })} /></label>
                 <label className="cms-full"><span>Titolo principale</span><input value={page.title || ''} onChange={(e) => mutatePages((next) => { next[productId].title = e.target.value })} /></label>
@@ -342,7 +459,7 @@ export default function AdminSiteEditorPage() {
 
               <div className="cms-product-page__footer-fields">
                 <label><span>Titolo galleria</span><input value={page.galleryLabel || ''} onChange={(e) => mutatePages((next) => { next[productId].galleryLabel = e.target.value })} /></label>
-                <a className="admin-secondary-button cms-product-page__preview" href={`/prodotti/${productId}?cms_preview=1`} target="_blank" rel="noreferrer">Apri anteprima prodotto ↗</a>
+                <a className="admin-secondary-button cms-product-page__preview" href={`/prodotti/${page.slug || productId}?cms_preview=1`} target="_blank" rel="noreferrer">Apri anteprima prodotto ↗</a>
               </div>
             </div>
           </details>
@@ -353,12 +470,48 @@ export default function AdminSiteEditorPage() {
 
   function renderProductsEditor(field) {
     const items = Array.isArray(values[field.key]) ? values[field.key] : []
+    const availablePages = Object.entries(values['products.details'] || {}).map(([productId, page]) => ({
+      label: page?.name || page?.title || productId,
+      url: `/prodotti/${page?.slug || productId}`,
+    }))
+
+    function addProduct() {
+      let counter = items.length + 1
+      let id = `nuovo-prodotto-${counter}`
+      const existingIds = new Set(items.map((item) => item.id))
+      while (existingIds.has(id)) {
+        counter += 1
+        id = `nuovo-prodotto-${counter}`
+      }
+      setValue(field.key, [
+        ...items,
+        {
+          id,
+          title: 'Nuova linea',
+          subtitle: 'Nuovo prodotto',
+          description: 'Inserisci qui una breve descrizione del prodotto.',
+          image: '/logo-cerchio.png',
+          cta: 'Scopri di più',
+          slug: `/prodotti/${id}`,
+          visible: true,
+        },
+      ])
+    }
+
     return (
       <div className="cms-product-editor">
+        <div className="cms-product-pages-help">
+          <strong>Prodotti mostrati nella pagina /prodotti</strong>
+          <span>Puoi aggiungere nuove schede. Se il pulsante deve aprire una pagina prodotto, crea prima quella pagina nella sezione “Pagine prodotto” e copia qui il relativo URL.</span>
+        </div>
+        <button type="button" className="admin-primary-button cms-add-product-card" onClick={addProduct}>+ Aggiungi nuovo prodotto</button>
+        <datalist id="cms-catalog-product-page-urls">
+          {availablePages.map((page) => <option key={page.url} value={page.url}>{page.label}</option>)}
+        </datalist>
         {items.map((item, index) => (
           <article className="cms-product-card" key={item.id || index}>
             <div className="cms-product-preview">
-              <img src={item.image} alt="" />
+              <img src={item.image || '/logo-cerchio.png'} alt="" />
               <div>
                 <strong>{item.title || 'Prodotto'}</strong>
                 <span>{item.subtitle}</span>
@@ -369,6 +522,7 @@ export default function AdminSiteEditorPage() {
               <label><span>Titolo visualizzato</span><input value={item.subtitle || ''} onChange={(e) => updateArrayItem(field.key, index, { subtitle: e.target.value })} /></label>
               <label className="cms-full"><span>Descrizione</span><textarea rows="3" value={item.description || ''} onChange={(e) => updateArrayItem(field.key, index, { description: e.target.value })} /></label>
               <label><span>Testo pulsante</span><input value={item.cta || ''} onChange={(e) => updateArrayItem(field.key, index, { cta: e.target.value })} /></label>
+              <label><span>Redirect URL del prodotto</span><input list="cms-catalog-product-page-urls" value={item.slug || ''} onChange={(e) => updateArrayItem(field.key, index, { slug: e.target.value })} placeholder="/prodotti/nome-prodotto" /></label>
               <div className="cms-image-control">
                 <span>Foto prodotto</span>
                 <FileUploadField
@@ -385,10 +539,13 @@ export default function AdminSiteEditorPage() {
                 <button type="button" onClick={() => moveArrayItem(field.key, index, -1)} disabled={index === 0}>↑</button>
                 <button type="button" onClick={() => moveArrayItem(field.key, index, 1)} disabled={index === items.length - 1}>↓</button>
               </div>
-              <label className="cms-switch">
-                <input type="checkbox" checked={item.visible !== false} onChange={(e) => updateArrayItem(field.key, index, { visible: e.target.checked })} />
-                <span>Visibile</span>
-              </label>
+              <div className="cms-product-footer-actions">
+                <label className="cms-switch">
+                  <input type="checkbox" checked={item.visible !== false} onChange={(e) => updateArrayItem(field.key, index, { visible: e.target.checked })} />
+                  <span>Visibile</span>
+                </label>
+                <button type="button" className="cms-mini-danger" onClick={() => setValue(field.key, items.filter((_, itemIndex) => itemIndex !== index))}>Elimina prodotto</button>
+              </div>
             </div>
           </article>
         ))}
@@ -400,8 +557,25 @@ export default function AdminSiteEditorPage() {
     const value = values[field.key] ?? field.defaultValue
 
     if (field.type === 'navigation') return renderNavigationEditor(field)
+    if (field.type === 'product-navigation') return renderProductNavigationEditor(field)
     if (field.type === 'products') return renderProductsEditor(field)
     if (field.type === 'product-pages') return renderProductPagesEditor(field)
+
+    if (field.type === 'boolean') {
+      const enabled = value !== false
+      return (
+        <div className={`cms-publish-toggle ${enabled ? 'is-enabled' : 'is-disabled'}`}>
+          <div>
+            <strong>{enabled ? 'Area pubblicata online' : 'Area non pubblicata'}</strong>
+            <span>{enabled ? 'La voce Assistenza è visibile nel sito e i clienti possono accedere al portale.' : 'La voce Assistenza è nascosta dal sito pubblico e le rotte clienti vengono reindirizzate alla Home.'}</span>
+          </div>
+          <label className="cms-switch cms-switch--large">
+            <input type="checkbox" checked={enabled} onChange={(e) => setValue(field.key, e.target.checked)} />
+            <span>{enabled ? 'Online' : 'Offline'}</span>
+          </label>
+        </div>
+      )
+    }
 
     if (field.type === 'string-list') {
       const items = Array.isArray(value) ? value : []

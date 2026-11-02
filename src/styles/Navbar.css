@@ -2,18 +2,23 @@
   position: sticky;
   top: 0;
   z-index: 1000;
-  background: rgba(255, 255, 255, 0.96);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(15, 52, 91, 0.08);
+  box-shadow: 0 4px 22px rgba(18, 53, 91, 0.035);
 }
 
-.navbar__inner {
-  min-height: 92px;
-  display: flex;
+/* La navbar usa una larghezza leggermente maggiore delle sezioni del sito:
+   evita che menu, lingue e pannello vadano su due righe sui desktop standard. */
+.navbar .navbar__inner {
+  width: min(1460px, calc(100% - 48px));
+  min-height: 82px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  justify-content: space-between;
-  gap: 24px;
+  gap: clamp(22px, 2.2vw, 38px);
   position: relative;
 }
 
@@ -24,19 +29,20 @@
 }
 
 .navbar__brand-logo {
-  height: 58px;
   width: auto;
+  height: 50px;
+  max-width: 255px;
   display: block;
   object-fit: contain;
 }
 
 .navbar__nav {
-  flex: 1;
+  min-width: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 22px;
-  flex-wrap: wrap;
+  gap: clamp(10px, 1.05vw, 18px);
+  flex-wrap: nowrap;
 }
 
 .navbar__mobile-panel-header,
@@ -46,55 +52,98 @@
 }
 
 .navbar__link {
-  font-size: 14px;
-  font-weight: 600;
-  color: #334155;
-  transition: 0.2s ease;
+  position: relative;
+  min-height: 42px;
+  padding: 0 2px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #263d57;
+  font-size: 13.5px;
+  font-weight: 650;
+  line-height: 1;
   white-space: nowrap;
+  transition: color 0.18s ease;
+}
+
+.navbar__link::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 0;
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #54a5ee, #176ac4);
+  transform: translateX(-50%);
+  transition: width 0.2s ease;
 }
 
 .navbar__link:hover,
 .navbar__link.active {
-  color: var(--primary-light);
+  color: #176ac4;
+}
+
+.navbar__link:hover::after,
+.navbar__link.active::after {
+  width: 100%;
 }
 
 .navbar__shop-link {
-  padding: 9px 14px;
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #d8e9fb;
   border-radius: 999px;
-  background: #eaf4ff;
-  color: #155fac;
+  background: #f1f7fe;
+  color: #1765b5;
+  font-weight: 750;
+}
+
+.navbar__shop-link::after {
+  display: none;
 }
 
 .navbar__shop-link:hover,
 .navbar__shop-link.active {
   color: #fff;
-  background: linear-gradient(135deg, #4397f2, #0f67d8);
+  border-color: transparent;
+  background: linear-gradient(135deg, #4ca0eb, #176bc6);
+  box-shadow: 0 7px 16px rgba(23, 107, 198, 0.18);
 }
 
 .navbar__actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
   flex-shrink: 0;
 }
 
 .navbar__login-btn {
-  min-height: 46px;
-  padding: 0 18px;
-  border-radius: 14px;
+  min-height: 42px;
+  padding: 0 17px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  background: linear-gradient(135deg, #54a5ee, #1d70c8);
   color: #fff;
-  font-weight: 700;
-  box-shadow: 0 12px 24px rgba(77, 159, 230, 0.24);
+  font-size: 13.5px;
+  font-weight: 800;
+  line-height: 1;
+  box-shadow: 0 8px 18px rgba(30, 112, 200, 0.18);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+}
+
+.navbar__login-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 11px 23px rgba(30, 112, 200, 0.24);
+  filter: saturate(1.05);
 }
 
 .navbar__toggle {
   display: none;
-  width: 46px;
-  height: 46px;
+  width: 44px;
+  height: 44px;
   border: none;
   background: transparent;
   cursor: pointer;
@@ -105,7 +154,7 @@
 
 .navbar__toggle span {
   display: block;
-  width: 26px;
+  width: 25px;
   height: 3px;
   margin: 5px auto;
   border-radius: 999px;
@@ -142,7 +191,7 @@
 .navbar__dropdown-top {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
 }
 
 .navbar__dropdown-arrow {
@@ -163,32 +212,31 @@
   position: absolute;
   top: calc(100% - 2px);
   left: 50%;
-  transform: translateX(-50%);
-  min-width: 250px;
-  padding: 14px 12px;
-  background: #ffffff;
-  border: 1px solid rgba(15, 23, 42, 0.18);
-  border-radius: 18px;
-  box-shadow: 0 18px 32px rgba(15, 23, 42, 0.14);
+  transform: translateX(-50%) translateY(6px);
+  min-width: 260px;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.99);
+  border: 1px solid rgba(15, 52, 91, 0.11);
+  border-radius: 16px;
+  box-shadow: 0 20px 42px rgba(15, 42, 74, 0.16);
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: 0.22s ease;
+  transition: opacity 0.18s ease, transform 0.18s ease, visibility 0.18s ease;
   z-index: 1200;
 }
 
 .navbar__dropdown-menu::before {
   content: '';
   position: absolute;
-  top: -8px;
+  top: -7px;
   left: 50%;
-  transform: translateX(-50%);
-  width: 14px;
-  height: 14px;
-  background: #ffffff;
-  border-top: 1px solid rgba(15, 23, 42, 0.18);
-  border-left: 1px solid rgba(15, 23, 42, 0.18);
-  rotate: 45deg;
+  width: 13px;
+  height: 13px;
+  background: #fff;
+  border-top: 1px solid rgba(15, 52, 91, 0.11);
+  border-left: 1px solid rgba(15, 52, 91, 0.11);
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .navbar__dropdown-menu::after {
@@ -205,20 +253,23 @@
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
 }
 
 .navbar__dropdown-link {
   display: block;
-  padding: 7px 0;
-  font-size: 15px;
-  font-weight: 500;
+  padding: 9px 11px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 550;
   color: #334155;
-  transition: 0.2s ease;
+  transition: 0.18s ease;
   white-space: nowrap;
 }
 
 .navbar__dropdown-link:hover {
-  color: var(--primary-light);
+  color: #176ac4;
+  background: #f1f7fd;
 }
 
 .navbar__dropdown-link.is-featured {
@@ -230,16 +281,16 @@
 .navbar__language-switcher {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px;
+  gap: 2px;
+  padding: 3px;
   border-radius: 999px;
-  background: rgba(13, 59, 142, 0.06);
-  border: 1px solid rgba(13, 59, 142, 0.1);
+  background: #f4f7fb;
+  border: 1px solid #e4ebf3;
 }
 
 .navbar__language-btn {
-  width: 40px;
-  height: 40px;
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 999px;
   display: inline-flex;
@@ -248,24 +299,26 @@
   background: transparent;
   color: #334155;
   cursor: pointer;
-  transition: 0.2s ease;
+  transition: 0.18s ease;
   position: relative;
 }
 
-.navbar__language-btn:hover,
+.navbar__language-btn:hover {
+  background: rgba(255, 255, 255, 0.78);
+}
+
 .navbar__language-btn.is-active {
-  background: #ffffff;
-  color: var(--primary);
-  box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+  background: #fff;
+  box-shadow: 0 3px 10px rgba(15, 42, 74, 0.12);
 }
 
 .navbar__language-flag {
-  width: 24px;
-  height: 24px;
+  width: 21px;
+  height: 21px;
   display: block;
   border-radius: 999px;
   object-fit: cover;
-  line-height: 1;
+  box-shadow: 0 0 0 1px rgba(15, 42, 74, 0.08);
 }
 
 .navbar__language-code {
@@ -280,28 +333,59 @@
   border: 0;
 }
 
-@media (max-width: 1180px) {
-  .navbar__nav {
+/* Desktop compatti: manteniamo comunque tutto su una sola riga. */
+@media (max-width: 1280px) and (min-width: 993px) {
+  .navbar .navbar__inner {
+    width: min(100% - 30px, 1240px);
     gap: 16px;
   }
 
+  .navbar__brand-logo {
+    height: 44px;
+    max-width: 220px;
+  }
+
+  .navbar__nav {
+    gap: 9px;
+  }
+
   .navbar__link {
-    font-size: 13px;
+    font-size: 12.5px;
   }
 
   .navbar__shop-link {
-    padding: 12px;
-    border-bottom: 0;
+    padding: 0 11px;
+  }
+
+  .navbar__language-btn {
+    width: 29px;
+    height: 29px;
+  }
+
+  .navbar__language-flag {
+    width: 19px;
+    height: 19px;
+  }
+
+  .navbar__login-btn {
+    min-height: 39px;
+    padding: 0 13px;
+    font-size: 12.5px;
   }
 }
 
 @media (max-width: 992px) {
-  .navbar__inner {
-    min-height: 78px;
+  .navbar .navbar__inner {
+    width: min(100% - 32px, 920px);
+    min-height: 76px;
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
   }
 
   .navbar__brand-logo {
-    height: 46px;
+    height: 44px;
+    max-width: 225px;
   }
 
   .navbar__toggle {
@@ -325,29 +409,27 @@
   .navbar__nav {
     position: absolute;
     top: calc(100% + 10px);
-    left: 12px;
-    right: 12px;
+    left: 0;
+    right: 0;
     width: auto;
     height: auto;
-    max-height: calc(100vh - 102px);
+    max-height: calc(100vh - 98px);
     padding: 18px;
     overflow-y: auto;
-    background: rgba(255, 255, 255, 0.985);
+    background: rgba(255, 255, 255, 0.99);
     border: 1px solid rgba(13, 59, 142, 0.1);
-    border-radius: 24px;
+    border-radius: 22px;
     box-shadow: 0 22px 52px rgba(15, 23, 42, 0.18);
     z-index: 1101;
-
     flex-direction: column;
     align-items: stretch;
     justify-content: flex-start;
-    gap: 8px;
+    gap: 5px;
     flex-wrap: nowrap;
-
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transform: translateY(-12px) scale(0.98);
+    transform: translateY(-10px) scale(0.985);
     transition: opacity 0.22s ease, transform 0.22s ease, visibility 0.22s ease;
   }
 
@@ -372,31 +454,38 @@
 
   .navbar__mobile-close {
     display: inline-flex;
-    width: 40px;
-    height: 40px;
+    width: 38px;
+    height: 38px;
     align-items: center;
     justify-content: center;
     border: 0;
     border-radius: 999px;
     background: rgba(13, 59, 142, 0.08);
     color: #0d3b8e;
-    font-size: 28px;
+    font-size: 27px;
     line-height: 1;
     cursor: pointer;
   }
 
   .navbar__link {
     width: 100%;
-    padding: 12px 2px;
-    border-bottom: 1px solid rgba(13, 59, 142, 0.08);
+    min-height: 46px;
+    padding: 0 4px;
+    justify-content: flex-start;
+    border-bottom: 1px solid rgba(13, 59, 142, 0.07);
     font-size: 15px;
   }
 
+  .navbar__link::after {
+    display: none;
+  }
+
   .navbar__shop-link {
-    padding: 12px 16px;
-    margin-top: 4px;
+    min-height: 44px;
+    margin-top: 5px;
+    padding: 0 16px;
     justify-content: center;
-    border-bottom: 0;
+    border-bottom: 1px solid #d8e9fb;
   }
 
   .navbar__dropdown {
@@ -439,10 +528,10 @@
     transform: none;
     min-width: 100%;
     margin-top: 8px;
-    padding: 10px 14px;
-    border-radius: 16px;
+    padding: 8px;
+    border-radius: 14px;
     box-shadow: none;
-    border: 1px solid rgba(13, 59, 142, 0.12);
+    border: 1px solid rgba(13, 59, 142, 0.1);
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -456,10 +545,11 @@
 
   .navbar__dropdown.is-open .navbar__dropdown-menu {
     display: block;
+    transform: none;
   }
 
   .navbar__dropdown-link {
-    padding: 8px 0;
+    padding: 9px 10px;
     font-size: 14px;
     white-space: normal;
   }
@@ -473,16 +563,17 @@
   .navbar__mobile-language .navbar__language-switcher {
     width: 100%;
     justify-content: center;
+    padding: 5px;
   }
 
   .navbar__language-btn {
-    width: 42px;
-    height: 42px;
+    width: 40px;
+    height: 40px;
   }
 
   .navbar__language-flag {
-    width: 26px;
-    height: 26px;
+    width: 25px;
+    height: 25px;
   }
 
   .navbar__mobile-actions {
@@ -493,6 +584,24 @@
 
   .navbar__mobile-actions .navbar__login-btn {
     width: 100%;
+    min-height: 46px;
     text-align: center;
+  }
+}
+
+@media (max-width: 520px) {
+  .navbar .navbar__inner {
+    width: calc(100% - 24px);
+    min-height: 70px;
+  }
+
+  .navbar__brand-logo {
+    height: 39px;
+    max-width: 205px;
+  }
+
+  .navbar__toggle {
+    width: 40px;
+    height: 40px;
   }
 }

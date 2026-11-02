@@ -4,9 +4,17 @@ import { useSiteContent } from '../context/SiteContentContext'
 import '../styles/Footer.css'
 
 export default function Footer() {
-  const { user } = useAuth()
+  const { user, role } = useAuth()
   const { get } = useSiteContent()
   const currentYear = new Date().getFullYear()
+  const supportEnabled = get('support.enabled', true) !== false
+  const panelPath = !user
+    ? '/login'
+    : role === 'technician'
+      ? '/admin/assistenza'
+      : role === 'customer' || !role
+        ? (supportEnabled ? '/assistenza/portale' : '/')
+        : '/admin'
 
   return (
     <footer className="footer" data-nosnippet>
@@ -37,10 +45,11 @@ export default function Footer() {
             <div className="footer__section footer__section--private">
               <h3>AREA PERSONALE</h3>
               <div className="footer__links">
-                <Link to={user ? '/admin' : '/login'}>{user ? 'Vai al pannello' : 'Login'}</Link>
+                <Link to={panelPath}>{user ? (role === 'technician' ? 'Vai all’assistenza' : role === 'customer' || !role ? (supportEnabled ? 'Vai all’assistenza' : 'Torna alla home') : 'Vai al pannello') : 'Login'}</Link>
                 <Link to="/prodotti">Prodotti</Link>
                 <Link to="/store">Macchinari usati</Link>
                 <Link to="/servizi">Servizi</Link>
+                {supportEnabled ? <Link to="/assistenza">Assistenza</Link> : null}
                 <Link to="/contatti">Contatti</Link>
               </div>
             </div>

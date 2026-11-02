@@ -4,22 +4,30 @@ import { useAuth } from '../context/AuthContext'
 import '../styles/AdminLayout.css'
 
 const navItems = [
-  { to: '/admin', label: 'Dashboard', icon: '⌂', end: true },
-  { to: '/admin/gestione-sito', label: 'Gestione sito', icon: '✎' },
-  { to: '/admin/macchinari', label: 'Macchinari', icon: '⚙' },
-  { to: '/admin/news', label: 'News', icon: '✦' },
-  { to: '/admin/recensioni', label: 'Recensioni', icon: '★' },
-  { to: '/admin/shop', label: 'Shop e ordini', icon: '▣' },
-  { to: '/admin/contatti', label: 'Contatti', icon: '☎', adminOnly: true },
-  { to: '/admin/seo', label: 'SEO', icon: '⌕', adminOnly: true },
-  { to: '/admin/link-in-bio', label: 'Link page', icon: '↗', adminOnly: true },
-  { to: '/admin/utenti', label: 'Utenti admin', icon: '♙', adminOnly: true },
+  { to: '/admin', label: 'Dashboard', icon: '⌂', end: true, roles: ['admin', 'editor'] },
+  { to: '/admin/gestione-sito', label: 'Gestione sito', icon: '✎', roles: ['admin', 'editor'] },
+  { to: '/admin/macchinari', label: 'Macchinari', icon: '⚙', roles: ['admin', 'editor'] },
+  { to: '/admin/news', label: 'News', icon: '✦', roles: ['admin', 'editor'] },
+  { to: '/admin/recensioni', label: 'Recensioni', icon: '★', roles: ['admin', 'editor'] },
+  { to: '/admin/shop', label: 'Shop e ordini', icon: '▣', roles: ['admin', 'editor'] },
+  { to: '/admin/assistenza', label: 'Assistenza', icon: '◉', roles: ['admin', 'technician'] },
+  { to: '/admin/contatti', label: 'Contatti', icon: '☎', roles: ['admin'] },
+  { to: '/admin/seo', label: 'SEO', icon: '⌕', roles: ['admin'] },
+  { to: '/admin/link-in-bio', label: 'Link page', icon: '↗', roles: ['admin'] },
+  { to: '/admin/utenti', label: 'Utenti e tecnici', icon: '♙', roles: ['admin'] },
 ]
 
+const roleLabels = {
+  admin: 'Amministratore',
+  editor: 'Editor',
+  technician: 'Tecnico assistenza',
+}
+
 export default function AdminLayout({ title, subtitle, actions, children }) {
-  const { user, profile, signOut } = useAuth()
+  const { user, profile, supportStaff, role, signOut } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
-  const isAdmin = profile?.role === 'admin'
+  const technicianMode = role === 'technician'
+  const displayName = profile?.full_name || supportStaff?.full_name || user?.email || 'Utente'
 
   async function handleLogout() {
     const { error } = await signOut()
@@ -33,7 +41,7 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
           <img src="/logo-idealtech-900.webp" alt="Idealtech" width="900" height="173" decoding="async" />
           <div>
             <strong>Idealtech</strong>
-            <span>Gestione sito</span>
+            <span>{technicianMode ? 'Portale assistenza' : 'Gestione sito'}</span>
           </div>
 
           <button
@@ -51,16 +59,14 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
 
         <nav className="admin-sidebar-nav" aria-label="Navigazione amministrazione">
           {navItems
-            .filter((item) => !item.adminOnly || isAdmin)
+            .filter((item) => item.roles.includes(role))
             .map((item) => (
               <NavLink
                 key={item.to}
                 to={item.to}
                 end={item.end}
                 onClick={() => setMenuOpen(false)}
-                className={({ isActive }) =>
-                  `admin-nav-link ${isActive ? 'is-active' : ''}`
-                }
+                className={({ isActive }) => `admin-nav-link ${isActive ? 'is-active' : ''}`}
               >
                 <span className="admin-nav-icon" aria-hidden="true">{item.icon}</span>
                 <span className="admin-nav-label">{item.label}</span>
@@ -71,21 +77,19 @@ export default function AdminLayout({ title, subtitle, actions, children }) {
         <div className="admin-sidebar-bottom">
           <div className="admin-account-card">
             <span>Accesso effettuato come</span>
-            <strong>{profile?.full_name || user?.email || 'Amministratore'}</strong>
-            <small>{isAdmin ? 'Amministratore' : 'Editor'}</small>
+            <strong>{displayName}</strong>
+            <small>{roleLabels[role] || 'Utente'}</small>
           </div>
 
           <a href="/" className="admin-site-link">Apri il sito pubblico ↗</a>
-          <button type="button" className="admin-signout" onClick={handleLogout}>
-            Esci
-          </button>
+          <button type="button" className="admin-signout" onClick={handleLogout}>Esci</button>
         </div>
       </aside>
 
       <main className="admin-main">
         <header className="admin-page-header">
           <div className="admin-page-heading">
-            <span className="admin-page-kicker">Area amministrazione</span>
+            <span className="admin-page-kicker">{technicianMode ? 'Area tecnica' : 'Area amministrazione'}</span>
             <h1>{title}</h1>
             {subtitle ? <p>{subtitle}</p> : null}
           </div>
