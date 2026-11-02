@@ -24,9 +24,17 @@ const previewRoutes = {
   footer: '/',
 }
 
+function getInitialEditorSection() {
+  if (typeof window === 'undefined') return 'navbar'
+  const urlSection = new URLSearchParams(window.location.search).get('section')
+  const savedSection = window.localStorage.getItem('idealtech.cms.activeSection')
+  const candidate = urlSection || savedSection || 'navbar'
+  return SITE_SECTIONS.some((section) => section.id === candidate) ? candidate : 'navbar'
+}
+
 export default function AdminSiteEditorPage() {
   const { user } = useAuth()
-  const [activeSection, setActiveSection] = useState('navbar')
+  const [activeSection, setActiveSection] = useState(getInitialEditorSection)
   const [values, setValues] = useState(SITE_CONTENT_DEFAULTS)
   const [versions, setVersions] = useState([])
   const [loading, setLoading] = useState(true)
@@ -37,6 +45,7 @@ export default function AdminSiteEditorPage() {
   const [message, setMessage] = useState('')
   const [dirty, setDirty] = useState(false)
   const [openProductId, setOpenProductId] = useState('drum-line')
+  const [openCatalogProductId, setOpenCatalogProductId] = useState('')
 
   const sectionFields = useMemo(
     () => SITE_CONTENT_FIELDS.filter((field) => field.section === activeSection),
@@ -46,6 +55,14 @@ export default function AdminSiteEditorPage() {
   useEffect(() => {
     loadEditor()
   }, [])
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    window.localStorage.setItem('idealtech.cms.activeSection', activeSection)
+    const url = new URL(window.location.href)
+    url.searchParams.set('section', activeSection)
+    window.history.replaceState(window.history.state, '', `${url.pathname}${url.search}${url.hash}`)
+  }, [activeSection])
 
   async function loadEditor() {
     try {
@@ -483,19 +500,18 @@ export default function AdminSiteEditorPage() {
         counter += 1
         id = `nuovo-prodotto-${counter}`
       }
-      setValue(field.key, [
-        ...items,
-        {
-          id,
-          title: 'Nuova linea',
-          subtitle: 'Nuovo prodotto',
-          description: 'Inserisci qui una breve descrizione del prodotto.',
-          image: '/logo-cerchio.png',
-          cta: 'Scopri di più',
-          slug: `/prodotti/${id}`,
-          visible: true,
-        },
-      ])
+      const newProduct = {
+        id,
+        title: 'Nuova linea',
+        subtitle: 'Nuovo prodotto',
+        description: 'Inserisci qui una breve descrizione del prodotto.',
+        image: '/logo-cerchio.png',
+        cta: 'Scopri di più',
+        slug: `/prodotti/${id}`,
+        visible: true,
+      }
+      setValue(field.key, [newProduct, ...items])
+      setOpenCatalogProductId(id)
     }
 
     return (
@@ -508,47 +524,70 @@ export default function AdminSiteEditorPage() {
         <datalist id="cms-catalog-product-page-urls">
           {availablePages.map((page) => <option key={page.url} value={page.url}>{page.label}</option>)}
         </datalist>
-        {items.map((item, index) => (
-          <article className="cms-product-card" key={item.id || index}>
-            <div className="cms-product-preview">
-              <img src={item.image || '/logo-cerchio.png'} alt="" />
-              <div>
-                <strong>{item.title || 'Prodotto'}</strong>
-                <span>{item.subtitle}</span>
-              </div>
-            </div>
-            <div className="cms-product-fields">
-              <label><span>Linea / nome</span><input value={item.title || ''} onChange={(e) => updateArrayItem(field.key, index, { title: e.target.value })} /></label>
-              <label><span>Titolo visualizzato</span><input value={item.subtitle || ''} onChange={(e) => updateArrayItem(field.key, index, { subtitle: e.target.value })} /></label>
-              <label className="cms-full"><span>Descrizione</span><textarea rows="3" value={item.description || ''} onChange={(e) => updateArrayItem(field.key, index, { description: e.target.value })} /></label>
-              <label><span>Testo pulsante</span><input value={item.cta || ''} onChange={(e) => updateArrayItem(field.key, index, { cta: e.target.value })} /></label>
-              <label><span>Redirect URL del prodotto</span><input list="cms-catalog-product-page-urls" value={item.slug || ''} onChange={(e) => updateArrayItem(field.key, index, { slug: e.target.value })} placeholder="/prodotti/nome-prodotto" /></label>
-              <div className="cms-image-control">
-                <span>Foto prodotto</span>
-                <FileUploadField
-                  accept="image/*"
-                  selectedFiles={[]}
-                  onChange={(e) => handleImageUpload(field, e.target.files?.[0], index)}
-                  buttonText={uploadingKey === `${field.key}-${index}` ? 'Caricamento...' : 'Cambia foto'}
-                  disabled={Boolean(uploadingKey)}
-                />
-              </div>
-            </div>
-            <div className="cms-product-footer">
-              <div className="cms-list-order">
-                <button type="button" onClick={() => moveArrayItem(field.key, index, -1)} disabled={index === 0}>↑</button>
-                <button type="button" onClick={() => moveArrayItem(field.key, index, 1)} disabled={index === items.length - 1}>↓</button>
-              </div>
-              <div className="cms-product-footer-actions">
-                <label className="cms-switch">
-                  <input type="checkbox" checked={item.visible !== false} onChange={(e) => updateArrayItem(field.key, index, { visible: e.target.checked })} />
-                  <span>Visibile</span>
-                </label>
-                <button type="button" className="cms-mini-danger" onClick={() => setValue(field.key, items.filter((_, itemIndex) => itemIndex !== index))}>Elimina prodotto</button>
-              </div>
-            </div>
-          </article>
-        ))}
+        <div className="cms-product-compact-list">
+          {items.map((item, index) => {
+            const itemId = item.id || `catalog-product-${index}`
+            const isOpen = openCatalogProductId === itemId
+            return (
+              <article className={`cms-product-card ${isOpen ? 'is-open' : ''}`} key={itemId}>
+                <button
+                  type="button"
+                  className="cms-product-card__summary"
+                  onClick={() => setOpenCatalogProductId(isOpen ? '' : itemId)}
+                  aria-expanded={isOpen}
+                >
+                  <img src={item.image || '/logo-cerchio.png'} alt="" />
+                  <span className="cms-product-card__summary-copy">
+                    <strong>{item.title || 'Prodotto'}</strong>
+                    <small>{item.subtitle || 'Nessun titolo visualizzato'}</small>
+                  </span>
+                  <span className={`cms-product-status ${item.visible !== false ? 'is-visible' : 'is-hidden'}`}>
+                    {item.visible !== false ? 'Visibile' : 'Nascosto'}
+                  </span>
+                  <span className="cms-product-card__chevron" aria-hidden="true">⌄</span>
+                </button>
+
+                {isOpen ? (
+                  <div className="cms-product-card__expanded">
+                    <div className="cms-product-fields">
+                      <label><span>Linea / nome</span><input value={item.title || ''} onChange={(e) => updateArrayItem(field.key, index, { title: e.target.value })} /></label>
+                      <label><span>Titolo visualizzato</span><input value={item.subtitle || ''} onChange={(e) => updateArrayItem(field.key, index, { subtitle: e.target.value })} /></label>
+                      <label className="cms-full"><span>Descrizione</span><textarea rows="3" value={item.description || ''} onChange={(e) => updateArrayItem(field.key, index, { description: e.target.value })} /></label>
+                      <label><span>Testo pulsante</span><input value={item.cta || ''} onChange={(e) => updateArrayItem(field.key, index, { cta: e.target.value })} /></label>
+                      <label><span>Redirect URL del prodotto</span><input list="cms-catalog-product-page-urls" value={item.slug || ''} onChange={(e) => updateArrayItem(field.key, index, { slug: e.target.value })} placeholder="/prodotti/nome-prodotto" /></label>
+                      <div className="cms-image-control">
+                        <span>Foto prodotto</span>
+                        <FileUploadField
+                          accept="image/*"
+                          selectedFiles={[]}
+                          onChange={(e) => handleImageUpload(field, e.target.files?.[0], index)}
+                          buttonText={uploadingKey === `${field.key}-${index}` ? 'Caricamento...' : 'Cambia foto'}
+                          disabled={Boolean(uploadingKey)}
+                        />
+                      </div>
+                    </div>
+                    <div className="cms-product-footer">
+                      <div className="cms-list-order">
+                        <button type="button" onClick={() => moveArrayItem(field.key, index, -1)} disabled={index === 0}>↑</button>
+                        <button type="button" onClick={() => moveArrayItem(field.key, index, 1)} disabled={index === items.length - 1}>↓</button>
+                      </div>
+                      <div className="cms-product-footer-actions">
+                        <label className="cms-switch">
+                          <input type="checkbox" checked={item.visible !== false} onChange={(e) => updateArrayItem(field.key, index, { visible: e.target.checked })} />
+                          <span>Visibile</span>
+                        </label>
+                        <button type="button" className="cms-mini-danger" onClick={() => {
+                          setValue(field.key, items.filter((_, itemIndex) => itemIndex !== index))
+                          if (openCatalogProductId === itemId) setOpenCatalogProductId('')
+                        }}>Elimina prodotto</button>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </article>
+            )
+          })}
+        </div>
       </div>
     )
   }
@@ -689,7 +728,7 @@ export default function AdminSiteEditorPage() {
             {dirty ? <strong>Bozza non salvata</strong> : <small>Salvato</small>}
           </div>
           {SITE_SECTIONS.map((section) => (
-            <button key={section.id} type="button" className={activeSection === section.id ? 'is-active' : ''} onClick={() => setActiveSection(section.id)}>
+            <button key={section.id} type="button" className={activeSection === section.id ? 'is-active' : ''} onClick={() => { setActiveSection(section.id); window.scrollTo({ top: 0, behavior: 'smooth' }) }}>
               <strong>{section.label}</strong>
               <span>{section.description}</span>
             </button>
