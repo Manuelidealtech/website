@@ -48,7 +48,13 @@ export default function AdminSiteEditorPage() {
   const [openCatalogProductId, setOpenCatalogProductId] = useState('')
 
   const sectionFields = useMemo(
-    () => SITE_CONTENT_FIELDS.filter((field) => field.section === activeSection),
+    () => SITE_CONTENT_FIELDS.filter((field) => {
+      if (field.section !== activeSection) return false
+      // Le vecchie gallerie restano nei default/DB per retrocompatibilità,
+      // ma ora si gestiscono direttamente dentro ogni singola pagina prodotto.
+      if (activeSection === 'productDetails' && field.type === 'image-list') return false
+      return true
+    }),
     [activeSection]
   )
 
@@ -372,6 +378,7 @@ export default function AdminSiteEditorPage() {
             { label: 'Caratteristiche', paragraphs: [], groups: [{ title: '', paragraphs: [], items: ['Prima caratteristica'] }] },
           ],
           galleryLabel: 'Galleria prodotto',
+          galleryImages: [],
         }
       })
       setOpenProductId(productId)
@@ -380,6 +387,38 @@ export default function AdminSiteEditorPage() {
     function deleteProductPage(productId) {
       mutatePages((next) => { delete next[productId] })
       if (openProductId === productId) setOpenProductId('')
+    }
+
+    function getProductGallery(productId, page) {
+      if (Array.isArray(page?.galleryImages)) return page.galleryImages
+      const legacy = values[`products.gallery.${productId}`]
+      return Array.isArray(legacy) ? legacy : []
+    }
+
+    function setProductGallery(productId, images) {
+      mutatePages((next) => {
+        next[productId].galleryImages = images
+      })
+    }
+
+    async function uploadProductGalleryImage(productId, page, file) {
+      if (!file) return
+      const token = `product-gallery-${productId}`
+      try {
+        setUploadingKey(token)
+        setError('')
+        const uploaded = await uploadSiteAsset({
+          file,
+          userId: user?.id || 'admin',
+          section: 'productDetails',
+        })
+        const currentImages = getProductGallery(productId, page)
+        setProductGallery(productId, [...currentImages, uploaded.url])
+      } catch (err) {
+        setError(err.message || 'Errore durante il caricamento dell’immagine prodotto.')
+      } finally {
+        setUploadingKey('')
+      }
     }
 
     const productOrder = ['drum-line', 'extruder-line', 'assy-line', 'coating-heads', 'custom-machines', 'ideal-melt', 'idm-gp', 'gun-line', 'hose-line', 'cold-line', 'hand-gun', 'spare-parts']
@@ -474,8 +513,80 @@ export default function AdminSiteEditorPage() {
                 <button type="button" className="admin-secondary-button cms-small-action" onClick={() => mutatePages((next) => { next[productId].sections.push({ label: 'Nuovo blocco', paragraphs: [], groups: [] }) })}>+ Aggiungi blocco di testo</button>
               </div>
 
-              <div className="cms-product-page__footer-fields">
-                <label><span>Titolo galleria</span><input value={page.galleryLabel || ''} onChange={(e) => mutatePages((next) => { next[productId].galleryLabel = e.target.value })} /></label>
+              <details className="cms-product-gallery-panel">
+                <summary>
+                  <div>
+                    <strong>Immagini / Galleria</strong>
+                    <span>{getProductGallery(productId, page).length} {getProductGallery(productId, page).length === 1 ? 'immagine' : 'immagini'}</span>
+                  </div>
+                </summary>
+                <div className="cms-product-gallery-panel__body">
+                  <label className="cms-product-gallery-title">
+                    <span>Titolo galleria</span>
+                    <input value={page.galleryLabel || ''} onChange={(e) => mutatePages((next) => { next[productId].galleryLabel = e.target.value })} />
+                  </label>
+
+                  {getProductGallery(productId, page).length ? (
+                    <div className="cms-product-gallery-grid">
+                      {getProductGallery(productId, page).map((image, imageIndex) => (
+                        <article className="cms-product-gallery-item" key={`${image}-${imageIndex}`}>
+                          <div className="cms-product-gallery-thumb">
+                            <img src={image} alt={`Immagine ${imageIndex + 1} ${page.name || page.title || ''}`} />
+                            <span>{imageIndex + 1}</span>
+                          </div>
+                          <div className="cms-product-gallery-actions">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const images = [...getProductGallery(productId, page)]
+                                if (imageIndex <= 0) return
+                                ;[images[imageIndex - 1], images[imageIndex]] = [images[imageIndex], images[imageIndex - 1]]
+                                setProductGallery(productId, images)
+                              }}
+                              disabled={imageIndex === 0}
+                              aria-label="Sposta immagine a sinistra"
+                            >←</button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const images = [...getProductGallery(productId, page)]
+                                if (imageIndex >= images.length - 1) return
+                                ;[images[imageIndex], images[imageIndex + 1]] = [images[imageIndex + 1], images[imageIndex]]
+                                setProductGallery(productId, images)
+                              }}
+                              disabled={imageIndex === getProductGallery(productId, page).length - 1}
+                              aria-label="Sposta immagine a destra"
+                            >→</button>
+                            <button
+                              type="button"
+                              className="is-danger"
+                              onClick={() => setProductGallery(productId, getProductGallery(productId, page).filter((_, index) => index !== imageIndex))}
+                            >Elimina</button>
+                          </div>
+                        </article>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="cms-product-gallery-empty">
+                      <strong>Nessuna immagine inserita</strong>
+                      <span>Carica la prima immagine della galleria di questo prodotto.</span>
+                    </div>
+                  )}
+
+                  <div className="cms-product-gallery-upload">
+                    <FileUploadField
+                      accept="image/*"
+                      selectedFiles={[]}
+                      onChange={(e) => uploadProductGalleryImage(productId, page, e.target.files?.[0])}
+                      buttonText={uploadingKey === `product-gallery-${productId}` ? 'Caricamento...' : '+ Aggiungi immagine'}
+                      disabled={Boolean(uploadingKey)}
+                    />
+                    <small>Puoi aggiungere, eliminare e riordinare le immagini. Le nuove foto vengono ottimizzate e convertite in WebP.</small>
+                  </div>
+                </div>
+              </details>
+
+              <div className="cms-product-page__footer-fields cms-product-page__footer-fields--preview-only">
                 <a className="admin-secondary-button cms-product-page__preview" href={`/prodotti/${page.slug || productId}?cms_preview=1`} target="_blank" rel="noreferrer">Apri anteprima prodotto ↗</a>
               </div>
             </div>

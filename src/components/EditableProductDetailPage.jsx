@@ -47,7 +47,8 @@ export default function EditableProductDetailPage({ productId }) {
   const { get } = useSiteContent()
   const allDetails = get('products.details', defaultProductPageDetails) || defaultProductPageDetails
   const page = allDetails[productId] || defaultProductPageDetails[productId]
-  const gallery = get(`products.gallery.${productId}`, defaultProductGalleries[productId] || []) || []
+  const legacyGallery = get(`products.gallery.${productId}`, defaultProductGalleries[productId] || []) || []
+  const gallery = Array.isArray(page?.galleryImages) ? page.galleryImages : legacyGallery
   const productCards = (get('products.catalog', defaultProductCards) || defaultProductCards).filter((product) => product.visible !== false && product.slug)
 
   const common = {

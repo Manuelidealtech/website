@@ -1,21 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useLocation } from 'react-router-dom'
-import { useSiteContent } from '../context/SiteContentContext'
 import './ProductGallery.css'
 
 export default function ProductGallery({ images = [], title = 'Prodotto' }) {
-  const { get } = useSiteContent()
-  const location = useLocation()
-  const productSlug = location.pathname.startsWith('/prodotti/')
-    ? location.pathname.split('/').filter(Boolean).pop()
-    : ''
-  const cmsImages = productSlug ? get(`products.gallery.${productSlug}`, images) : images
-  const validImages = useMemo(() => (Array.isArray(cmsImages) ? cmsImages : images).filter(Boolean), [cmsImages, images])
+  const validImages = useMemo(() => (Array.isArray(images) ? images : []).filter(Boolean), [images])
   const [selectedIndex, setSelectedIndex] = useState(0)
 
   useEffect(() => {
     setSelectedIndex(0)
-  }, [cmsImages])
+  }, [images])
+
+  useEffect(() => {
+    if (selectedIndex > validImages.length - 1) setSelectedIndex(0)
+  }, [selectedIndex, validImages.length])
 
   if (!validImages.length) return null
 
