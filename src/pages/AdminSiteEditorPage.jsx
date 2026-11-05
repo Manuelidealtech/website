@@ -753,43 +753,54 @@ export default function AdminSiteEditorPage() {
     if (field.type === 'image-list') {
       const images = Array.isArray(value) ? value : []
       return (
-        <div className="cms-gallery-editor">
-          <div className="cms-gallery-grid">
-            {images.map((image, index) => (
-              <div className="cms-gallery-item" key={`${image}-${index}`}>
-                <img src={image} alt={`Immagine ${index + 1}`} />
-                <div className="cms-gallery-item-actions">
-                  <button type="button" onClick={() => moveArrayItem(field.key, index, -1)} disabled={index === 0} aria-label="Sposta immagine a sinistra">←</button>
-                  <button type="button" onClick={() => moveArrayItem(field.key, index, 1)} disabled={index === images.length - 1} aria-label="Sposta immagine a destra">→</button>
-                  <button type="button" className="is-danger" onClick={() => setValue(field.key, images.filter((_, imageIndex) => imageIndex !== index))}>Elimina</button>
-                </div>
+        <details className="cms-product-gallery-panel cms-page-gallery-panel">
+          <summary>
+            <div>
+              <strong>Immagini / Galleria</strong>
+              <span>{images.length} {images.length === 1 ? 'immagine' : 'immagini'} · clicca per gestire</span>
+            </div>
+          </summary>
+          <div className="cms-product-gallery-panel__body">
+            <div className="cms-gallery-editor">
+              <div className="cms-gallery-grid">
+                {images.map((image, index) => (
+                  <div className="cms-gallery-item" key={`${image}-${index}`}>
+                    <img src={image} alt={`Immagine ${index + 1}`} />
+                    <div className="cms-gallery-item-actions">
+                      <button type="button" onClick={() => moveArrayItem(field.key, index, -1)} disabled={index === 0} aria-label="Sposta immagine a sinistra">←</button>
+                      <button type="button" onClick={() => moveArrayItem(field.key, index, 1)} disabled={index === images.length - 1} aria-label="Sposta immagine a destra">→</button>
+                      <button type="button" className="is-danger" onClick={() => setValue(field.key, images.filter((_, imageIndex) => imageIndex !== index))}>Elimina</button>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+              {!images.length ? <div className="cms-product-gallery-empty">Nessuna immagine presente. Aggiungi la prima foto qui sotto.</div> : null}
+              <div className="cms-gallery-upload">
+                <FileUploadField
+                  accept="image/*"
+                  selectedFiles={[]}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    try {
+                      setUploadingKey(field.key)
+                      setError('')
+                      const uploaded = await uploadSiteAsset({ file, userId: user?.id || 'admin', section: field.section })
+                      setValue(field.key, [...images, uploaded.url])
+                    } catch (err) {
+                      setError(err.message || 'Errore durante il caricamento dell’immagine.')
+                    } finally {
+                      setUploadingKey('')
+                    }
+                  }}
+                  buttonText={uploadingKey === field.key ? 'Caricamento...' : '+ Aggiungi immagine'}
+                  disabled={Boolean(uploadingKey)}
+                />
+                <small>Puoi aggiungere, eliminare e riordinare le immagini. Le nuove foto vengono convertite in WebP.</small>
+              </div>
+            </div>
           </div>
-          <div className="cms-gallery-upload">
-            <FileUploadField
-              accept="image/*"
-              selectedFiles={[]}
-              onChange={async (e) => {
-                const file = e.target.files?.[0]
-                if (!file) return
-                try {
-                  setUploadingKey(field.key)
-                  setError('')
-                  const uploaded = await uploadSiteAsset({ file, userId: user?.id || 'admin', section: field.section })
-                  setValue(field.key, [...images, uploaded.url])
-                } catch (err) {
-                  setError(err.message || 'Errore durante il caricamento dell’immagine.')
-                } finally {
-                  setUploadingKey('')
-                }
-              }}
-              buttonText={uploadingKey === field.key ? 'Caricamento...' : '+ Aggiungi immagine'}
-              disabled={Boolean(uploadingKey)}
-            />
-            <small>Puoi aggiungere, eliminare e riordinare le immagini. Le nuove foto vengono convertite in WebP.</small>
-          </div>
-        </div>
+        </details>
       )
     }
 

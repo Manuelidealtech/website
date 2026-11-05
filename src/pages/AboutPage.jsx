@@ -1,7 +1,7 @@
 import '../styles/AboutPage.css'
 import { useSiteContent } from '../context/SiteContentContext'
 
-const galleryImages = [
+const defaultGalleryImages = [
   '/images/chi-siamo/gallery-1.png',
   '/images/chi-siamo/gallery-2.png',
   '/images/chi-siamo/gallery-3.png',
@@ -20,6 +20,7 @@ export default function AboutPage() {
   const card1Paragraphs = String(get('about.card1.text', '')).split(/\n\n+/).filter(Boolean)
   const card2Paragraphs = String(get('about.card2.text', '')).split(/\n\n+/).filter(Boolean)
   const card3Paragraphs = String(get('about.card3.text', 'Grazie alla produzione interna e a un’organizzazione flessibile, l’azienda è in grado di sviluppare soluzioni su misura, studiando insieme al cliente la risposta più adatta a ogni esigenza applicativa.\n\nIdealtech realizza inoltre progetti personalizzati che spaziano dai sistemi di applicazione colla fino a macchine speciali per imballaggio e incollaggio, con l’obiettivo di offrire soluzioni precise, efficaci e perfettamente integrate nei processi produttivi.')).split(/\n\n+/).filter(Boolean)
+  const galleryImages = get('about.gallery', defaultGalleryImages) || defaultGalleryImages
   const ownerParagraphs = String(get('about.ownerText', 'Alla guida di Idealtech c’è una visione imprenditoriale fondata su competenza tecnica, affidabilità e capacità di interpretare concretamente le esigenze del mercato industriale.\n\nL’azienda è cresciuta nel tempo mantenendo un approccio diretto, serio e orientato alla qualità, costruendo relazioni solide con i clienti e sviluppando soluzioni capaci di unire innovazione, efficienza produttiva e supporto costante.\n\nOgni progetto nasce dall’ascolto, dall’esperienza sul campo e dalla volontà di offrire risposte realmente utili, personalizzate e durature.')).split(/\n\n+/).filter(Boolean)
 
   return (

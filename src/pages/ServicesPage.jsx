@@ -12,20 +12,21 @@ const services = [
   'Ricambi compatibili',
 ]
 
-const galleryImages = [
-  { src: '/images/servizi/gallery-1-960.webp', width: 640, height: 427 },
-  { src: '/images/servizi/gallery-2-960.webp', width: 540, height: 960 },
-  { src: '/images/servizi/gallery-3-960.webp', width: 960, height: 960 },
-  { src: '/images/servizi/gallery-4-960.webp', width: 960, height: 640 },
-  { src: '/images/servizi/gallery-5-960.webp', width: 960, height: 640 },
-  { src: '/images/servizi/gallery-6-960.webp', width: 960, height: 640 },
-  { src: '/images/servizi/gallery-7-960.webp', width: 960, height: 640 },
-  { src: '/images/servizi/gallery-8-960.webp', width: 755, height: 960 },
+const defaultGalleryImages = [
+  '/images/servizi/gallery-1-960.webp',
+  '/images/servizi/gallery-2-960.webp',
+  '/images/servizi/gallery-3-960.webp',
+  '/images/servizi/gallery-4-960.webp',
+  '/images/servizi/gallery-5-960.webp',
+  '/images/servizi/gallery-6-960.webp',
+  '/images/servizi/gallery-7-960.webp',
+  '/images/servizi/gallery-8-960.webp',
 ]
 
 export default function ServicesPage() {
   const { get } = useSiteContent()
   const editableServices = get('services.list', services) || services
+  const galleryImages = get('services.gallery', defaultGalleryImages) || defaultGalleryImages
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -156,12 +157,10 @@ export default function ServicesPage() {
         <div className="site-container">
           <div className="services-gallery-grid">
             {galleryImages.map((image, index) => (
-              <div className="services-gallery-item" key={image.src}>
+              <div className="services-gallery-item" key={`${image}-${index}`}>
                 <img
-                  src={image.src}
+                  src={image}
                   alt={`Servizio tecnico Idealtech ${index + 1}`}
-                  width={image.width}
-                  height={image.height}
                   loading="lazy"
                   decoding="async"
                 />

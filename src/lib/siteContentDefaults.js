@@ -217,6 +217,7 @@ export const SITE_CONTENT_FIELDS = [
   { key: 'about.ownerTitle', section: 'about', label: 'Titolo quarto blocco', type: 'text', defaultValue: 'Visione, esperienza e attenzione al cliente' },
   { key: 'about.ownerName', section: 'about', label: 'Nome e ruolo', type: 'text', defaultValue: 'Enrico Bozza — Titolare Idealtech' },
   { key: 'about.ownerText', section: 'about', label: 'Testo quarto blocco (Enrico Bozza)', type: 'textarea', defaultValue: 'Alla guida di Idealtech c’è una visione imprenditoriale fondata su competenza tecnica, affidabilità e capacità di interpretare concretamente le esigenze del mercato industriale.\n\nL’azienda è cresciuta nel tempo mantenendo un approccio diretto, serio e orientato alla qualità, costruendo relazioni solide con i clienti e sviluppando soluzioni capaci di unire innovazione, efficienza produttiva e supporto costante.\n\nOgni progetto nasce dall’ascolto, dall’esperienza sul campo e dalla volontà di offrire risposte realmente utili, personalizzate e durature.' },
+  { key: 'about.gallery', section: 'about', label: 'Galleria in fondo alla pagina', type: 'image-list', defaultValue: ['/images/chi-siamo/gallery-1.png', '/images/chi-siamo/gallery-2.png', '/images/chi-siamo/gallery-3.png', '/images/chi-siamo/gallery-4.png', '/images/chi-siamo/gallery-5.png', '/images/chi-siamo/gallery-6.png', '/images/chi-siamo/gallery-7.png', '/images/chi-siamo/gallery-8.png', '/images/chi-siamo/gallery-9.png', '/images/chi-siamo/gallery-10.png', '/images/chi-siamo/gallery-11.png'] },
 
   { key: 'products.hero.kicker', section: 'products', label: 'Etichetta hero', type: 'text', defaultValue: 'Prodotti' },
   { key: 'products.hero.title', section: 'products', label: 'Titolo hero', type: 'text', defaultValue: 'Soluzioni e impianti per il gluing industriale' },
@@ -255,6 +256,7 @@ export const SITE_CONTENT_FIELDS = [
   { key: 'services.copy.title', section: 'services', label: 'Titolo assistenza', type: 'text', defaultValue: 'Assistenza Tecnica ed Operativa' },
   { key: 'services.contact.title', section: 'services', label: 'Titolo richiesta preventivo', type: 'text', defaultValue: 'Per un preventivo' },
   { key: 'services.contact.text', section: 'services', label: 'Testo richiesta preventivo', type: 'textarea', defaultValue: 'Saremo lieti di fissare un appuntamento nel più breve tempo possibile.' },
+  { key: 'services.gallery', section: 'services', label: 'Galleria in fondo alla pagina', type: 'image-list', defaultValue: ['/images/servizi/gallery-1-960.webp', '/images/servizi/gallery-2-960.webp', '/images/servizi/gallery-3-960.webp', '/images/servizi/gallery-4-960.webp', '/images/servizi/gallery-5-960.webp', '/images/servizi/gallery-6-960.webp', '/images/servizi/gallery-7-960.webp', '/images/servizi/gallery-8-960.webp'] },
 
   { key: 'footer.heading', section: 'footer', label: 'Titolo azienda', type: 'text', defaultValue: 'IDEALTECH' },
   { key: 'footer.company', section: 'footer', label: 'Ragione sociale', type: 'text', defaultValue: 'Idealtech s.r.l.' },
@@ -273,10 +275,10 @@ export const SITE_CONTENT_DEFAULTS = Object.fromEntries(
 export const SITE_SECTIONS = [
   { id: 'navbar', label: 'Navbar', description: 'Menu principale e voci del menu Prodotti.' },
   { id: 'home', label: 'Home', description: 'Hero, titoli principali e immagini della homepage.' },
-  { id: 'about', label: 'Chi siamo', description: 'Tutti i quattro blocchi testuali, foto azienda e sezione Enrico Bozza.' },
+  { id: 'about', label: 'Chi siamo', description: 'Tutti i quattro blocchi testuali, foto azienda, sezione Enrico Bozza e gallery finale.' },
   { id: 'products', label: 'Prodotti', description: 'Hero, riquadri introduttivi e schede del catalogo prodotti.' },
   { id: 'productDetails', label: 'Pagine prodotto', description: 'Testi, caratteristiche, elenchi e gallerie delle singole pagine prodotto.' },
-  { id: 'services', label: 'Servizi', description: 'Testi, elenco servizi e call to action.' },
+  { id: 'services', label: 'Servizi', description: 'Testi, elenco servizi, gallery finale e call to action.' },
   { id: 'support', label: 'Assistenza', description: 'Pubblica o nascondi online il portale assistenza clienti.' },
   { id: 'footer', label: 'Footer', description: 'Dati societari e collegamenti social.' },
 ]
