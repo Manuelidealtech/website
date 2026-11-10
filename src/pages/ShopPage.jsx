@@ -2,7 +2,8 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../i18n/LanguageContext'
-import { calculateCartTotals, formatMoney, getProductAvailability } from '../lib/shop'
+import { calculateCartTotals, formatMoney } from '../lib/shop'
+import { getLocalizedAvailability, localizedCountry, shopT } from '../i18n/shopTranslations'
 import { getPrimaryProductImage } from '../lib/shopImages'
 import '../styles/ShopPage.css'
 
@@ -35,7 +36,8 @@ function readCart() {
 }
 
 export default function ShopPage() {
-  const { locale } = useLanguage()
+  const { language, locale } = useLanguage()
+  const t = (key, variables) => shopT(language, key, variables)
   const [products, setProducts] = useState([])
   const [config, setConfig] = useState({ shipping_cost: 0, currency: 'EUR' })
   const [cart, setCart] = useState(readCart)
@@ -84,7 +86,7 @@ export default function ShopPage() {
           console.warn('Configurazione shop non disponibile:', configError)
         }
       } catch (loadError) {
-        if (active) setError(loadError.message || 'Impossibile caricare lo shop.')
+        if (active) setError(loadError.message || t('loadShopError'))
       } finally {
         if (active) setLoading(false)
       }
@@ -99,6 +101,14 @@ export default function ShopPage() {
   useEffect(() => {
     window.localStorage.setItem(CART_KEY, JSON.stringify(cart))
   }, [cart])
+
+
+  useEffect(() => {
+    setCustomer((current) => {
+      if (!['Italia', 'Italy', 'İtalya'].includes(current.country)) return current
+      return { ...current, country: localizedCountry(language) }
+    })
+  }, [language])
 
   const cartItems = useMemo(
     () =>
@@ -115,7 +125,7 @@ export default function ShopPage() {
   const totals = calculateCartTotals(cartItems, config.shipping_cost)
 
   function addToCart(product) {
-    const availability = getProductAvailability(product)
+    const availability = getLocalizedAvailability(product, language)
     if (!availability.available) return
 
     setCart((current) => {
@@ -182,19 +192,19 @@ export default function ShopPage() {
       }
 
       if (!response.ok) {
-        throw new Error(result?.message || 'Non è stato possibile registrare l’ordine.')
+        throw new Error(result?.message || t('orderRegisterError'))
       }
 
       if (!result?.success || !result?.order_number) {
-        throw new Error('Il servizio ordini non sta rispondendo correttamente. Se stai provando il sito in locale, avvialo con Vercel Dev; sul sito online verifica il deployment delle funzioni /api.')
+        throw new Error(t('orderServiceError'))
       }
 
       setConfirmation(result)
       setCart([])
-      setCustomer(emptyCustomer)
+      setCustomer({ ...emptyCustomer, country: localizedCountry(language) })
       setCheckoutOpen(false)
     } catch (submitError) {
-      setError(submitError.message || 'Errore durante l’invio dell’ordine.')
+      setError(submitError.message || t('submitError'))
     } finally {
       setSubmitting(false)
     }
@@ -205,10 +215,10 @@ export default function ShopPage() {
       <section className="shop-hero">
         <div className="site-container shop-hero__inner">
           <div>
-            <span className="shop-kicker">Ricambi e accessori Idealtech</span>
-            <h1>Shop Idealtech</h1>
+            <span className="shop-kicker">{t('sparePartsAccessories')}</span>
+            <h1>{t('shopTitle')}</h1>
             <p>
-              Seleziona i prodotti, invia l’ordine e completa il pagamento tramite bonifico bancario.
+              {t('shopIntro')}
             </p>
           </div>
           <button type="button" className="shop-cart-button" onClick={() => setCartOpen(true)}>
@@ -216,7 +226,7 @@ export default function ShopPage() {
               <path d="M3 3h2l2.25 10.08a2 2 0 0 0 1.95 1.56h7.65a2 2 0 0 0 1.95-1.55L20.3 6H6" />
               <path d="M9 19.25h.01M17 19.25h.01" />
             </svg>
-            Carrello
+            {t('cart')}
             <strong>{itemCount}</strong>
           </button>
         </div>
@@ -224,32 +234,32 @@ export default function ShopPage() {
 
       <main className="site-container shop-content">
         <div className="shop-assurance-row">
-          <div><strong>Ordine diretto</strong><span>La richiesta arriva subito al commerciale</span></div>
-          <div><strong>Pagamento sicuro</strong><span>Bonifico alle coordinate indicate nell’ordine</span></div>
-          <div><strong>Supporto Idealtech</strong><span>Assistenza prima e dopo l’acquisto</span></div>
+          <div><strong>{t('directOrder')}</strong><span>{t('directOrderCopy')}</span></div>
+          <div><strong>{t('securePayment')}</strong><span>{t('securePaymentCopy')}</span></div>
+          <div><strong>{t('idealtechSupport')}</strong><span>{t('idealtechSupportCopy')}</span></div>
         </div>
 
         {error && !checkoutOpen ? <div className="shop-message shop-message--error">{error}</div> : null}
 
         {loading ? (
-          <div className="shop-empty">Caricamento prodotti...</div>
+          <div className="shop-empty">{t('loadingProducts')}</div>
         ) : products.length === 0 ? (
           <div className="shop-empty">
-            <span>Shop in aggiornamento</span>
-            <h2>I prodotti saranno disponibili a breve</h2>
-            <p>Per una richiesta urgente puoi contattare direttamente il nostro ufficio commerciale.</p>
-            <Link className="shop-primary-button" to="/contatti">Contattaci</Link>
+            <span>{t('shopUpdating')}</span>
+            <h2>{t('productsSoon')}</h2>
+            <p>{t('urgentContact')}</p>
+            <Link className="shop-primary-button" to="/contatti">{t('contactUs')}</Link>
           </div>
         ) : (
           <div className="shop-grid">
             {products.map((product) => {
-              const availability = getProductAvailability(product)
+              const availability = getLocalizedAvailability(product, language)
               const grossPrice = Number(product.price) * (1 + Number(product.vat_rate || 0) / 100)
               const primaryImage = getPrimaryProductImage(product)
 
               return (
                 <article className="shop-product-card" key={product.id}>
-                  <Link className="shop-product-card__image" to={`/shop/${product.id}`} aria-label={`Apri ${product.name}`}>
+                  <Link className="shop-product-card__image" to={`/shop/${product.id}`} aria-label={t('openProduct', { name: product.name })}>
                     {primaryImage?.url ? (
                       <img src={primaryImage.url} alt={product.name} loading="lazy" />
                     ) : (
@@ -258,24 +268,24 @@ export default function ShopPage() {
                     {product.category ? <span className="shop-product-category">{product.category}</span> : null}
                   </Link>
                   <div className="shop-product-card__body">
-                    {product.sku ? <span className="shop-product-sku">Cod. {product.sku}</span> : null}
+                    {product.sku ? <span className="shop-product-sku">{t('code')} {product.sku}</span> : null}
                     <h2><Link to={`/shop/${product.id}`}>{product.name}</Link></h2>
                     {product.description ? <p>{product.description}</p> : null}
-                    <Link className="shop-product-detail-link" to={`/shop/${product.id}`}>Vedi dettagli e descrizione completa →</Link>
+                    <Link className="shop-product-detail-link" to={`/shop/${product.id}`}>{t('details')}</Link>
                     <span className={`shop-availability ${availability.available ? '' : 'is-empty'}`}>
                       {availability.label}
                     </span>
                     <div className="shop-product-card__footer">
                       <div className="shop-product-price">
                         <strong>{formatMoney(grossPrice, locale)}</strong>
-                        <small>IVA inclusa</small>
+                        <small>{t('vatIncluded')}</small>
                       </div>
                       <button
                         type="button"
                         onClick={() => addToCart(product)}
                         disabled={!availability.available}
                       >
-                        {availability.available ? 'Aggiungi' : 'Esaurito'}
+                        {availability.available ? t('add') : t('soldOut')}
                       </button>
                     </div>
                   </div>
@@ -288,14 +298,14 @@ export default function ShopPage() {
 
       {cartOpen ? (
         <div className="shop-drawer-layer" role="presentation" onMouseDown={() => setCartOpen(false)}>
-          <aside className="shop-cart-drawer" role="dialog" aria-modal="true" aria-label="Carrello" onMouseDown={(event) => event.stopPropagation()}>
+          <aside className="shop-cart-drawer" role="dialog" aria-modal="true" aria-label={t('cart')} onMouseDown={(event) => event.stopPropagation()}>
             <div className="shop-panel-head">
-              <div><span>Il tuo ordine</span><h2>Carrello</h2></div>
-              <button type="button" onClick={() => setCartOpen(false)} aria-label="Chiudi carrello">×</button>
+              <div><span>{t('yourOrder')}</span><h2>{t('cart')}</h2></div>
+              <button type="button" onClick={() => setCartOpen(false)} aria-label={t('closeCart')}>×</button>
             </div>
 
             {cartItems.length === 0 ? (
-              <div className="shop-cart-empty"><p>Il carrello è vuoto.</p></div>
+              <div className="shop-cart-empty"><p>{t('emptyCart')}</p></div>
             ) : (
               <>
                 <div className="shop-cart-items">
@@ -306,20 +316,20 @@ export default function ShopPage() {
                       </div>
                       <div className="shop-cart-item__copy">
                         <strong>{item.name}</strong>
-                        <small>{formatMoney(Number(item.price) * (1 + Number(item.vat_rate || 0) / 100), locale)} cad.</small>
+                        <small>{formatMoney(Number(item.price) * (1 + Number(item.vat_rate || 0) / 100), locale)} {t('each')}</small>
                         <div className="shop-quantity">
-                          <button type="button" onClick={() => updateQuantity(item, item.quantity - 1)} aria-label="Riduci quantità">−</button>
+                          <button type="button" onClick={() => updateQuantity(item, item.quantity - 1)} aria-label={t('decreaseQty')}>−</button>
                           <span>{item.quantity}</span>
-                          <button type="button" onClick={() => updateQuantity(item, item.quantity + 1)} aria-label="Aumenta quantità">+</button>
+                          <button type="button" onClick={() => updateQuantity(item, item.quantity + 1)} aria-label={t('increaseQty')}>+</button>
                         </div>
                       </div>
-                      <button className="shop-cart-remove" type="button" onClick={() => updateQuantity(item, 0)} aria-label={`Rimuovi ${item.name}`}>×</button>
+                      <button className="shop-cart-remove" type="button" onClick={() => updateQuantity(item, 0)} aria-label={t('removeProduct', { name: item.name })}>×</button>
                     </div>
                   ))}
                 </div>
-                <OrderTotals totals={totals} locale={locale} />
+                <OrderTotals totals={totals} locale={locale} language={language} />
                 <button type="button" className="shop-primary-button shop-full-button" onClick={openCheckout}>
-                  Procedi con l’ordine
+                  {t('proceedOrder')}
                 </button>
               </>
             )}
@@ -331,89 +341,89 @@ export default function ShopPage() {
         <div className="shop-modal-layer" role="presentation">
           <div className="shop-checkout-modal" role="dialog" aria-modal="true" aria-labelledby="checkout-title">
             <div className="shop-panel-head">
-              <div><span>Pagamento con bonifico</span><h2 id="checkout-title">Dati per l’ordine</h2></div>
-              <button type="button" onClick={() => setCheckoutOpen(false)} aria-label="Chiudi checkout">×</button>
+              <div><span>{t('bankTransferPayment')}</span><h2 id="checkout-title">{t('orderDetails')}</h2></div>
+              <button type="button" onClick={() => setCheckoutOpen(false)} aria-label={t('closeCheckout')}>×</button>
             </div>
 
             <div className="shop-checkout-layout">
               <form className="shop-checkout-form" onSubmit={submitOrder}>
                 <div className="shop-form-grid">
                   <label className="shop-field shop-field--wide">
-                    <span>Azienda *</span>
+                    <span>{t('company')}</span>
                     <input value={customer.company} onChange={(event) => updateCustomer('company', event.target.value)} required maxLength="160" />
                   </label>
                   <label className="shop-field">
-                    <span>Partita IVA *</span>
+                    <span>{t('vatNumber')}</span>
                     <input value={customer.vatNumber} onChange={(event) => updateCustomer('vatNumber', event.target.value)} required maxLength="32" />
                   </label>
                   <label className="shop-field">
-                    <span>Codice fiscale</span>
+                    <span>{t('taxCode')}</span>
                     <input value={customer.taxCode} onChange={(event) => updateCustomer('taxCode', event.target.value)} maxLength="32" />
                   </label>
                   <label className="shop-field">
-                    <span>Nome e cognome *</span>
+                    <span>{t('fullName')}</span>
                     <input value={customer.fullName} onChange={(event) => updateCustomer('fullName', event.target.value)} required maxLength="140" />
                   </label>
                   <label className="shop-field">
-                    <span>Email *</span>
+                    <span>{t('email')}</span>
                     <input type="email" value={customer.email} onChange={(event) => updateCustomer('email', event.target.value)} required maxLength="254" />
                   </label>
                   <label className="shop-field">
-                    <span>Telefono *</span>
+                    <span>{t('phone')}</span>
                     <input type="tel" value={customer.phone} onChange={(event) => updateCustomer('phone', event.target.value)} required maxLength="60" />
                   </label>
                   <label className="shop-field shop-field--wide">
-                    <span>Indirizzo di consegna *</span>
+                    <span>{t('shippingAddress')}</span>
                     <input value={customer.address} onChange={(event) => updateCustomer('address', event.target.value)} required maxLength="220" />
                   </label>
                   <label className="shop-field">
-                    <span>Città *</span>
+                    <span>{t('city')}</span>
                     <input value={customer.city} onChange={(event) => updateCustomer('city', event.target.value)} required maxLength="120" />
                   </label>
                   <label className="shop-field shop-field--small">
-                    <span>CAP *</span>
+                    <span>{t('postalCode')}</span>
                     <input value={customer.postalCode} onChange={(event) => updateCustomer('postalCode', event.target.value)} required maxLength="16" />
                   </label>
                   <label className="shop-field shop-field--small">
-                    <span>Provincia</span>
+                    <span>{t('province')}</span>
                     <input value={customer.province} onChange={(event) => updateCustomer('province', event.target.value)} maxLength="60" />
                   </label>
                   <label className="shop-field">
-                    <span>Paese *</span>
+                    <span>{t('country')}</span>
                     <input value={customer.country} onChange={(event) => updateCustomer('country', event.target.value)} required maxLength="80" />
                   </label>
                   <label className="shop-field shop-field--wide">
-                    <span>Note</span>
+                    <span>{t('notes')}</span>
                     <textarea value={customer.notes} onChange={(event) => updateCustomer('notes', event.target.value)} rows="3" maxLength="2000" />
                   </label>
                   <label className="shop-honeypot" aria-hidden="true">
-                    Sito web
+                    {t('website')}
                     <input tabIndex="-1" autoComplete="off" value={customer.website} onChange={(event) => updateCustomer('website', event.target.value)} />
                   </label>
                 </div>
 
                 <label className="shop-privacy-check">
                   <input type="checkbox" checked={customer.privacyAccepted} onChange={(event) => updateCustomer('privacyAccepted', event.target.checked)} required />
-                  <span>Ho letto e accetto l’<Link to="/termini-e-privacy" target="_blank">informativa privacy</Link> e autorizzo il trattamento dei dati per la gestione dell’ordine.</span>
+                  <span>{t('privacyBefore')}<Link to="/termini-e-privacy" target="_blank">{t('privacyLink')}</Link>{t('privacyAfter')}</span>
                 </label>
 
                 {error ? <div className="shop-message shop-message--error">{error}</div> : null}
 
                 <button type="submit" className="shop-primary-button shop-full-button" disabled={submitting}>
-                  {submitting ? 'Registrazione ordine...' : `Conferma e ordina — ${formatMoney(totals.total, locale)}`}
+                  {submitting ? t('registeringOrder') : t('confirmOrder', { total: formatMoney(totals.total, locale) })}
                 </button>
-                <p className="shop-submit-note">Nessun addebito online: riceverai i dati per il bonifico dopo la conferma.</p>
+                <p className="shop-submit-note">{t('noOnlineCharge')}</p>
               </form>
 
               <aside className="shop-checkout-summary">
-                <h3>Riepilogo</h3>
+                <h3>{t('summary')}</h3>
                 {cartItems.map((item) => (
                   <div className="shop-summary-line" key={item.id}>
                     <span>{item.quantity} × {item.name}</span>
                     <strong>{formatMoney(Number(item.price) * (1 + Number(item.vat_rate || 0) / 100) * item.quantity, locale)}</strong>
                   </div>
                 ))}
-                <OrderTotals totals={totals} locale={locale} />
+                <OrderTotals totals={totals} locale={locale} language={language} />
               </aside>
             </div>
           </div>
@@ -424,31 +434,31 @@ export default function ShopPage() {
         <div className="shop-modal-layer" role="presentation">
           <div className="shop-confirmation" role="dialog" aria-modal="true" aria-labelledby="confirmation-title">
             <span className="shop-confirmation__icon">✓</span>
-            <span className="shop-kicker">Ordine registrato</span>
-            <h2 id="confirmation-title">Grazie, ordine {confirmation.order_number}</h2>
-            <p>La richiesta è stata registrata e inviata al nostro ufficio commerciale.{confirmation.customer_email_sent ? ' Ti abbiamo inviato anche una conferma via email.' : ''}</p>
+            <span className="shop-kicker">{t('orderRegistered')}</span>
+            <h2 id="confirmation-title">{t('thanksOrder', { number: confirmation.order_number })}</h2>
+            <p>{t('requestRegistered')}{confirmation.customer_email_sent ? t('emailConfirmationSent') : ''}</p>
 
             <div className="shop-bank-box">
-              <span>Pagamento tramite bonifico</span>
+              <span>{t('paymentViaTransfer')}</span>
               <dl>
-                <div><dt>Intestatario</dt><dd>{confirmation.bank?.account_holder || 'Idealtech s.r.l.'}</dd></div>
+                <div><dt>{t('accountHolder')}</dt><dd>{confirmation.bank?.account_holder || 'Idealtech s.r.l.'}</dd></div>
                 <div><dt>IBAN</dt><dd data-no-translate>{confirmation.bank?.iban || 'Contattare il commerciale'}</dd></div>
                 {confirmation.bank?.bic ? <div><dt>BIC / SWIFT</dt><dd data-no-translate>{confirmation.bank.bic}</dd></div> : null}
-                <div><dt>Causale</dt><dd>Ordine {confirmation.order_number}</dd></div>
-                <div><dt>Importo</dt><dd>{formatMoney(confirmation.total, locale)}</dd></div>
+                <div><dt>{t('paymentReason')}</dt><dd>{t('order', { number: confirmation.order_number })}</dd></div>
+                <div><dt>{t('amount')}</dt><dd>{formatMoney(confirmation.total, locale)}</dd></div>
               </dl>
               {confirmation.bank?.instructions ? <p>{confirmation.bank.instructions}</p> : null}
             </div>
 
             {!confirmation.email_sent ? (
-              <div className="shop-message shop-message--warning">L’ordine è salvato correttamente. Il commerciale lo vedrà nel pannello anche se la notifica email non è partita.</div>
+              <div className="shop-message shop-message--warning">{t('adminEmailWarning')}</div>
             ) : null}
 
             {!confirmation.customer_email_sent ? (
-              <div className="shop-message shop-message--warning">L’ordine è confermato, ma non è stato possibile inviare la copia via email. Conserva il numero ordine indicato sopra.</div>
+              <div className="shop-message shop-message--warning">{t('customerEmailWarning')}</div>
             ) : null}
 
-            <button type="button" className="shop-primary-button" onClick={() => setConfirmation(null)}>Chiudi</button>
+            <button type="button" className="shop-primary-button" onClick={() => setConfirmation(null)}>{t('close')}</button>
           </div>
         </div>
       ) : null}
@@ -456,13 +466,14 @@ export default function ShopPage() {
   )
 }
 
-function OrderTotals({ totals, locale }) {
+function OrderTotals({ totals, locale, language }) {
+  const t = (key, variables) => shopT(language, key, variables)
   return (
     <div className="shop-totals">
-      <div><span>Imponibile</span><strong>{formatMoney(totals.net, locale)}</strong></div>
-      <div><span>IVA</span><strong>{formatMoney(totals.vat, locale)}</strong></div>
-      <div><span>Spedizione (IVA incl.)</span><strong>{totals.shipping ? formatMoney(totals.shipping, locale) : 'Gratuita'}</strong></div>
-      <div className="shop-totals__grand"><span>Totale</span><strong>{formatMoney(totals.total, locale)}</strong></div>
+      <div><span>{t('taxable')}</span><strong>{formatMoney(totals.net, locale)}</strong></div>
+      <div><span>{t('vat')}</span><strong>{formatMoney(totals.vat, locale)}</strong></div>
+      <div><span>{t('shippingVat')}</span><strong>{totals.shipping ? formatMoney(totals.shipping, locale) : t('free')}</strong></div>
+      <div className="shop-totals__grand"><span>{t('total')}</span><strong>{formatMoney(totals.total, locale)}</strong></div>
     </div>
   )
 }

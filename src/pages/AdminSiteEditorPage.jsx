@@ -6,6 +6,7 @@ import { supabase } from '../lib/supabase'
 import { SITE_CONTENT_DEFAULTS, SITE_CONTENT_FIELDS, SITE_SECTIONS } from '../lib/siteContentDefaults'
 import { uploadSiteAsset } from '../lib/siteAssetStorage'
 import { slugify } from '../lib/slugify'
+import { readLocalizedText, writeLocalizedText } from '../i18n/localizedContent'
 import '../styles/AdminSiteEditorPage.css'
 
 function rowsToMap(rows = []) {
@@ -46,6 +47,7 @@ export default function AdminSiteEditorPage() {
   const [dirty, setDirty] = useState(false)
   const [openProductId, setOpenProductId] = useState('drum-line')
   const [openCatalogProductId, setOpenCatalogProductId] = useState('')
+  const [editorLanguage, setEditorLanguage] = useState('it')
 
   const sectionFields = useMemo(
     () => SITE_CONTENT_FIELDS.filter((field) => {
@@ -110,6 +112,33 @@ export default function AdminSiteEditorPage() {
     setValues((current) => ({ ...current, [key]: value }))
     setDirty(true)
     setMessage('')
+  }
+
+  function editorText(value) {
+    return readLocalizedText(value, editorLanguage) || ''
+  }
+
+  function setLocalizedValue(key, nextText) {
+    const current = values[key]
+    setValue(key, writeLocalizedText(current, editorLanguage, nextText))
+  }
+
+  function updateArrayLocalizedItem(key, index, property, nextText) {
+    const items = Array.isArray(values[key]) ? [...values[key]] : []
+    const item = { ...(items[index] || {}) }
+    item[property] = writeLocalizedText(item[property], editorLanguage, nextText)
+    items[index] = item
+    setValue(key, items)
+  }
+
+  function localizedParagraphText(items = []) {
+    return (items || []).map((item) => editorText(item)).join('\n\n')
+  }
+
+  function localizedParagraphsFromText(currentItems = [], text = '') {
+    return String(text || '').split(/\n\s*\n+/).map((item) => item.trim()).filter(Boolean).map((item, index) =>
+      writeLocalizedText(currentItems[index] || '', editorLanguage, item)
+    )
   }
 
   function updateArrayItem(key, index, patch) {
@@ -269,7 +298,7 @@ export default function AdminSiteEditorPage() {
             <div className="cms-list-main">
               <label>
                 <span>Titolo visualizzato</span>
-                <input value={item.label || ''} onChange={(e) => updateArrayItem(field.key, index, { label: e.target.value })} />
+                <input value={editorText(item.label)} onChange={(e) => updateArrayLocalizedItem(field.key, index, 'label', e.target.value)} />
               </label>
               <small>{item.to}</small>
             </div>
@@ -287,7 +316,7 @@ export default function AdminSiteEditorPage() {
   function renderProductNavigationEditor(field) {
     const items = Array.isArray(values[field.key]) ? values[field.key] : []
     const availablePages = Object.entries(values['products.details'] || {}).map(([productId, page]) => ({
-      label: page?.name || page?.title || productId,
+      label: editorText(page?.name || page?.title || productId),
       url: `/prodotti/${page?.slug || productId}`,
     }))
 
@@ -320,7 +349,7 @@ export default function AdminSiteEditorPage() {
               <div className="cms-product-menu-fields">
                 <label>
                   <span>Nome nel sottomenu</span>
-                  <input value={item.label || ''} onChange={(e) => updateArrayItem(field.key, index, { label: e.target.value })} />
+                  <input value={editorText(item.label)} onChange={(e) => updateArrayLocalizedItem(field.key, index, 'label', e.target.value)} />
                 </label>
                 <label>
                   <span>Redirect URL</span>
@@ -451,8 +480,8 @@ export default function AdminSiteEditorPage() {
           >
             <summary>
               <div>
-                <strong>{page.name || page.kicker || page.title || productId}</strong>
-                <span>{page.title}</span>
+                <strong>{editorText(page.name || page.kicker || page.title || productId)}</strong>
+                <span>{editorText(page.title)}</span>
               </div>
               <span className="cms-product-page__path">/prodotti/{page.slug || productId}</span>
             </summary>
@@ -467,10 +496,10 @@ export default function AdminSiteEditorPage() {
               </div>
               <div className="cms-product-page__hero-fields">
                 <label className="cms-full"><span>URL pagina prodotto</span><div className="cms-slug-field"><span>/prodotti/</span><input value={page.slug || productId} onChange={(e) => mutatePages((next) => { next[productId].slug = slugify(e.target.value) })} placeholder="nome-prodotto" /></div></label>
-                <label><span>Nome nel breadcrumb</span><input value={page.name || ''} onChange={(e) => mutatePages((next) => { next[productId].name = e.target.value })} /></label>
-                <label><span>Etichetta / linea</span><input value={page.kicker || ''} onChange={(e) => mutatePages((next) => { next[productId].kicker = e.target.value })} /></label>
-                <label className="cms-full"><span>Titolo principale</span><input value={page.title || ''} onChange={(e) => mutatePages((next) => { next[productId].title = e.target.value })} /></label>
-                <label className="cms-full"><span>Testo introduttivo</span><textarea rows="4" value={page.intro || ''} onChange={(e) => mutatePages((next) => { next[productId].intro = e.target.value })} /></label>
+                <label><span>Nome nel breadcrumb</span><input value={editorText(page.name)} onChange={(e) => mutatePages((next) => { next[productId].name = writeLocalizedText(next[productId].name, editorLanguage, e.target.value) })} /></label>
+                <label><span>Etichetta / linea</span><input value={editorText(page.kicker)} onChange={(e) => mutatePages((next) => { next[productId].kicker = writeLocalizedText(next[productId].kicker, editorLanguage, e.target.value) })} /></label>
+                <label className="cms-full"><span>Titolo principale</span><input value={editorText(page.title)} onChange={(e) => mutatePages((next) => { next[productId].title = writeLocalizedText(next[productId].title, editorLanguage, e.target.value) })} /></label>
+                <label className="cms-full"><span>Testo introduttivo</span><textarea rows="4" value={editorText(page.intro)} onChange={(e) => mutatePages((next) => { next[productId].intro = writeLocalizedText(next[productId].intro, editorLanguage, e.target.value) })} /></label>
               </div>
 
               <div className="cms-product-page__sections">
@@ -481,8 +510,8 @@ export default function AdminSiteEditorPage() {
                       <button type="button" className="cms-mini-danger" onClick={() => mutatePages((next) => { next[productId].sections.splice(sectionIndex, 1) })}>Rimuovi blocco</button>
                     </div>
 
-                    <label><span>Titolo del blocco</span><input value={section.label || ''} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].label = e.target.value })} /></label>
-                    <label><span>Testo del blocco</span><textarea rows="5" value={(section.paragraphs || []).join('\n\n')} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].paragraphs = paragraphsFromText(e.target.value) })} placeholder="Scrivi un paragrafo. Lascia una riga vuota per iniziarne un altro." /></label>
+                    <label><span>Titolo del blocco</span><input value={editorText(section.label)} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].label = writeLocalizedText(next[productId].sections[sectionIndex].label, editorLanguage, e.target.value) })} /></label>
+                    <label><span>Testo del blocco</span><textarea rows="5" value={localizedParagraphText(section.paragraphs || [])} onChange={(e) => mutatePages((next) => { const current = next[productId].sections[sectionIndex].paragraphs || []; next[productId].sections[sectionIndex].paragraphs = localizedParagraphsFromText(current, e.target.value) })} placeholder="Scrivi un paragrafo. Lascia una riga vuota per iniziarne un altro." /></label>
 
                     {(section.groups || []).map((group, groupIndex) => (
                       <div className="cms-product-page__group" key={`${productId}-section-${sectionIndex}-group-${groupIndex}`}>
@@ -490,14 +519,14 @@ export default function AdminSiteEditorPage() {
                           <strong>Sottosezione / elenco {groupIndex + 1}</strong>
                           <button type="button" className="cms-mini-danger" onClick={() => mutatePages((next) => { next[productId].sections[sectionIndex].groups.splice(groupIndex, 1) })}>Rimuovi</button>
                         </div>
-                        <label><span>Titolo sottosezione (facoltativo)</span><input value={group.title || ''} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].title = e.target.value })} /></label>
-                        <label><span>Testo sottosezione (facoltativo)</span><textarea rows="4" value={(group.paragraphs || []).join('\n\n')} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].paragraphs = paragraphsFromText(e.target.value) })} /></label>
+                        <label><span>Titolo sottosezione (facoltativo)</span><input value={editorText(group.title)} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].title = writeLocalizedText(next[productId].sections[sectionIndex].groups[groupIndex].title, editorLanguage, e.target.value) })} /></label>
+                        <label><span>Testo sottosezione (facoltativo)</span><textarea rows="4" value={localizedParagraphText(group.paragraphs || [])} onChange={(e) => mutatePages((next) => { const current = next[productId].sections[sectionIndex].groups[groupIndex].paragraphs || []; next[productId].sections[sectionIndex].groups[groupIndex].paragraphs = localizedParagraphsFromText(current, e.target.value) })} /></label>
 
                         <div className="cms-product-page__items">
                           <span className="cms-product-page__items-label">Elenco puntato</span>
                           {(group.items || []).map((item, itemIndex) => (
                             <div className="cms-product-page__item" key={`${productId}-${sectionIndex}-${groupIndex}-${itemIndex}`}>
-                              <input value={item || ''} onChange={(e) => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].items[itemIndex] = e.target.value })} />
+                              <input value={editorText(item)} onChange={(e) => mutatePages((next) => { const current = next[productId].sections[sectionIndex].groups[groupIndex].items[itemIndex]; next[productId].sections[sectionIndex].groups[groupIndex].items[itemIndex] = writeLocalizedText(current, editorLanguage, e.target.value) })} />
                               <button type="button" className="cms-mini-danger" aria-label="Elimina voce" onClick={() => mutatePages((next) => { next[productId].sections[sectionIndex].groups[groupIndex].items.splice(itemIndex, 1) })}>×</button>
                             </div>
                           ))}
@@ -523,7 +552,7 @@ export default function AdminSiteEditorPage() {
                 <div className="cms-product-gallery-panel__body">
                   <label className="cms-product-gallery-title">
                     <span>Titolo galleria</span>
-                    <input value={page.galleryLabel || ''} onChange={(e) => mutatePages((next) => { next[productId].galleryLabel = e.target.value })} />
+                    <input value={editorText(page.galleryLabel)} onChange={(e) => mutatePages((next) => { next[productId].galleryLabel = writeLocalizedText(next[productId].galleryLabel, editorLanguage, e.target.value) })} />
                   </label>
 
                   {getProductGallery(productId, page).length ? (
@@ -531,7 +560,7 @@ export default function AdminSiteEditorPage() {
                       {getProductGallery(productId, page).map((image, imageIndex) => (
                         <article className="cms-product-gallery-item" key={`${image}-${imageIndex}`}>
                           <div className="cms-product-gallery-thumb">
-                            <img src={image} alt={`Immagine ${imageIndex + 1} ${page.name || page.title || ''}`} />
+                            <img src={image} alt={`Immagine ${imageIndex + 1} ${editorText(page.name || page.title || '')}`} />
                             <span>{imageIndex + 1}</span>
                           </div>
                           <div className="cms-product-gallery-actions">
@@ -599,7 +628,7 @@ export default function AdminSiteEditorPage() {
   function renderProductsEditor(field) {
     const items = Array.isArray(values[field.key]) ? values[field.key] : []
     const availablePages = Object.entries(values['products.details'] || {}).map(([productId, page]) => ({
-      label: page?.name || page?.title || productId,
+      label: editorText(page?.name || page?.title || productId),
       url: `/prodotti/${page?.slug || productId}`,
     }))
 
@@ -649,8 +678,8 @@ export default function AdminSiteEditorPage() {
                 >
                   <img src={item.image || '/logo-cerchio.png'} alt="" />
                   <span className="cms-product-card__summary-copy">
-                    <strong>{item.title || 'Prodotto'}</strong>
-                    <small>{item.subtitle || 'Nessun titolo visualizzato'}</small>
+                    <strong>{editorText(item.title) || 'Prodotto'}</strong>
+                    <small>{editorText(item.subtitle) || 'Nessun titolo visualizzato'}</small>
                   </span>
                   <span className={`cms-product-status ${item.visible !== false ? 'is-visible' : 'is-hidden'}`}>
                     {item.visible !== false ? 'Visibile' : 'Nascosto'}
@@ -661,10 +690,10 @@ export default function AdminSiteEditorPage() {
                 {isOpen ? (
                   <div className="cms-product-card__expanded">
                     <div className="cms-product-fields">
-                      <label><span>Linea / nome</span><input value={item.title || ''} onChange={(e) => updateArrayItem(field.key, index, { title: e.target.value })} /></label>
-                      <label><span>Titolo visualizzato</span><input value={item.subtitle || ''} onChange={(e) => updateArrayItem(field.key, index, { subtitle: e.target.value })} /></label>
-                      <label className="cms-full"><span>Descrizione</span><textarea rows="3" value={item.description || ''} onChange={(e) => updateArrayItem(field.key, index, { description: e.target.value })} /></label>
-                      <label><span>Testo pulsante</span><input value={item.cta || ''} onChange={(e) => updateArrayItem(field.key, index, { cta: e.target.value })} /></label>
+                      <label><span>Linea / nome</span><input value={editorText(item.title)} onChange={(e) => updateArrayLocalizedItem(field.key, index, 'title', e.target.value)} /></label>
+                      <label><span>Titolo visualizzato</span><input value={editorText(item.subtitle)} onChange={(e) => updateArrayLocalizedItem(field.key, index, 'subtitle', e.target.value)} /></label>
+                      <label className="cms-full"><span>Descrizione</span><textarea rows="3" value={editorText(item.description)} onChange={(e) => updateArrayLocalizedItem(field.key, index, 'description', e.target.value)} /></label>
+                      <label><span>Testo pulsante</span><input value={editorText(item.cta)} onChange={(e) => updateArrayLocalizedItem(field.key, index, 'cta', e.target.value)} /></label>
                       <label><span>Redirect URL del prodotto</span><input list="cms-catalog-product-page-urls" value={item.slug || ''} onChange={(e) => updateArrayItem(field.key, index, { slug: e.target.value })} placeholder="/prodotti/nome-prodotto" /></label>
                       <div className="cms-image-control">
                         <span>Foto prodotto</span>
@@ -733,9 +762,9 @@ export default function AdminSiteEditorPage() {
         <div className="cms-string-list">
           {items.map((item, index) => (
             <div className="cms-string-row" key={`${field.key}-${index}`}>
-              <input value={item} onChange={(e) => {
+              <input value={editorText(item)} onChange={(e) => {
                 const next = [...items]
-                next[index] = e.target.value
+                next[index] = writeLocalizedText(next[index], editorLanguage, e.target.value)
                 setValue(field.key, next)
               }} />
               <div className="cms-list-order">
@@ -821,10 +850,14 @@ export default function AdminSiteEditorPage() {
     }
 
     if (field.type === 'textarea') {
-      return <textarea rows="5" value={value || ''} onChange={(e) => setValue(field.key, e.target.value)} />
+      return <textarea rows="5" value={editorText(value)} onChange={(e) => setLocalizedValue(field.key, e.target.value)} />
     }
 
-    return <input type={field.type === 'url' ? 'url' : 'text'} value={value || ''} onChange={(e) => setValue(field.key, e.target.value)} />
+    if (field.type === 'url') {
+      return <input type="url" value={value || ''} onChange={(e) => setValue(field.key, e.target.value)} />
+    }
+
+    return <input type="text" value={editorText(value)} onChange={(e) => setLocalizedValue(field.key, e.target.value)} />
   }
 
   const activeSectionInfo = SITE_SECTIONS.find((section) => section.id === activeSection)
@@ -865,7 +898,18 @@ export default function AdminSiteEditorPage() {
                 <span className="admin-section-kicker">{activeSectionInfo?.label}</span>
                 <h2>{activeSectionInfo?.description}</h2>
               </div>
-              <button type="button" className="admin-secondary-button" onClick={() => saveDraft()} disabled={saving || loading}>{saving ? 'Salvataggio...' : 'Salva bozza'}</button>
+              <div className="cms-editor-card-actions">
+                <div className="cms-language-tabs" aria-label="Lingua contenuti CMS">
+                  {[['it', 'IT'], ['en', 'EN'], ['tr', 'TR']].map(([code, label]) => (
+                    <button key={code} type="button" className={editorLanguage === code ? 'is-active' : ''} onClick={() => setEditorLanguage(code)}>{label}</button>
+                  ))}
+                </div>
+                <button type="button" className="admin-secondary-button" onClick={() => saveDraft()} disabled={saving || loading}>{saving ? 'Salvataggio...' : 'Salva bozza'}</button>
+              </div>
+            </div>
+            <div className="cms-language-hint">
+              <strong>{editorLanguage === 'it' ? 'Italiano' : editorLanguage === 'en' ? 'English' : 'Türkçe'}</strong>
+              <span>Stai modificando i testi mostrati in questa lingua. Immagini, URL, ordine e visibilità restano condivisi.</span>
             </div>
 
             {loading ? <div className="cms-loading">Caricamento editor...</div> : (

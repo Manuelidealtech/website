@@ -2,6 +2,8 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { supabase } from '../lib/supabase'
 import { SITE_CONTENT_DEFAULTS } from '../lib/siteContentDefaults'
 import { useAuth } from './AuthContext'
+import { useLanguage } from '../i18n/LanguageContext'
+import { resolveLocalizedContent } from '../i18n/localizedContent'
 
 const SiteContentContext = createContext(null)
 
@@ -11,6 +13,7 @@ function rowsToMap(rows = []) {
 
 export function SiteContentProvider({ children }) {
   const { user, loading: authLoading } = useAuth()
+  const { language } = useLanguage()
   const [content, setContent] = useState(SITE_CONTENT_DEFAULTS)
   const [loading, setLoading] = useState(true)
   const isPreview = new URLSearchParams(window.location.search).get('cms_preview') === '1'
@@ -55,8 +58,9 @@ export function SiteContentProvider({ children }) {
 
   const get = useCallback((key, fallback) => {
     const value = content[key]
-    return value === undefined || value === null ? fallback : value
-  }, [content])
+    const source = value === undefined || value === null ? fallback : value
+    return resolveLocalizedContent(source, language)
+  }, [content, language])
 
   const value = useMemo(() => ({ content, get, loading, isPreview, reload: loadContent }), [content, get, loading, isPreview, loadContent])
   return <SiteContentContext.Provider value={value}>{children}</SiteContentContext.Provider>
