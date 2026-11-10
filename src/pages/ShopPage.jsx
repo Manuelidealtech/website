@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../i18n/LanguageContext'
 import { calculateCartTotals, formatMoney } from '../lib/shop'
-import { getLocalizedAvailability, localizedCountry, shopT } from '../i18n/shopTranslations'
+import { getLocalizedAvailability, getLocalizedShopProduct, localizedCountry, shopT } from '../i18n/shopTranslations'
 import { getPrimaryProductImage } from '../lib/shopImages'
 import '../styles/ShopPage.css'
 
@@ -102,6 +102,10 @@ export default function ShopPage() {
     window.localStorage.setItem(CART_KEY, JSON.stringify(cart))
   }, [cart])
 
+  const localizedProducts = useMemo(
+    () => products.map((product) => getLocalizedShopProduct(product, language)),
+    [products, language]
+  )
 
   useEffect(() => {
     setCustomer((current) => {
@@ -114,11 +118,11 @@ export default function ShopPage() {
     () =>
       cart
         .map((entry) => {
-          const product = products.find((item) => item.id === entry.id)
+          const product = localizedProducts.find((item) => item.id === entry.id)
           return product ? { ...product, quantity: entry.quantity } : null
         })
         .filter(Boolean),
-    [cart, products]
+    [cart, localizedProducts]
   )
 
   const itemCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
@@ -252,7 +256,7 @@ export default function ShopPage() {
           </div>
         ) : (
           <div className="shop-grid">
-            {products.map((product) => {
+            {localizedProducts.map((product) => {
               const availability = getLocalizedAvailability(product, language)
               const grossPrice = Number(product.price) * (1 + Number(product.vat_rate || 0) / 100)
               const primaryImage = getPrimaryProductImage(product)

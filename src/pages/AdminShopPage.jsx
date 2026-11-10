@@ -22,6 +22,7 @@ const emptyProduct = {
   image_url: '',
   image_path: '',
   images: [],
+  translations: { en: { name: '', category: '', description: '' }, tr: { name: '', category: '', description: '' } },
 }
 
 
@@ -67,6 +68,7 @@ export default function AdminShopPage() {
   const [savingProduct, setSavingProduct] = useState(false)
   const [savingSettings, setSavingSettings] = useState(false)
   const [savingOrderStatus, setSavingOrderStatus] = useState(null)
+  const [productLanguage, setProductLanguage] = useState('it')
 
   async function loadData(showLoader = true) {
     if (showLoader) setLoading(true)
@@ -180,6 +182,7 @@ export default function AdminShopPage() {
     setProductForm(emptyProduct)
     setProductImages([])
     setRemovedImagePaths([])
+    setProductLanguage('it')
     setProductModal(true)
   }
 
@@ -202,11 +205,47 @@ export default function AdminShopPage() {
     })
     setProductImages(savedImages)
     setRemovedImagePaths([])
+    setProductLanguage('it')
     setProductModal(true)
   }
 
   function updateProductField(name, value) {
     setProductForm((current) => ({ ...current, [name]: value }))
+  }
+
+  function getProductTextField(name) {
+    if (productLanguage === 'it') return productForm[name] || ''
+    return productForm.translations?.[productLanguage]?.[name] || ''
+  }
+
+  function updateProductTextField(name, value) {
+    if (productLanguage === 'it') {
+      updateProductField(name, value)
+      return
+    }
+
+    setProductForm((current) => ({
+      ...current,
+      translations: {
+        ...(current.translations || {}),
+        [productLanguage]: {
+          ...(current.translations?.[productLanguage] || {}),
+          [name]: value,
+        },
+      },
+    }))
+  }
+
+  function normalizedProductTranslations() {
+    const translations = productForm.translations || {}
+    return Object.fromEntries(['en', 'tr'].map((language) => [
+      language,
+      {
+        name: String(translations?.[language]?.name || '').trim(),
+        category: String(translations?.[language]?.category || '').trim(),
+        description: String(translations?.[language]?.description || '').trim(),
+      },
+    ]))
   }
 
   function addProductImages(files) {
@@ -287,6 +326,7 @@ export default function AdminShopPage() {
         name: productForm.name.trim(),
         category: String(productForm.category || '').trim() || null,
         description: String(productForm.description || '').trim() || null,
+        translations: normalizedProductTranslations(),
         price: Number(productForm.price),
         vat_rate: Number(productForm.vat_rate || 0),
         track_stock: Boolean(productForm.track_stock),
@@ -320,9 +360,11 @@ export default function AdminShopPage() {
     } catch (saveError) {
       if (uploadedPaths.length) await removeShopProductImages(uploadedPaths).catch(() => {})
       const message = saveError.message || 'Errore durante il salvataggio del prodotto.'
-      setError(/images/i.test(message) && /column|schema cache|does not exist/i.test(message)
-        ? 'Prima di usare le foto multiple esegui SUPABASE_SHOP_MULTIFOTO.sql nel SQL Editor di Supabase.'
-        : message)
+      setError(/translations/i.test(message) && /column|schema cache|does not exist/i.test(message)
+        ? 'Prima di usare le traduzioni dello Shop esegui SUPABASE_SHOP_TRADUZIONI.sql nel SQL Editor di Supabase.'
+        : /images/i.test(message) && /column|schema cache|does not exist/i.test(message)
+          ? 'Prima di usare le foto multiple esegui SUPABASE_SHOP_MULTIFOTO.sql nel SQL Editor di Supabase.'
+          : message)
     } finally {
       setSavingProduct(false)
     }
@@ -588,13 +630,25 @@ export default function AdminShopPage() {
               <button type="button" onClick={() => setProductModal(false)}>×</button>
             </div>
             <form onSubmit={saveProduct}>
+              <div className="shop-product-language-tabs" role="tablist" aria-label="Lingua contenuti prodotto Shop">
+                {[['it', 'IT', 'Italiano'], ['en', 'EN', 'English'], ['tr', 'TR', 'Türkçe']].map(([code, shortLabel, label]) => (
+                  <button key={code} type="button" className={productLanguage === code ? 'is-active' : ''} onClick={() => setProductLanguage(code)}>
+                    <strong>{shortLabel}</strong><span>{label}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="shop-product-language-note">
+                {productLanguage === 'it'
+                  ? 'L’italiano è la lingua principale del prodotto.'
+                  : `Inserisci nome, categoria e descrizione in ${productLanguage === 'en' ? 'inglese' : 'turco'}. Se lasci un campo vuoto, sul sito verrà usato l’italiano.`}
+              </div>
               <div className="shop-product-form-grid">
-                <label className="shop-admin-field"><span>Nome prodotto *</span><input value={productForm.name} onChange={(event) => updateProductField('name', event.target.value)} required maxLength="180" /></label>
+                <label className="shop-admin-field"><span>Nome prodotto {productLanguage === 'it' ? '*' : ''}</span><input value={getProductTextField('name')} onChange={(event) => updateProductTextField('name', event.target.value)} required={productLanguage === 'it'} maxLength="180" /></label>
                 <label className="shop-admin-field"><span>Codice / SKU</span><input value={productForm.sku || ''} onChange={(event) => updateProductField('sku', event.target.value)} maxLength="80" /></label>
-                <label className="shop-admin-field"><span>Categoria</span><input value={productForm.category || ''} onChange={(event) => updateProductField('category', event.target.value)} maxLength="100" /></label>
+                <label className="shop-admin-field"><span>Categoria</span><input value={getProductTextField('category')} onChange={(event) => updateProductTextField('category', event.target.value)} maxLength="100" /></label>
                 <label className="shop-admin-field"><span>Prezzo imponibile *</span><div className="shop-price-input"><span>€</span><input type="number" min="0" step="0.01" value={productForm.price} onChange={(event) => updateProductField('price', event.target.value)} required /></div></label>
                 <label className="shop-admin-field"><span>IVA %</span><input type="number" min="0" max="100" step="0.01" value={productForm.vat_rate} onChange={(event) => updateProductField('vat_rate', event.target.value)} /></label>
-                <label className="shop-admin-field shop-admin-field--wide"><span>Descrizione</span><textarea rows="4" value={productForm.description || ''} onChange={(event) => updateProductField('description', event.target.value)} maxLength="3000" /></label>
+                <label className="shop-admin-field shop-admin-field--wide"><span>Descrizione</span><textarea rows="4" value={getProductTextField('description')} onChange={(event) => updateProductTextField('description', event.target.value)} maxLength="3000" /></label>
                 <div className="shop-admin-field shop-admin-field--wide shop-product-images-field">
                   <span>Foto prodotto</span>
                   <small className="shop-product-images-help">Puoi caricare più foto. La prima è la copertina. Ordinale come preferisci con le frecce; le nuove immagini vengono ridimensionate e compresse automaticamente in WebP prima dell’upload.</small>

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { formatMoney } from '../lib/shop'
-import { getLocalizedAvailability, shopT } from '../i18n/shopTranslations'
+import { getLocalizedAvailability, getLocalizedShopProduct, shopT } from '../i18n/shopTranslations'
 import { normalizeProductImages } from '../lib/shopImages'
 import { useLanguage } from '../i18n/LanguageContext'
 import '../styles/ShopProductPage.css'
@@ -57,6 +57,7 @@ export default function ShopProductPage() {
     return () => { active = false }
   }, [productId])
 
+  const displayProduct = useMemo(() => getLocalizedShopProduct(product, language), [product, language])
   const images = useMemo(() => normalizeProductImages(product), [product])
   const availability = product ? getLocalizedAvailability(product, language) : { available: false, label: '' }
   const maxQuantity = product?.track_stock ? Math.max(1, Number(product.stock_quantity || 0)) : 99
@@ -149,8 +150,8 @@ export default function ShopProductPage() {
         <nav className="shop-product-breadcrumb" aria-label={t('path')}>
           <Link to="/shop">Shop</Link>
           <span>›</span>
-          {product.category ? <><span>{product.category}</span><span>›</span></> : null}
-          <strong>{product.name}</strong>
+          {displayProduct.category ? <><span>{displayProduct.category}</span><span>›</span></> : null}
+          <strong>{displayProduct.name}</strong>
         </nav>
 
         <section className="shop-product-detail">
@@ -178,15 +179,15 @@ export default function ShopProductPage() {
               aria-label={currentImage?.url ? t('openLargeImage') : t('productImage')}
             >
               {currentImage?.url
-                ? <img src={currentImage.url} alt={t('productPhotoAlt', { name: product.name, number: selectedImage + 1 })} />
+                ? <img src={currentImage.url} alt={t('productPhotoAlt', { name: displayProduct.name, number: selectedImage + 1 })} />
                 : <div className="shop-product-main-placeholder">Idealtech</div>}
               {currentImage?.url ? <span className="shop-product-zoom-hint">{t('tapToZoom')}</span> : null}
             </button>
           </div>
 
           <div className="shop-product-info">
-            {product.category ? <span className="shop-product-detail-category">{product.category}</span> : null}
-            <h1>{product.name}</h1>
+            {displayProduct.category ? <span className="shop-product-detail-category">{displayProduct.category}</span> : null}
+            <h1>{displayProduct.name}</h1>
             {product.sku ? <p className="shop-product-detail-sku">{t('productCode')} <strong>{product.sku}</strong></p> : null}
             <div className="shop-product-detail-price">
               <strong>{formatMoney(grossPrice, locale)}</strong>
@@ -232,8 +233,8 @@ export default function ShopProductPage() {
         <section className="shop-product-full-description">
           <span>{t('productDetails')}</span>
           <h2>{t('fullDescription')}</h2>
-          {product.description
-            ? <p>{product.description}</p>
+          {displayProduct.description
+            ? <p>{displayProduct.description}</p>
             : <p>{t('noDescription')}</p>}
         </section>
       </div>
@@ -270,10 +271,10 @@ export default function ShopProductPage() {
 
             <div className="shop-product-lightbox-stage">
               <div className="shop-product-lightbox-image-frame">
-                <img src={currentImage.url} alt={t('productImageAlt', { name: product.name, number: selectedImage + 1 })} className="shop-product-lightbox-image" />
+                <img src={currentImage.url} alt={t('productImageAlt', { name: displayProduct.name, number: selectedImage + 1 })} className="shop-product-lightbox-image" />
               </div>
               <div className="shop-product-lightbox-meta">
-                <strong>{product.name}</strong>
+                <strong>{displayProduct.name}</strong>
                 <span>{selectedImage + 1} / {images.length}</span>
               </div>
             </div>

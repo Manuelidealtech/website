@@ -28,6 +28,7 @@ create table if not exists public.shop_products (
   name text not null,
   description text,
   category text,
+  translations jsonb not null default '{}'::jsonb,
   price numeric(12,2) not null default 0 check (price >= 0),
   vat_rate numeric(5,2) not null default 22 check (vat_rate >= 0 and vat_rate <= 100),
   image_url text,

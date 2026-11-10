@@ -1,3 +1,5 @@
+import { translateKnownText } from './localizedContent'
+
 const SHOP_TRANSLATIONS = {
   it: {
     sparePartsAccessories: 'Ricambi e accessori Idealtech',
@@ -353,4 +355,35 @@ export function localizedCountry(language = 'it') {
   if (language === 'en') return 'Italy'
   if (language === 'tr') return 'İtalya'
   return 'Italia'
+}
+
+
+function cleanLocalizedValue(value) {
+  return typeof value === 'string' ? value.trim() : ''
+}
+
+export function getLocalizedShopProduct(product, language = 'it') {
+  if (!product) return product
+  if (language === 'it') return product
+
+  const translations = product.translations && typeof product.translations === 'object'
+    ? product.translations
+    : {}
+  const localized = translations[language] && typeof translations[language] === 'object'
+    ? translations[language]
+    : {}
+
+  const resolve = (field) => {
+    const explicit = cleanLocalizedValue(localized[field])
+    if (explicit) return explicit
+    const source = typeof product[field] === 'string' ? product[field] : ''
+    return translateKnownText(source, language) || source
+  }
+
+  return {
+    ...product,
+    name: resolve('name'),
+    category: resolve('category'),
+    description: resolve('description'),
+  }
 }
