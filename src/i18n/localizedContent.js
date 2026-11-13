@@ -28,6 +28,17 @@ const CMS_TRANSLATION_OVERRIDES = {
     'I fusori hot-melt della serie IdealMelt sono progettati per la fusione e l’erogazione di adesivi termoplastici. Grazie alla struttura modulare, al controllo preciso della temperatura e alle diverse possibilità di configurazione, offrono una soluzione affidabile e versatile per le applicazioni di incollaggio industriale.': 'IdealMelt hot-melt melters are designed for melting and dispensing thermoplastic adhesives. Thanks to their modular construction, precise temperature control and multiple configuration options, they provide a reliable and versatile solution for industrial gluing applications.',
     "La serie IdealMelt comprende fusori hot-melt modulari progettati per la fusione e l'erogazione di adesivi termoplastici, tra cui EVA e PSA. Disponibili con serbatoi da 5, 12 e 30 litri, questi sistemi combinano affidabilità, semplicità di utilizzo e flessibilità di configurazione.": 'The IdealMelt series includes modular hot-melt melters designed for melting and dispensing thermoplastic adhesives, including EVA and PSA. Available with 5, 12 and 30 litre tanks, these systems combine reliability, ease of use and configuration flexibility.',
     'La serie IdealMelt comprende fusori hot-melt modulari progettati per la fusione e l’erogazione di adesivi termoplastici, tra cui EVA e PSA. Disponibili con serbatoi da 5, 12 e 30 litri, questi sistemi combinano affidabilità, semplicità di utilizzo e flessibilità di configurazione.': 'The IdealMelt series includes modular hot-melt melters designed for melting and dispensing thermoplastic adhesives, including EVA and PSA. Available with 5, 12 and 30 litre tanks, these systems combine reliability, ease of use and configuration flexibility.',
+    "Il controllo preciso della temperatura e le diverse capacità di fusione consentono di adattare il sistema alle esigenze di un'ampia gamma di applicazioni industriali.": 'Precise temperature control and the different melting capacities allow the system to be adapted to the requirements of a wide range of industrial applications.',
+    'Grazie alla struttura modulare, i fusori IdealMelt possono essere configurati con differenti accessori e sistemi di controllo, offrendo soluzioni personalizzabili in base alle specifiche esigenze produttive.': 'Thanks to their modular design, IdealMelt melters can be configured with different accessories and control systems, providing customisable solutions for specific production requirements.',
+    'Design modulare: configurazioni flessibili per diverse esigenze applicative': 'Modular design: flexible configurations for different application requirements',
+    'Capacità del serbatoio: disponibili versioni da 5, 12 e 30 litri': 'Tank capacity: available in 5, 12 and 30 litre versions',
+    "Controllo della temperatura: regolazione precisa per una fusione uniforme dell'adesivo": 'Temperature control: precise regulation for uniform adhesive melting',
+    "Manutenzione semplificata: struttura progettata per facilitare l'accesso ai componenti": 'Simplified maintenance: structure designed to provide easy access to components',
+    'Flessibilità applicativa: compatibilità con tubi riscaldati e applicatori manuali e automatici': 'Application flexibility: compatible with heated hoses and manual and automatic applicators',
+    'Configurazioni opzionali: alimentazione automatica del granulato, controllo dei pattern di applicazione e pannello operatore remoto': 'Optional configurations: automatic granulate feeding, application pattern control and remote operator panel',
+    'Grazie alle loro caratteristiche si prestano pertanto ad essere installati in qualsiasi linea produttiva.': 'Thanks to their characteristics, they can be installed in virtually any production line.',
+    'Grazie al nostro servizio interno di progettazione, concepiamo e realizziamo progetti custom per rispondere anche a richieste di piccole e medie automazioni.': 'Thanks to our in-house engineering service, we design and manufacture custom projects to meet the requirements of small and medium-sized automation systems.',
+    'Grazie al nostro servizio interno di progettazione, concepiamo e realizziamo progetti custom, sviluppati attorno alle reali esigenze produttive del cliente. Siamo in grado di rispondere anche a richieste per piccole e medie automazioni.': 'Thanks to our in-house engineering service, we design and manufacture custom projects around the customer’s actual production requirements. We can also meet requests for small and medium-sized automation systems.',
     'NORDSON 8503686 – Applicatore hot-melt H201-T': 'NORDSON 8503686 – H201-T hot-melt applicator',
     'NORDSON 729450C – Scheda controllo temperatura TR6K+': 'NORDSON 729450C – TR6K+ temperature control board',
     'Applicatore hot-melt Nordson H201-T, codice 8503686, configurato con singolo modulo per l’erogazione di adesivo termofusibile.': 'Nordson H201-T hot-melt applicator, code 8503686, configured with a single module for dispensing thermoplastic adhesive.',
@@ -67,6 +78,17 @@ const CMS_TRANSLATION_OVERRIDES = {
     'I fusori hot-melt della serie IdealMelt sono progettati per la fusione e l’erogazione di adesivi termoplastici. Grazie alla struttura modulare, al controllo preciso della temperatura e alle diverse possibilità di configurazione, offrono una soluzione affidabile e versatile per le applicazioni di incollaggio industriale.': 'IdealMelt serisi hot-melt eritme üniteleri termoplastik yapıştırıcıların eritilmesi ve uygulanması için tasarlanmıştır. Modüler yapıları, hassas sıcaklık kontrolü ve farklı konfigürasyon seçenekleri sayesinde endüstriyel yapıştırma uygulamaları için güvenilir ve çok yönlü bir çözüm sunarlar.',
     "La serie IdealMelt comprende fusori hot-melt modulari progettati per la fusione e l'erogazione di adesivi termoplastici, tra cui EVA e PSA. Disponibili con serbatoi da 5, 12 e 30 litri, questi sistemi combinano affidabilità, semplicità di utilizzo e flessibilità di configurazione.": 'IdealMelt serisi, EVA ve PSA dahil termoplastik yapıştırıcıların eritilmesi ve uygulanması için tasarlanmış modüler hot-melt eritme ünitelerinden oluşur. 5, 12 ve 30 litrelik tank seçenekleriyle bu sistemler güvenilirlik, kullanım kolaylığı ve konfigürasyon esnekliğini bir araya getirir.',
     'La serie IdealMelt comprende fusori hot-melt modulari progettati per la fusione e l’erogazione di adesivi termoplastici, tra cui EVA e PSA. Disponibili con serbatoi da 5, 12 e 30 litri, questi sistemi combinano affidabilità, semplicità di utilizzo e flessibilità di configurazione.': 'IdealMelt serisi, EVA ve PSA dahil termoplastik yapıştırıcıların eritilmesi ve uygulanması için tasarlanmış modüler hot-melt eritme ünitelerinden oluşur. 5, 12 ve 30 litrelik tank seçenekleriyle bu sistemler güvenilirlik, kullanım kolaylığı ve konfigürasyon esnekliğini bir araya getirir.',
+    "Il controllo preciso della temperatura e le diverse capacità di fusione consentono di adattare il sistema alle esigenze di un'ampia gamma di applicazioni industriali.": 'Hassas sıcaklık kontrolü ve farklı eritme kapasiteleri, sistemin çok çeşitli endüstriyel uygulama ihtiyaçlarına uyarlanmasını sağlar.',
+    'Grazie alla struttura modulare, i fusori IdealMelt possono essere configurati con differenti accessori e sistemi di controllo, offrendo soluzioni personalizzabili in base alle specifiche esigenze produttive.': 'Modüler yapıları sayesinde IdealMelt eritme üniteleri farklı aksesuarlar ve kontrol sistemleriyle yapılandırılabilir ve özel üretim ihtiyaçlarına göre özelleştirilebilir çözümler sunar.',
+    'Design modulare: configurazioni flessibili per diverse esigenze applicative': 'Modüler tasarım: farklı uygulama ihtiyaçları için esnek konfigürasyonlar',
+    'Capacità del serbatoio: disponibili versioni da 5, 12 e 30 litri': 'Tank kapasitesi: 5, 12 ve 30 litrelik versiyonlar mevcuttur',
+    "Controllo della temperatura: regolazione precisa per una fusione uniforme dell'adesivo": 'Sıcaklık kontrolü: yapıştırıcının homojen eritilmesi için hassas ayar',
+    "Manutenzione semplificata: struttura progettata per facilitare l'accesso ai componenti": 'Kolay bakım: bileşenlere erişimi kolaylaştırmak üzere tasarlanmış yapı',
+    'Flessibilità applicativa: compatibilità con tubi riscaldati e applicatori manuali e automatici': 'Uygulama esnekliği: ısıtmalı hortumlar ile manuel ve otomatik aplikatörlerle uyumluluk',
+    'Configurazioni opzionali: alimentazione automatica del granulato, controllo dei pattern di applicazione e pannello operatore remoto': 'Opsiyonel konfigürasyonlar: otomatik granül besleme, uygulama deseni kontrolü ve uzaktan operatör paneli',
+    'Grazie alle loro caratteristiche si prestano pertanto ad essere installati in qualsiasi linea produttiva.': 'Özellikleri sayesinde hemen hemen her üretim hattına kurulabilirler.',
+    'Grazie al nostro servizio interno di progettazione, concepiamo e realizziamo progetti custom per rispondere anche a richieste di piccole e medie automazioni.': 'Şirket içi mühendislik hizmetimiz sayesinde küçük ve orta ölçekli otomasyon ihtiyaçlarını da karşılamak üzere özel projeler tasarlayıp üretiyoruz.',
+    'Grazie al nostro servizio interno di progettazione, concepiamo e realizziamo progetti custom, sviluppati attorno alle reali esigenze produttive del cliente. Siamo in grado di rispondere anche a richieste per piccole e medie automazioni.': 'Şirket içi mühendislik hizmetimiz sayesinde müşterinin gerçek üretim ihtiyaçlarına göre özel projeler tasarlayıp üretiyoruz. Küçük ve orta ölçekli otomasyon taleplerini de karşılayabiliyoruz.',
     'NORDSON 8503686 – Applicatore hot-melt H201-T': 'NORDSON 8503686 – H201-T hot-melt aplikatörü',
     'NORDSON 729450C – Scheda controllo temperatura TR6K+': 'NORDSON 729450C – TR6K+ sıcaklık kontrol kartı',
     'Applicatore hot-melt Nordson H201-T, codice 8503686, configurato con singolo modulo per l’erogazione di adesivo termofusibile.': 'Nordson H201-T hot-melt aplikatörü, 8503686 kodlu, termoplastik yapıştırıcı uygulaması için tek modüllü konfigürasyon.',
@@ -85,7 +107,13 @@ const CMS_TRANSLATION_OVERRIDES = {
 }
 
 function normalizeText(value = '') {
-  return String(value).replace(/\s+/g, ' ').trim().toLocaleLowerCase('it-IT')
+  return String(value)
+    .normalize('NFKC')
+    .replace(/[’‘`´]/g, "'")
+    .replace(/\s*([,;:!?])\s*/g, '$1')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .toLocaleLowerCase('it-IT')
 }
 
 const NORMALIZED_TRANSLATIONS = Object.fromEntries(
@@ -102,6 +130,51 @@ const NORMALIZED_CMS_OVERRIDES = Object.fromEntries(
   ])
 )
 
+const KNOWN_TRANSLATION_FRAGMENTS = Object.fromEntries(
+  CMS_LANGUAGES.filter((language) => language !== 'it').map((language) => {
+    const merged = new Map([
+      ...Array.from(NORMALIZED_TRANSLATIONS[language]?.entries?.() || []),
+      ...Array.from(NORMALIZED_CMS_OVERRIDES[language]?.entries?.() || []),
+    ])
+    const fragments = Array.from(merged.entries())
+      .filter(([source]) => source.length >= 28)
+      .sort((a, b) => b[0].length - a[0].length)
+    return [language, fragments]
+  })
+)
+
+function translateKnownFragments(value, language) {
+  const source = normalizeText(value)
+  if (!source) return null
+  const fragments = KNOWN_TRANSLATION_FRAGMENTS[language] || []
+  const memo = new Map()
+
+  function walk(position) {
+    while (source[position] === ' ') position += 1
+    if (position >= source.length) return []
+    if (memo.has(position)) return memo.get(position)
+
+    for (const [knownSource, translated] of fragments) {
+      if (!source.startsWith(knownSource, position)) continue
+      const nextPosition = position + knownSource.length
+      const nextChar = source[nextPosition]
+      if (nextChar && nextChar !== ' ' && !/[.!?]/.test(nextChar)) continue
+      const rest = walk(nextPosition)
+      if (rest) {
+        const result = [translated, ...rest]
+        memo.set(position, result)
+        return result
+      }
+    }
+
+    memo.set(position, null)
+    return null
+  }
+
+  const translatedParts = walk(0)
+  return translatedParts?.length ? translatedParts.join(' ') : null
+}
+
 export function isLocalizedValue(value) {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value) && value.__i18n === true)
 }
@@ -116,8 +189,13 @@ export function translateKnownText(value, language) {
   const known = NORMALIZED_TRANSLATIONS[language]?.get(normalized)
   if (known) return known
 
-  // Evita traduzioni parola-per-parola che producono frasi ibride (es. italiano + inglese).
-  // Per contenuti CMS nuovi la traduzione va inserita esplicitamente nell'editor IT/EN/TR.
+  // Supporta paragrafi CMS ottenuti unendo più blocchi/frasi già tradotti.
+  // La traduzione viene usata solo se l'intero testo è coperto da frammenti completi noti:
+  // niente sostituzioni parola-per-parola e quindi niente frasi ibride italiano/inglese.
+  const translatedFragments = translateKnownFragments(value, language)
+  if (translatedFragments) return translatedFragments
+
+  // Per contenuti CMS completamente nuovi la traduzione va inserita esplicitamente nell'editor IT/EN/TR.
   return value
 }
 
