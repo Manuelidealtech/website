@@ -5,6 +5,13 @@ export const CMS_LANGUAGES = ['it', 'en', 'tr']
 
 const CMS_TRANSLATION_OVERRIDES = {
   en: {
+    // Varianti legacy / personalizzate usate nel sottomenu Prodotti
+    'Fusori per Adesivi Hot-Melt': 'Hot-Melt Adhesive Melters',
+    'Fusori IDM-GP': 'IDM-GP Melters',
+    'Fusori IDM-GP EVO': 'IDM-GP EVO Melters',
+    'Applicatori Automatici': 'Automatic Applicators',
+    'Applicatori Manuali': 'Manual Applicators',
+    'Blocco Pompe': 'Pump Station',
     'Sistemi e soluzioni per l’incollaggio industriale': 'Systems and solutions for industrial gluing',
     'Sistemi, componenti e soluzioni per la fusione, il dosaggio, il trasferimento e l’applicazione di adesivi in ambito industriale.': 'Systems, components and solutions for melting, dosing, transferring and applying adhesives in industrial environments.',
     'Una gamma completa': 'A complete range',
@@ -55,6 +62,32 @@ const CMS_TRANSLATION_OVERRIDES = {
     'Applicazione: erogazione adesivi hot-melt': 'Application: hot-melt adhesive dispensing',
   },
   tr: {
+    // Varianti legacy / personalizzate usate nel sottomenu Prodotti
+    'Piatti Prementi': 'Varil Eritme Sistemleri',
+    'Drum Melters': 'Varil Eritme Sistemleri',
+    'Fusori per Adesivi Hot-Melt': 'Hot-Melt Yapıştırıcı Eritme Üniteleri',
+    'Hot-Melt Adhesive Melters': 'Hot-Melt Yapıştırıcı Eritme Üniteleri',
+    'Fusori IDM-GP': 'IDM-GP Eritme Üniteleri',
+    'IDM-GP Melters': 'IDM-GP Eritme Üniteleri',
+    'Fusori IDM-GP EVO': 'IDM-GP EVO Eritme Üniteleri',
+    'IDM-GP EVO Melters': 'IDM-GP EVO Eritme Üniteleri',
+    'Estrusori': 'Ekstrüderler',
+    'Extruders': 'Ekstrüderler',
+    'Tubi elettroriscaldati': 'Elektrikli Isıtmalı Hortumlar',
+    'Electrically Heated Hoses': 'Elektrikli Isıtmalı Hortumlar',
+    'Applicatori Automatici': 'Otomatik Aplikatörler',
+    'Automatic Applicators': 'Otomatik Aplikatörler',
+    'Applicatori Manuali': 'Manuel Aplikatörler',
+    'Manual Applicators': 'Manuel Aplikatörler',
+    'Teste di Spalmatura': 'Kaplama Kafaları',
+    'Coating Heads': 'Kaplama Kafaları',
+    'Applicatori per colla a freddo': 'Soğuk Tutkal Aplikatörleri',
+    'Cold Glue Applicators': 'Soğuk Tutkal Aplikatörleri',
+    'Blocco Pompe': 'Pompa İstasyonu',
+    'Pump Station': 'Pompa İstasyonu',
+    'Custom Machines': 'Özel Makineler',
+    'Ricambi Compatibili': 'Uyumlu Yedek Parçalar',
+    'Compatible Spare Parts': 'Uyumlu Yedek Parçalar',
     'Sistemi e soluzioni per l’incollaggio industriale': 'Endüstriyel yapıştırma sistemleri ve çözümleri',
     'Sistemi, componenti e soluzioni per la fusione, il dosaggio, il trasferimento e l’applicazione di adesivi in ambito industriale.': 'Endüstriyel uygulamalarda yapıştırıcıların eritilmesi, dozajlanması, aktarılması ve uygulanması için sistemler, bileşenler ve çözümler.',
     'Una gamma completa': 'Eksiksiz bir ürün yelpazesi',
@@ -201,10 +234,26 @@ export function translateKnownText(value, language) {
 
 export function readLocalizedText(value, language = 'it') {
   if (isLocalizedValue(value)) {
-    const selected = value[language]
-    if (typeof selected === 'string' && selected.trim()) return selected
     const italian = typeof value.it === 'string' ? value.it : ''
-    return language === 'it' ? italian : translateKnownText(italian, language)
+    if (language === 'it') return italian
+
+    const selected = value[language]
+    if (typeof selected === 'string' && selected.trim()) {
+      // Auto-riparazione dei dati legacy: alcune vecchie versioni del CMS hanno
+      // salvato nel campo EN/TR lo stesso testo italiano. In quel caso non
+      // consideriamo la traduzione esplicita valida e la risolviamo nuovamente.
+      const repairedSelected = translateKnownText(selected, language)
+      if (repairedSelected !== selected) return repairedSelected
+
+      if (normalizeText(selected) === normalizeText(italian)) {
+        const repairedItalian = translateKnownText(italian, language)
+        if (repairedItalian !== italian) return repairedItalian
+      }
+
+      return selected
+    }
+
+    return translateKnownText(italian, language)
   }
 
   if (typeof value !== 'string') return value ?? ''
@@ -212,14 +261,35 @@ export function readLocalizedText(value, language = 'it') {
 }
 
 export function writeLocalizedText(value, language, nextText) {
+  const previousItalian = isLocalizedValue(value)
+    ? (typeof value.it === 'string' ? value.it : '')
+    : (typeof value === 'string' ? value : '')
+
   const base = isLocalizedValue(value)
     ? { ...value }
     : {
         __i18n: true,
-        it: typeof value === 'string' ? value : '',
+        it: previousItalian,
         en: '',
         tr: '',
       }
+
+  // Se cambia l'italiano, rimuoviamo soltanto le vecchie traduzioni che erano
+  // chiaramente automatiche/copiate dall'italiano. Le traduzioni manuali vere
+  // restano intatte.
+  if (language === 'it' && nextText !== previousItalian) {
+    for (const targetLanguage of ['en', 'tr']) {
+      const current = typeof base[targetLanguage] === 'string' ? base[targetLanguage] : ''
+      if (!current.trim()) continue
+      const oldAutomatic = translateKnownText(previousItalian, targetLanguage)
+      if (
+        normalizeText(current) === normalizeText(previousItalian) ||
+        (oldAutomatic !== previousItalian && normalizeText(current) === normalizeText(oldAutomatic))
+      ) {
+        base[targetLanguage] = ''
+      }
+    }
+  }
 
   base.__i18n = true
   base[language] = nextText
@@ -228,7 +298,12 @@ export function writeLocalizedText(value, language, nextText) {
 
 export function hasExplicitTranslation(value, language) {
   if (language === 'it') return true
-  return isLocalizedValue(value) && typeof value[language] === 'string' && Boolean(value[language].trim())
+  if (!isLocalizedValue(value)) return false
+  const selected = typeof value[language] === 'string' ? value[language].trim() : ''
+  if (!selected) return false
+  const italian = typeof value.it === 'string' ? value.it : ''
+  if (normalizeText(selected) === normalizeText(italian)) return false
+  return translateKnownText(selected, language) === selected
 }
 
 export function resolveLocalizedContent(value, language = 'it') {

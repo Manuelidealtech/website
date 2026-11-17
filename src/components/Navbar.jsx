@@ -4,12 +4,13 @@ import { useAuth } from '../context/AuthContext'
 import { useLanguage } from '../i18n/LanguageContext'
 import { useSiteContent } from '../context/SiteContentContext'
 import { defaultNavbarItems, defaultProductMenuItems } from '../lib/siteContentDefaults'
+import { resolveProductMenuLabel } from '../i18n/productTranslations'
 import '../styles/Navbar.css'
 
 export default function Navbar() {
   const { user, role } = useAuth()
   const { language, languages, setLanguage } = useLanguage()
-  const { get } = useSiteContent()
+  const { content, get } = useSiteContent()
   const [menuOpen, setMenuOpen] = useState(false)
   const [productsOpen, setProductsOpen] = useState(false)
 
@@ -40,7 +41,10 @@ export default function Navbar() {
         ...storedNavItems.slice(supportInsertIndex),
       ]
   const navItems = navItemsWithSupport.filter((item) => item.visible !== false && !((item.id === 'support' || item.to === '/assistenza') && !supportEnabled))
-  const productMenuItems = (get('navbar.products', defaultProductMenuItems) || []).filter((item) => item.visible !== false)
+  const rawProductMenuItems = content['navbar.products'] ?? defaultProductMenuItems
+  const productMenuItems = (Array.isArray(rawProductMenuItems) ? rawProductMenuItems : defaultProductMenuItems)
+    .filter((item) => item.visible !== false)
+    .map((item) => ({ ...item, label: resolveProductMenuLabel(item, language) }))
 
   const closeMenu = () => {
     setMenuOpen(false)
