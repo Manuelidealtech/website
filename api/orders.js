@@ -796,6 +796,13 @@ async function getAuthorizedStaff(req, serviceClient) {
   const { data, error } = await serviceClient.auth.getUser(token)
   if (error || !data?.user) throw new Error('UNAUTHORIZED')
 
+  const appRole = String(data.user.app_metadata?.role || '').toLowerCase()
+  const accountType = String(data.user.app_metadata?.account_type || data.user.user_metadata?.account_type || '').toLowerCase()
+
+  if (appRole === 'admin') return data.user
+  if (appRole === 'customer' || accountType === 'support_customer') throw new Error('FORBIDDEN')
+  if (appRole === 'editor') return data.user
+
   const { data: profile, error: profileError } = await serviceClient
     .from('profiles')
     .select('role')

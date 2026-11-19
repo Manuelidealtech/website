@@ -90,7 +90,7 @@ export default async function handler(req, res) {
     password,
     email_confirm: true,
     user_metadata: metadata,
-    app_metadata: { account_type: 'support_customer' },
+    app_metadata: { account_type: 'support_customer', role: 'customer' },
   })
 
   if (createError || !data?.user) {
@@ -109,9 +109,20 @@ export default async function handler(req, res) {
     }, { onConflict: 'user_id' })
 
   if (customerError) {
-    // Non lasciamo account orfani se il profilo assistenza non viene creato.
     await serviceClient.auth.admin.deleteUser(data.user.id)
     return json(res, 400, { error: 'Impossibile completare il profilo assistenza. Riprova.' })
+  }
+
+  // Difesa in profondità: vecchi trigger del progetto possono creare automaticamente
+  // una riga in profiles. Un cliente assistenza non deve MAI ereditare privilegi CMS.
+  const [profileCleanup, staffCleanup] = await Promise.all([
+    serviceClient.from('profiles').delete().eq('id', data.user.id),
+    serviceClient.from('support_staff').delete().eq('user_id', data.user.id),
+  ])
+
+  if (profileCleanup.error || (staffCleanup.error && staffCleanup.error.code !== '42P01')) {
+    await serviceClient.auth.admin.deleteUser(data.user.id)
+    return json(res, 400, { error: 'Impossibile completare in sicurezza il profilo assistenza. Riprova.' })
   }
 
   return json(res, 201, {

@@ -21,6 +21,14 @@ async function getAuthorizedAdmin(req, serviceClient) {
   const { data, error } = await serviceClient.auth.getUser(token)
   if (error || !data?.user) throw new Error('UNAUTHORIZED')
 
+  const appRole = String(data.user.app_metadata?.role || '').toLowerCase()
+  const accountType = String(data.user.app_metadata?.account_type || data.user.user_metadata?.account_type || '').toLowerCase()
+
+  if (appRole === 'admin') return data.user
+
+  // Un account nato come cliente assistenza non può sfruttare eventuali profili legacy.
+  if (appRole === 'customer' || accountType === 'support_customer') throw new Error('FORBIDDEN')
+
   const { data: profile, error: profileError } = await serviceClient
     .from('profiles')
     .select('role')
@@ -100,7 +108,7 @@ async function assignRole({ serviceClient, userId, role, fullName, email }) {
   }
 
   const { error: authError } = await serviceClient.auth.admin.updateUserById(userId, {
-    app_metadata: { role },
+    app_metadata: { role, account_type: role === 'customer' ? 'support_customer' : 'staff' },
   })
   if (authError) throw authError
 }
@@ -155,13 +163,19 @@ export default async function handler(req, res) {
       const profile = profileMap.get(user.id)
       const staff = staffMap.get(user.id)
       const customer = customerMap.get(user.id)
-      const role = profile?.role === 'admin'
-        ? 'admin'
-        : staff?.role === 'technician'
-          ? 'technician'
-          : customer
-            ? 'customer'
-            : 'unassigned'
+      const appRole = String(user.app_metadata?.role || '').toLowerCase()
+      const accountType = String(user.app_metadata?.account_type || user.user_metadata?.account_type || '').toLowerCase()
+      const role = ['admin', 'technician', 'customer'].includes(appRole)
+        ? appRole
+        : accountType === 'support_customer'
+          ? 'customer'
+          : staff?.role === 'technician'
+            ? 'technician'
+            : profile?.role === 'admin'
+              ? 'admin'
+              : customer
+                ? 'customer'
+                : 'unassigned'
 
       return {
         id: user.id,

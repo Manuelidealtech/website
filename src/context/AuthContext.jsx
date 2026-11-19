@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { resolveAccountRole } from '../lib/accountRole'
 
 const AuthContext = createContext(null)
 
@@ -35,7 +36,7 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function applyAccountData(currentUser) {
+  async function applyAccountData(currentUser, accessToken = '') {
     if (!currentUser) {
       setProfile(null)
       setSupportStaff(null)
@@ -43,7 +44,23 @@ export function AuthProvider({ children }) {
       return
     }
 
-    const account = await fetchAccountData(currentUser.id)
+    let account = await fetchAccountData(currentUser.id)
+    const preliminaryRole = resolveAccountRole({ user: currentUser, ...account })
+
+    // Se è un cliente assistenza, il server rimuove eventuali privilegi legacy
+    // prima che l'applicazione consideri concluso il caricamento della sessione.
+    if (preliminaryRole === 'customer' && accessToken) {
+      try {
+        const response = await fetch('/api/support-session-security', {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${accessToken}` },
+        })
+        if (response.ok) account = await fetchAccountData(currentUser.id)
+      } catch (securityError) {
+        console.error('Errore sanificazione account cliente:', securityError)
+      }
+    }
+
     setProfile(account.profile)
     setSupportStaff(account.supportStaff)
     setSupportCustomer(account.supportCustomer)
@@ -69,7 +86,7 @@ export function AuthProvider({ children }) {
       const currentUser = currentSession?.user ?? null
       setSession(currentSession ?? null)
       setUser(currentUser)
-      await applyAccountData(currentUser)
+      await applyAccountData(currentUser, currentSession?.access_token || '')
     } catch (err) {
       console.error('Errore bootstrapAuth:', err)
       setSession(null)
@@ -86,12 +103,13 @@ export function AuthProvider({ children }) {
     const {
       data: { subscription },
     } = supabase.auth.onAuthStateChange((event, newSession) => {
+      setLoading(true)
       setSession(newSession ?? null)
       setUser(newSession?.user ?? null)
 
       setTimeout(async () => {
         try {
-          await applyAccountData(newSession?.user ?? null)
+          await applyAccountData(newSession?.user ?? null, newSession?.access_token || '')
         } finally {
           setLoading(false)
         }
@@ -138,10 +156,10 @@ export function AuthProvider({ children }) {
 
   async function refreshAccount() {
     if (!user) return
-    await applyAccountData(user)
+    await applyAccountData(user, session?.access_token || '')
   }
 
-  const role = profile?.role || supportStaff?.role || (supportCustomer ? 'customer' : null)
+  const role = resolveAccountRole({ user, profile, supportStaff, supportCustomer })
   const isAdmin = role === 'admin'
   const isEditor = role === 'editor'
   const isTechnician = role === 'technician'

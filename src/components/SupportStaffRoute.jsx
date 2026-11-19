@@ -6,6 +6,8 @@ export default function SupportStaffRoute({ children }) {
 
   if (loading) return <div style={{ padding: 24 }}>Caricamento...</div>
   if (!user) return <Navigate to="/login" replace />
-  if (role !== 'admin' && role !== 'technician') return <Navigate to="/admin" replace />
-  return children
+  if (role === 'admin' || role === 'technician') return children
+  if (role === 'customer') return <Navigate to="/assistenza/portale" replace />
+  if (role === 'editor') return <Navigate to="/admin" replace />
+  return <Navigate to="/" replace />
 }

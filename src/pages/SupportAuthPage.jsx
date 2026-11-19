@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { supabase } from '../lib/supabase'
+import { resolveAccountRole } from '../lib/accountRole'
 import '../styles/SupportAuthPage.css'
 
 export default function SupportAuthPage() {
@@ -33,16 +34,24 @@ export default function SupportAuthPage() {
     setForm((current) => ({ ...current, [name]: value }))
   }
 
-  async function resolveLoginDestination(userId) {
-    const [profileResult, staffResult] = await Promise.all([
-      supabase.from('profiles').select('role').eq('id', userId).maybeSingle(),
-      supabase.from('support_staff').select('role,active').eq('user_id', userId).maybeSingle(),
+  async function resolveLoginDestination(currentUser) {
+    const [profileResult, staffResult, customerResult] = await Promise.all([
+      supabase.from('profiles').select('*').eq('id', currentUser.id).maybeSingle(),
+      supabase.from('support_staff').select('*').eq('user_id', currentUser.id).maybeSingle(),
+      supabase.from('support_customers').select('*').eq('user_id', currentUser.id).maybeSingle(),
     ])
 
-    if (profileResult.data?.role === 'admin') return '/admin/assistenza'
-    if (profileResult.data?.role === 'editor') return '/admin'
-    if (staffResult.data?.role === 'technician' && staffResult.data?.active !== false) return '/admin/assistenza'
-    return '/assistenza/portale'
+    const resolvedRole = resolveAccountRole({
+      user: currentUser,
+      profile: profileResult.data || null,
+      supportStaff: staffResult.data || null,
+      supportCustomer: customerResult.data || null,
+    })
+
+    if (resolvedRole === 'admin' || resolvedRole === 'technician') return '/admin/assistenza'
+    if (resolvedRole === 'editor') return '/admin'
+    if (resolvedRole === 'customer') return '/assistenza/portale'
+    return '/assistenza'
   }
 
   async function submitLogin(event) {
@@ -52,7 +61,7 @@ export default function SupportAuthPage() {
       setError('')
       const { data, error: signInError } = await signIn(form.email.trim().toLowerCase(), form.password)
       if (signInError) throw signInError
-      const destination = await resolveLoginDestination(data.user.id)
+      const destination = await resolveLoginDestination(data.user)
       navigate(destination, { replace: true })
     } catch (err) {
       setError(err.message || 'Email o password non corrette.')
