@@ -5,6 +5,14 @@ function json(res, status, body) {
   res.status(status).json(body)
 }
 
+function parseBody(req) {
+  let body = req.body || {}
+  if (typeof body === 'string') {
+    try { body = JSON.parse(body) } catch { return null }
+  }
+  return body
+}
+
 async function getAuthorizedAdmin(req, serviceClient) {
   const authorization = req.headers.authorization || ''
   const token = authorization.startsWith('Bearer ') ? authorization.slice(7) : ''
@@ -21,6 +29,80 @@ async function getAuthorizedAdmin(req, serviceClient) {
 
   if (profileError || profile?.role !== 'admin') throw new Error('FORBIDDEN')
   return data.user
+}
+
+async function countAdmins(serviceClient) {
+  const { count, error } = await serviceClient
+    .from('profiles')
+    .select('id', { count: 'exact', head: true })
+    .eq('role', 'admin')
+  if (error) throw error
+  return count || 0
+}
+
+async function getRoleRecord(serviceClient, userId) {
+  const [profileResult, staffResult, customerResult] = await Promise.all([
+    serviceClient.from('profiles').select('id,full_name,role').eq('id', userId).maybeSingle(),
+    serviceClient.from('support_staff').select('user_id,full_name,role,active').eq('user_id', userId).maybeSingle(),
+    serviceClient.from('support_customers').select('user_id,full_name,company,phone,email').eq('user_id', userId).maybeSingle(),
+  ])
+
+  if (profileResult.error) throw profileResult.error
+  if (staffResult.error && staffResult.error.code !== '42P01') throw staffResult.error
+  if (customerResult.error && customerResult.error.code !== '42P01') throw customerResult.error
+
+  if (profileResult.data?.role === 'admin') return { role: 'admin', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
+  if (staffResult.data?.role === 'technician') return { role: 'technician', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
+  if (customerResult.data) return { role: 'customer', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
+  return { role: 'unassigned', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
+}
+
+async function assignRole({ serviceClient, userId, role, fullName, email }) {
+  const current = await getRoleRecord(serviceClient, userId)
+
+  if (current.role === 'admin' && role !== 'admin') {
+    const admins = await countAdmins(serviceClient)
+    if (admins <= 1) throw new Error('LAST_ADMIN')
+  }
+
+  if (role === 'admin') {
+    const { error: profileError } = await serviceClient
+      .from('profiles')
+      .upsert({ id: userId, full_name: fullName || email || 'Amministratore', role: 'admin' })
+    if (profileError) throw profileError
+
+    const { error: staffDeleteError } = await serviceClient.from('support_staff').delete().eq('user_id', userId)
+    if (staffDeleteError && staffDeleteError.code !== '42P01') throw staffDeleteError
+  }
+
+  if (role === 'technician') {
+    const { error: profileDeleteError } = await serviceClient.from('profiles').delete().eq('id', userId)
+    if (profileDeleteError) throw profileDeleteError
+
+    const { error: staffError } = await serviceClient
+      .from('support_staff')
+      .upsert({ user_id: userId, full_name: fullName || email || 'Tecnico', role: 'technician', active: true })
+    if (staffError) throw staffError
+  }
+
+  if (role === 'customer') {
+    const [profileDeleteResult, staffDeleteResult] = await Promise.all([
+      serviceClient.from('profiles').delete().eq('id', userId),
+      serviceClient.from('support_staff').delete().eq('user_id', userId),
+    ])
+    if (profileDeleteResult.error) throw profileDeleteResult.error
+    if (staffDeleteResult.error && staffDeleteResult.error.code !== '42P01') throw staffDeleteResult.error
+
+    const { error: customerError } = await serviceClient
+      .from('support_customers')
+      .upsert({ user_id: userId, full_name: fullName || email || 'Cliente', email })
+    if (customerError) throw customerError
+  }
+
+  const { error: authError } = await serviceClient.auth.admin.updateUserById(userId, {
+    app_metadata: { role },
+  })
+  if (authError) throw authError
 }
 
 export default async function handler(req, res) {
@@ -47,46 +129,62 @@ export default async function handler(req, res) {
     const { data: usersData, error: usersError } = await serviceClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
     if (usersError) return json(res, 400, { error: usersError.message })
 
-    const userIds = (usersData.users || []).map((user) => user.id)
-    const [profilesResult, staffResult] = await Promise.all([
+    const authUsers = usersData.users || []
+    const userIds = authUsers.map((user) => user.id)
+    const [profilesResult, staffResult, customersResult] = await Promise.all([
       userIds.length
         ? serviceClient.from('profiles').select('id,full_name,role').in('id', userIds)
         : Promise.resolve({ data: [], error: null }),
       userIds.length
         ? serviceClient.from('support_staff').select('user_id,full_name,role,active').in('user_id', userIds)
         : Promise.resolve({ data: [], error: null }),
+      userIds.length
+        ? serviceClient.from('support_customers').select('user_id,full_name,company,phone,email').in('user_id', userIds)
+        : Promise.resolve({ data: [], error: null }),
     ])
 
     if (profilesResult.error) return json(res, 400, { error: profilesResult.error.message })
-    if (staffResult.error) return json(res, 400, { error: staffResult.error.message })
+    if (staffResult.error && staffResult.error.code !== '42P01') return json(res, 400, { error: staffResult.error.message })
+    if (customersResult.error && customersResult.error.code !== '42P01') return json(res, 400, { error: customersResult.error.message })
 
     const profileMap = new Map((profilesResult.data || []).map((profile) => [profile.id, profile]))
     const staffMap = new Map((staffResult.data || []).map((staff) => [staff.user_id, staff]))
+    const customerMap = new Map((customersResult.data || []).map((customer) => [customer.user_id, customer]))
 
-    const users = (usersData.users || []).map((user) => {
+    const users = authUsers.map((user) => {
       const profile = profileMap.get(user.id)
       const staff = staffMap.get(user.id)
-      const role = profile?.role === 'admin' ? 'admin' : staff?.role === 'technician' ? 'technician' : ''
+      const customer = customerMap.get(user.id)
+      const role = profile?.role === 'admin'
+        ? 'admin'
+        : staff?.role === 'technician'
+          ? 'technician'
+          : customer
+            ? 'customer'
+            : 'unassigned'
+
       return {
         id: user.id,
-        email: user.email,
-        full_name: profile?.full_name || staff?.full_name || user.user_metadata?.full_name || '',
+        email: user.email || customer?.email || '',
+        full_name: profile?.full_name || staff?.full_name || customer?.full_name || user.user_metadata?.full_name || '',
+        company: customer?.company || '',
+        phone: customer?.phone || '',
         role,
         active: staff?.active ?? true,
+        app_metadata_role: user.app_metadata?.role || '',
+        email_confirmed_at: user.email_confirmed_at || null,
         created_at: user.created_at,
         last_sign_in_at: user.last_sign_in_at,
         is_current: user.id === currentAdmin.id,
       }
-    }).filter((user) => user.role === 'admin' || user.role === 'technician')
+    }).sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0))
 
     return json(res, 200, { users })
   }
 
   if (req.method === 'POST') {
-    let body = req.body || {}
-    if (typeof body === 'string') {
-      try { body = JSON.parse(body) } catch { return json(res, 400, { error: 'Dati della richiesta non validi.' }) }
-    }
+    const body = parseBody(req)
+    if (!body) return json(res, 400, { error: 'Dati della richiesta non validi.' })
 
     const email = String(body.email || '').trim().toLowerCase()
     const password = String(body.password || '')
@@ -106,16 +204,9 @@ export default async function handler(req, res) {
     })
     if (error) return json(res, 400, { error: error.message })
 
-    let roleError = null
-    if (role === 'admin') {
-      const { error: profileError } = await serviceClient.from('profiles').upsert({ id: data.user.id, full_name: fullName, role: 'admin' })
-      roleError = profileError
-    } else {
-      const { error: staffError } = await serviceClient.from('support_staff').upsert({ user_id: data.user.id, full_name: fullName, role: 'technician', active: true })
-      roleError = staffError
-    }
-
-    if (roleError) {
+    try {
+      await assignRole({ serviceClient, userId: data.user.id, role, fullName, email })
+    } catch (roleError) {
       await serviceClient.auth.admin.deleteUser(data.user.id)
       return json(res, 400, { error: roleError.message })
     }
@@ -123,16 +214,85 @@ export default async function handler(req, res) {
     return json(res, 201, { success: true, role })
   }
 
+  if (req.method === 'PATCH') {
+    const body = parseBody(req)
+    if (!body) return json(res, 400, { error: 'Dati della richiesta non validi.' })
+
+    const userId = String(body.id || '')
+    const action = String(body.action || '')
+    if (!userId) return json(res, 400, { error: 'Utente non specificato.' })
+
+    if (action === 'password') {
+      const password = String(body.password || '')
+      if (password.length < 8) return json(res, 400, { error: 'La nuova password deve avere almeno 8 caratteri.' })
+
+      const { error } = await serviceClient.auth.admin.updateUserById(userId, { password })
+      if (error) return json(res, 400, { error: error.message })
+      return json(res, 200, { success: true, message: 'Password aggiornata direttamente in Supabase Auth.' })
+    }
+
+    if (action === 'role') {
+      const role = ['admin', 'technician', 'customer'].includes(body.role) ? body.role : ''
+      if (!role) return json(res, 400, { error: 'Ruolo non valido.' })
+      if (userId === currentAdmin.id && role !== 'admin') {
+        return json(res, 400, { error: 'Non puoi modificare il tuo stesso ruolo mentre sei autenticato.' })
+      }
+
+      const { data: userResult, error: getUserError } = await serviceClient.auth.admin.getUserById(userId)
+      if (getUserError || !userResult?.user) return json(res, 404, { error: 'Utente Supabase non trovato.' })
+
+      const fullName = String(body.fullName || userResult.user.user_metadata?.full_name || '').trim()
+      const email = String(userResult.user.email || '').trim().toLowerCase()
+
+      try {
+        await assignRole({ serviceClient, userId, role, fullName, email })
+      } catch (error) {
+        if (error.message === 'LAST_ADMIN') return json(res, 400, { error: 'Non puoi declassare l’ultimo amministratore rimasto.' })
+        return json(res, 400, { error: error.message })
+      }
+
+      return json(res, 200, { success: true, role })
+    }
+
+    return json(res, 400, { error: 'Operazione non riconosciuta.' })
+  }
+
   if (req.method === 'DELETE') {
     const userId = String(req.query?.id || '')
     if (!userId) return json(res, 400, { error: 'Utente non specificato.' })
     if (userId === currentAdmin.id) return json(res, 400, { error: 'Non puoi eliminare il tuo stesso accesso.' })
+
+    try {
+      const current = await getRoleRecord(serviceClient, userId)
+      if (current.role === 'admin') {
+        const admins = await countAdmins(serviceClient)
+        if (admins <= 1) return json(res, 400, { error: 'Non puoi eliminare l’ultimo amministratore rimasto.' })
+      }
+    } catch (error) {
+      return json(res, 400, { error: error.message })
+    }
+
+    const [ticketCountResult, messageCountResult] = await Promise.all([
+      serviceClient.from('support_tickets').select('id', { count: 'exact', head: true }).eq('customer_id', userId),
+      serviceClient.from('support_messages').select('id', { count: 'exact', head: true }).eq('sender_id', userId),
+    ])
+
+    if (ticketCountResult.error && ticketCountResult.error.code !== '42P01') return json(res, 400, { error: ticketCountResult.error.message })
+    if (messageCountResult.error && messageCountResult.error.code !== '42P01') return json(res, 400, { error: messageCountResult.error.message })
+
+    const linkedTickets = ticketCountResult.count || 0
+    const linkedMessages = messageCountResult.count || 0
+    if (linkedTickets > 0 || linkedMessages > 0) {
+      return json(res, 409, {
+        error: `Questo account ha storico assistenza collegato (${linkedTickets} ticket, ${linkedMessages} messaggi). Per sicurezza non viene eliminato da Auth, così non perdi lo storico. Puoi cambiarne il ruolo o la password.`,
+      })
+    }
 
     const { error } = await serviceClient.auth.admin.deleteUser(userId)
     if (error) return json(res, 400, { error: error.message })
     return json(res, 200, { success: true })
   }
 
-  res.setHeader('Allow', 'GET, POST, DELETE')
+  res.setHeader('Allow', 'GET, POST, PATCH, DELETE')
   return json(res, 405, { error: 'Metodo non supportato.' })
 }

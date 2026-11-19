@@ -27,3 +27,12 @@
 .support-auth-form > button:disabled { opacity: .62; cursor: default; }
 .support-auth-back { display: inline-block; margin-top: 18px; color: rgba(255,255,255,.7); font-size: .8rem; font-weight: 800; text-decoration: none; }
 @media (max-width: 560px) { .support-auth-page { align-items: start; padding: 14px 10px; } .support-auth-card { padding: 20px 16px; border-radius: 22px; } .support-auth-brand img { width: 130px; } }
+
+/* Password visibility */
+.support-password-field { position: relative; display: block; }
+.support-password-field input { padding-right: 52px !important; }
+.support-password-toggle { position: absolute; top: 50%; right: 8px; width: 38px; height: 38px; transform: translateY(-50%); display: grid; place-items: center; padding: 0; border: 0; border-radius: 10px; background: rgba(255,255,255,.08); color: rgba(255,255,255,.88); cursor: pointer; transition: background .18s ease, color .18s ease; }
+.support-password-toggle:hover { background: rgba(255,255,255,.16); color: #fff; }
+.support-password-toggle:focus-visible { outline: 2px solid #fff; outline-offset: 2px; }
+.support-password-toggle svg { width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.support-auth-honeypot { position: absolute !important; left: -10000px !important; width: 1px !important; height: 1px !important; overflow: hidden !important; opacity: 0 !important; pointer-events: none !important; }
