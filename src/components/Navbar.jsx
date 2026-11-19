@@ -40,7 +40,14 @@ export default function Navbar() {
         { id: 'support', label: 'Assistenza', to: '/assistenza', visible: true },
         ...storedNavItems.slice(supportInsertIndex),
       ]
-  const navItems = navItemsWithSupport.filter((item) => item.visible !== false && !((item.id === 'support' || item.to === '/assistenza') && !supportEnabled))
+  // Il flag globale support.enabled è l'unica sorgente di verità per la pubblicazione
+  // dell'area Assistenza. Se l'area è online, la relativa voce viene resa visibile
+  // anche se una vecchia configurazione CMS l'aveva salvata con visible:false.
+  const navItems = navItemsWithSupport.filter((item) => {
+    const isSupportItem = item.id === 'support' || item.to === '/assistenza'
+    if (isSupportItem) return supportEnabled
+    return item.visible !== false
+  })
   const rawProductMenuItems = content['navbar.products'] ?? defaultProductMenuItems
   const productMenuItems = (Array.isArray(rawProductMenuItems) ? rawProductMenuItems : defaultProductMenuItems)
     .filter((item) => item.visible !== false)

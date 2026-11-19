@@ -114,6 +114,33 @@ export default function AdminSiteEditorPage() {
     setMessage('')
   }
 
+  function setSupportEnabled(enabled) {
+    setValues((current) => {
+      const next = { ...current, 'support.enabled': enabled }
+      const navItems = Array.isArray(current['navbar.items']) ? [...current['navbar.items']] : []
+      const supportIndex = navItems.findIndex((item) => item?.id === 'support' || item?.to === '/assistenza')
+
+      if (supportIndex >= 0) {
+        navItems[supportIndex] = { ...navItems[supportIndex], visible: enabled }
+      } else {
+        const contactsIndex = navItems.findIndex((item) => item?.id === 'contacts')
+        navItems.splice(contactsIndex >= 0 ? contactsIndex : navItems.length, 0, {
+          id: 'support',
+          label: 'Assistenza',
+          to: '/assistenza',
+          visible: enabled,
+        })
+      }
+
+      next['navbar.items'] = navItems
+      return next
+    })
+    setDirty(true)
+    setMessage(enabled
+      ? 'Assistenza impostata Online in bozza. Premi “Pubblica” per renderla visibile sul sito pubblico.'
+      : 'Assistenza impostata Offline in bozza. Premi “Pubblica” per nasconderla dal sito pubblico.')
+  }
+
   function editorText(value) {
     return readLocalizedText(value, editorLanguage) || ''
   }
@@ -746,10 +773,10 @@ export default function AdminSiteEditorPage() {
         <div className={`cms-publish-toggle ${enabled ? 'is-enabled' : 'is-disabled'}`}>
           <div>
             <strong>{enabled ? 'Area pubblicata online' : 'Area non pubblicata'}</strong>
-            <span>{enabled ? 'La voce Assistenza è visibile nel sito e i clienti possono accedere al portale.' : 'La voce Assistenza è nascosta dal sito pubblico e le rotte clienti vengono reindirizzate alla Home.'}</span>
+            <span>{enabled ? 'Dopo aver premuto Pubblica, la voce Assistenza sarà visibile nel sito e i clienti potranno accedere al portale.' : 'Dopo aver premuto Pubblica, la voce Assistenza sarà nascosta dal sito pubblico e le rotte clienti verranno reindirizzate alla Home.'}</span>
           </div>
           <label className="cms-switch cms-switch--large">
-            <input type="checkbox" checked={enabled} onChange={(e) => setValue(field.key, e.target.checked)} />
+            <input type="checkbox" checked={enabled} onChange={(e) => setSupportEnabled(e.target.checked)} />
             <span>{enabled ? 'Online' : 'Offline'}</span>
           </label>
         </div>
