@@ -967,3 +967,10 @@
 .cms-machine-translation-toolbar__text small { font-weight: 800; color: #0969bd; }
 .cms-machine-translation-toolbar__actions { display: flex; flex-wrap: wrap; gap: 9px; }
 @media (max-width: 640px) { .cms-machine-translation-toolbar__actions { width: 100%; } .cms-machine-translation-toolbar__actions button { flex: 1 1 100%; } }
+
+
+/* Deepl 4.1: mostra i controlli direttamente nel riepilogo traduzioni. */
+.cms-translation-audit .cms-machine-translation-toolbar { width: 100%; margin: 3px 0 0; border-color: #bad8f2; background: #ffffff; color: #153b64; box-shadow: 0 2px 8px rgba(9,56,107,.06); }
+.cms-translation-audit .cms-machine-translation-toolbar__text { min-width: min(100%, 240px); }
+.cms-build-version { display: inline-flex; margin-inline-start: 12px; border: 1px solid #d8e7f7; border-radius: 8px; padding: 2px 8px; font-size: .72rem !important; color: #31669b; background: white; font-weight: 800; white-space: nowrap; }
+@media (max-width: 700px) { .cms-translation-audit .cms-machine-translation-toolbar__actions { display: grid; grid-template-columns: 1fr; width: 100%; } }

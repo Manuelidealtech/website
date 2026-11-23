@@ -994,6 +994,7 @@ export default function AdminSiteEditorPage() {
       <div className={`cms-translation-audit ${translationIssues.length ? 'has-issues' : 'is-complete'}`}>
         <div>
           <strong>{translationIssues.length ? `${translationIssues.length} traduzioni mancanti` : 'Traduzioni complete'}</strong>
+          <span className="cms-build-version">CMS DeepL v4.1</span>
           <span>{translationIssues.length
             ? 'Completa EN e TR prima di pubblicare. La bozza può essere salvata normalmente.'
             : 'Tutti i testi CMS hanno copertura IT / EN / TR.'}</span>
@@ -1006,7 +1007,6 @@ export default function AdminSiteEditorPage() {
             {translationIssues.length > 4 ? <span>+ {translationIssues.length - 4} altre</span> : null}
           </div>
         ) : null}
-      </div>
 
       <div className="cms-machine-translation-toolbar" role="group" aria-label="Traduzioni automatiche del CMS">
         <div className="cms-machine-translation-toolbar__text">
@@ -1018,6 +1018,7 @@ export default function AdminSiteEditorPage() {
           <button type="button" className="admin-primary-button" disabled={loading || translating || saving || publishing} onClick={() => translateCmsContent(false)}>{translating ? 'Traduzione in corso…' : 'Traduci testi mancanti EN/TR'}</button>
           <button type="button" className="admin-secondary-button" disabled={loading || translating || saving || publishing} onClick={() => translateCmsContent(true)}>Rigenera tutte EN/TR</button>
         </div>
+      </div>
       </div>
 
       <div className="cms-editor-layout">
