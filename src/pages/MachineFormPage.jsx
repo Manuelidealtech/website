@@ -7,11 +7,13 @@ import { useAuth } from '../context/AuthContext'
 import { uploadMachineImage } from '../lib/storage'
 import { getMachineImageUrl } from '../lib/storagePublicUrl'
 import { clearMachineDraftFiles, loadMachineDraftFiles, saveMachineDraftFiles } from '../lib/machineDraft'
+import { getMachineMissingTranslations, MACHINE_TRANSLATABLE_FIELDS, translateMachineWithDeepL } from '../i18n/machineTranslations'
 import AdminLayout from '../components/AdminLayout'
 import FileUploadField from '../components/FileUploadField'
 import '../styles/MachineFormPage.css'
 
 const DRAFT_KEY = 'idealtech-new-machine-draft-v2'
+const DRAFT_TRANSLATIONS_KEY = 'idealtech-new-machine-draft-translations-v1'
 
 const initialForm = {
   title: '',
@@ -26,6 +28,12 @@ const initialForm = {
   location: '',
   status: 'available',
   is_published: false,
+}
+
+function getInitialDraftTranslations(isEditMode) {
+  if (isEditMode || typeof window === 'undefined') return {}
+  try { return JSON.parse(window.localStorage.getItem(DRAFT_TRANSLATIONS_KEY) || '{}') }
+  catch { return {} }
 }
 
 function getInitialForm(isEditMode) {
@@ -46,6 +54,10 @@ export default function MachineFormPage() {
   const isEditMode = useMemo(() => Boolean(id), [id])
 
   const [form, setForm] = useState(() => getInitialForm(Boolean(id)))
+  const [translations, setTranslations] = useState(() => getInitialDraftTranslations(Boolean(id)))
+  const [translationLanguage, setTranslationLanguage] = useState('en')
+  const [translating, setTranslating] = useState(false)
+  const [translationNotice, setTranslationNotice] = useState('')
   const [files, setFiles] = useState([])
   const [existingImages, setExistingImages] = useState([])
   const [saving, setSaving] = useState(false)
@@ -66,10 +78,46 @@ export default function MachineFormPage() {
   useEffect(() => {
     if (isEditMode || !draftLoaded) return
     window.localStorage.setItem(DRAFT_KEY, JSON.stringify(form))
-  }, [form, isEditMode, draftLoaded])
+    window.localStorage.setItem(DRAFT_TRANSLATIONS_KEY, JSON.stringify(translations))
+  }, [form, translations, isEditMode, draftLoaded])
 
   function updateField(name, value) {
     setForm((prev) => ({ ...prev, [name]: value }))
+    // An edited Italian source invalidates only this field in EN/TR.
+    // It cannot silently keep translations belonging to the previous text.
+    if (MACHINE_TRANSLATABLE_FIELDS.includes(name)) {
+      setTranslations((current) => {
+        const next = structuredClone(current || {})
+        for (const lang of ['en', 'tr']) {
+          if (next[lang]) delete next[lang][name]
+        }
+        return next
+      })
+      setTranslationNotice('Il testo italiano è cambiato: rigenera le traduzioni EN/TR prima di pubblicare.')
+    }
+  }
+
+  function updateTranslatedField(language, field, value) {
+    setTranslations((current) => ({
+      ...current,
+      [language]: { ...(current[language] || {}), [field]: value },
+    }))
+    setTranslationNotice('Traduzione modificata. Salva la scheda per renderla pubblica.')
+  }
+
+  async function translateNow() {
+    setTranslating(true)
+    setErrorMessage('')
+    setTranslationNotice('')
+    try {
+      const next = await translateMachineWithDeepL({ ...form, translations }, { force: true })
+      setTranslations(next)
+      setTranslationNotice('Traduzioni complete EN/TR generate con DeepL. Controllale e salva la scheda.')
+    } catch (error) {
+      setErrorMessage(error.message || 'Traduzione non riuscita.')
+    } finally {
+      setTranslating(false)
+    }
   }
 
   async function handleFilesChange(event) {
@@ -94,8 +142,10 @@ export default function MachineFormPage() {
     if (hasData && !window.confirm('Vuoi svuotare tutti i dati della bozza?')) return
 
     setForm(initialForm)
+    setTranslations({})
     setFiles([])
     window.localStorage.removeItem(DRAFT_KEY)
+    window.localStorage.removeItem(DRAFT_TRANSLATIONS_KEY)
     await clearMachineDraftFiles().catch(() => {})
   }
 
@@ -112,6 +162,7 @@ export default function MachineFormPage() {
 
       if (machineError) throw new Error(machineError.message)
 
+      setTranslations(machineData.translations || {})
       setForm({
         title: machineData.title || '',
         brand: machineData.brand || '',
@@ -221,7 +272,7 @@ export default function MachineFormPage() {
     }
   }
 
-  function buildPayload(slug) {
+  function buildPayload(slug, translatedValues = translations) {
     return {
       title: form.title.trim(),
       slug,
@@ -233,6 +284,7 @@ export default function MachineFormPage() {
       price: form.price !== '' ? Number(form.price) : 0,
       price_includes_vat: Boolean(form.price_includes_vat),
       description: form.description.trim() || null,
+      translations: translatedValues,
       location: form.location.trim() || null,
       status: form.status,
       is_published: form.is_published,
@@ -270,10 +322,20 @@ export default function MachineFormPage() {
 
     try {
       if (!form.title.trim()) throw new Error('Il titolo è obbligatorio.')
+      let checkedTranslations = translations
+      // A published listing must have full field-level translations. If the
+      // editor has not generated them yet, translate BEFORE writing to DB.
+      if (form.is_published && getMachineMissingTranslations({ ...form, translations }).length > 0) {
+        checkedTranslations = await translateMachineWithDeepL({ ...form, translations })
+        setTranslations(checkedTranslations)
+      }
+      if (form.is_published && getMachineMissingTranslations({ ...form, translations: checkedTranslations }).length) {
+        throw new Error('Traduzioni mancanti: non è possibile pubblicare la scheda.')
+      }
 
       if (isEditMode) {
         const slug = await generateUniqueSlug(form.title, id)
-        const { error: updateError } = await supabase.from('machines').update(buildPayload(slug)).eq('id', id)
+        const { error: updateError } = await supabase.from('machines').update(buildPayload(slug, checkedTranslations)).eq('id', id)
         if (updateError) throw new Error(updateError.message)
 
         const newRows = await uploadNewImages(id, existingImages.length)
@@ -305,7 +367,7 @@ export default function MachineFormPage() {
         const { data: insertedMachine, error: machineError } = await supabase
           .from('machines')
           .insert({
-            ...buildPayload(slug),
+            ...buildPayload(slug, checkedTranslations),
             created_by: user.id,
             display_order: displayOrder,
           })
@@ -325,6 +387,7 @@ export default function MachineFormPage() {
         }
 
         window.localStorage.removeItem(DRAFT_KEY)
+        window.localStorage.removeItem(DRAFT_TRANSLATIONS_KEY)
         await clearMachineDraftFiles().catch(() => {})
         setSuccessMessage('Macchinario creato con successo. Torno alla dashboard...')
         setTimeout(() => navigate('/admin', { replace: true }), 600)
@@ -419,6 +482,43 @@ export default function MachineFormPage() {
               <textarea rows="7" value={form.description} onChange={(e) => updateField('description', e.target.value)} placeholder="Descrivi caratteristiche, dotazioni e condizioni del macchinario." />
             </div>
 
+            <div className="form-group form-group-full machine-translation-panel">
+              <div className="machine-translation-panel__heading">
+                <div>
+                  <strong>Traduzioni della scheda · IT / EN / TR</strong>
+                  <p>Traduzioni dell'intera frase salvate nel database. Nessuna sostituzione di singole parole sul sito pubblico.</p>
+                  <small>{getMachineMissingTranslations({ ...form, translations }).length
+                    ? `${getMachineMissingTranslations({ ...form, translations }).length} campi EN/TR ancora da completare`
+                    : 'Tutti i testi compilati hanno EN e TR.'}</small>
+                </div>
+                <button type="button" className="admin-primary-button" disabled={saving || translating} onClick={translateNow}>
+                  {translating ? 'Traduzione in corso…' : 'Traduci / Rigenera EN + TR con DeepL'}
+                </button>
+              </div>
+              {translationNotice ? <div className="machine-translation-notice">{translationNotice}</div> : null}
+              <div className="machine-translation-tabs" role="tablist" aria-label="Lingua traduzioni macchinario">
+                {['en', 'tr'].map((lang) => (
+                  <button type="button" role="tab" aria-selected={translationLanguage === lang}
+                    className={translationLanguage === lang ? 'is-active' : ''} key={lang}
+                    onClick={() => setTranslationLanguage(lang)}>{lang === 'en' ? 'English' : 'Türkçe'}</button>
+                ))}
+              </div>
+              <div className="machine-translation-fields">
+                {MACHINE_TRANSLATABLE_FIELDS.map((field) => (
+                  <label key={field}>
+                    <span>{({ title: 'Titolo', category: 'Categoria', condition: 'Condizione', description: 'Descrizione' })[field]} · {translationLanguage.toUpperCase()}</span>
+                    {field === 'description' ? (
+                      <textarea rows="5" value={translations?.[translationLanguage]?.[field] || ''}
+                        onChange={(e) => updateTranslatedField(translationLanguage, field, e.target.value)} />
+                    ) : (
+                      <input type="text" value={translations?.[translationLanguage]?.[field] || ''}
+                        onChange={(e) => updateTranslatedField(translationLanguage, field, e.target.value)} />
+                    )}
+                  </label>
+                ))}
+              </div>
+            </div>
+
             {isEditMode && existingImages.length > 0 ? (
               <div className="form-group form-group-full">
                 <label>Immagini attuali</label>
@@ -473,7 +573,7 @@ export default function MachineFormPage() {
 
           <div className="form-actions">
             <button type="button" className="secondary-btn" onClick={() => navigate(isEditMode ? '/admin/macchinari' : '/admin')}>Annulla</button>
-            <button type="submit" className="auth-button" disabled={saving}>
+            <button type="submit" className="auth-button" disabled={saving || translating}>
               {saving ? 'Salvataggio...' : isEditMode ? 'Salva modifiche' : 'Crea macchinario'}
             </button>
           </div>

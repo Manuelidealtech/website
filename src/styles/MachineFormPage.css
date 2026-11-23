@@ -436,3 +436,50 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Traduzioni DeepL delle schede macchinario: visualizzazione separata dal testo IT */
+.machine-translation-panel {
+  padding: 20px;
+  border: 1px solid #d8e6f4;
+  border-radius: 18px;
+  background: #f2f7fc;
+}
+.machine-translation-panel__heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+.machine-translation-panel__heading > div { flex: 1 1 270px; }
+.machine-translation-panel__heading strong { color: #153f6f; font-size: 1.05rem; }
+.machine-translation-panel__heading p { margin: 8px 0; color: #566f88; line-height: 1.5; }
+.machine-translation-panel__heading small { display: block; font-weight: 700; }
+.machine-translation-notice {
+  padding: 11px 14px;
+  border: 1px solid #b4d9f0;
+  background: #e8f6ff;
+  border-radius: 10px;
+  color: #1c5877;
+}
+.machine-translation-tabs { display: flex; gap: 8px; }
+.machine-translation-tabs button {
+  border-radius: 10px;
+  border: 1px solid #cbdbea;
+  background: #fff;
+  color: #345f87;
+  padding: 9px 18px;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+}
+.machine-translation-tabs button.is-active { background: #1264b4; border-color: #1264b4; color: #fff; }
+.machine-translation-fields { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.machine-translation-fields label { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.machine-translation-fields label:last-child { grid-column: 1 / -1; }
+.machine-translation-fields label span { color: #395c7c; font-size: .85rem; font-weight: 750; }
+.machine-translation-fields input, .machine-translation-fields textarea {
+  width: 100%; min-width: 0; border-radius: 12px; padding: 12px; border: 1px solid #cbdbea;
+  background: #fff; color: #163c60; font: inherit;
+}
+@media (max-width: 700px) { .machine-translation-fields { grid-template-columns: 1fr; } }

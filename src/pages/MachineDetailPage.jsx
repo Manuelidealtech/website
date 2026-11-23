@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../i18n/LanguageContext'
-import { getLocalizedField, getMachineStatusLabel } from '../i18n/contentTranslations'
+import { getMachineStatusLabel } from '../i18n/contentTranslations'
+import { getMachineLocalizedField, machineUi } from '../i18n/machineTranslations'
 import BackButton from '../components/BackButton'
 import '../styles/MachineDetailPage.css'
 import { Link, useParams } from 'react-router-dom'
@@ -70,10 +71,10 @@ export default function MachineDetailPage() {
   useEffect(() => {
     if (!machine) return
 
-    const title = getLocalizedField(machine, 'title', language) || machine.model || 'Macchinario usato'
+    const title = getMachineLocalizedField(machine, 'title', language) || machine.model || 'Macchinario usato'
     const rawDescription =
-      getLocalizedField(machine, 'description', language) ||
-      [machine.brand, machine.model, getLocalizedField(machine, 'category', language)]
+      getMachineLocalizedField(machine, 'description', language) ||
+      [machine.brand, machine.model, getMachineLocalizedField(machine, 'category', language)]
         .filter(Boolean)
         .join(' · ')
     const description = String(rawDescription || 'Macchinario usato disponibile presso Idealtech.')
@@ -98,7 +99,7 @@ export default function MachineDetailPage() {
       image: imageUrls.length ? [...new Set(imageUrls)] : undefined,
       sku: machine.id ? String(machine.id) : undefined,
       model: machine.model || undefined,
-      category: getLocalizedField(machine, 'category', language) || undefined,
+      category: getMachineLocalizedField(machine, 'category', language) || undefined,
       itemCondition: 'https://schema.org/UsedCondition',
       brand: machine.brand
         ? { '@type': 'Brand', name: machine.brand }
@@ -121,9 +122,9 @@ export default function MachineDetailPage() {
         detail: {
           path: `/macchinario/${slug}`,
           page_name: title,
-          title: `${title} usato | Idealtech`,
+          title: `${title} ${machineUi('used', language)} | Idealtech`,
           description,
-          og_title: `${title} usato | Idealtech`,
+          og_title: `${title} ${machineUi('used', language)} | Idealtech`,
           og_description: description,
           og_image_url: imageUrls[0] || undefined,
           product,
@@ -136,7 +137,7 @@ export default function MachineDetailPage() {
     return (
       <div className="page-shell">
         <div className="content-card">
-          <p>Caricamento...</p>
+          <p>{machineUi('loading', language)}</p>
         </div>
       </div>
     )
@@ -147,8 +148,8 @@ export default function MachineDetailPage() {
       <div className="page-shell">
         <div className="page-topbar">
           <div>
-            <h1>Dettaglio macchinario</h1>
-            <p>Si è verificato un problema.</p>
+            <h1>{machineUi('detailTitle', language)}</h1>
+            <p>{machineUi('problem', language)}</p>
           </div>
           <BackButton fallback="/store" />
         </div>
@@ -164,10 +165,10 @@ export default function MachineDetailPage() {
     <div className="site-container machine-detail-page">
       <div className="page-topbar">
         <div>
-          <h1>{getLocalizedField(machine, 'title', language)}</h1>
-          {[machine.brand, machine.model, getLocalizedField(machine, 'category', language)]
+          <h1 data-no-translate>{getMachineLocalizedField(machine, 'title', language)}</h1>
+          {[machine.brand, machine.model, getMachineLocalizedField(machine, 'category', language)]
             .filter(Boolean).length ? (
-            <p>{[machine.brand, machine.model, getLocalizedField(machine, 'category', language)].filter(Boolean).join(' · ')}</p>
+            <p data-no-translate>{[machine.brand, machine.model, getMachineLocalizedField(machine, 'category', language)].filter(Boolean).join(' · ')}</p>
           ) : null}
         </div>
 
@@ -180,9 +181,9 @@ export default function MachineDetailPage() {
         <div className="content-card">
           <div className="detail-main-image">
             {selectedImage ? (
-              <img src={selectedImage} alt={getLocalizedField(machine, 'title', language)} />
+              <img src={selectedImage} alt={getMachineLocalizedField(machine, 'title', language)} />
             ) : (
-              <div className="machine-thumb-placeholder">Nessuna immagine</div>
+              <div className="machine-thumb-placeholder">{machineUi('missing', language)}</div>
             )}
           </div>
 
@@ -196,7 +197,7 @@ export default function MachineDetailPage() {
                     }`}
                   onClick={() => setSelectedImage(image.image_url)}
                 >
-                  <img src={image.image_url} alt={getLocalizedField(machine, 'title', language)} />
+                  <img src={image.image_url} alt={getMachineLocalizedField(machine, 'title', language)} />
                 </button>
               ))}
             </div>
@@ -216,51 +217,51 @@ export default function MachineDetailPage() {
                   currency: 'EUR',
                 })}
               </span>
-              {machine.price_includes_vat === false ? <small>IVA esclusa</small> : null}
+              {machine.price_includes_vat === false ? <small>{machineUi('vatExcluded', language)}</small> : null}
             </strong>
           </div>
 
           <div className="detail-info-grid">
             <div className="detail-info-item">
-              <span>Marca</span>
+              <span>{machineUi('brand', language)}</span>
               <strong>{machine.brand || '—'}</strong>
             </div>
 
             <div className="detail-info-item">
-              <span>Modello</span>
+              <span>{machineUi('model', language)}</span>
               <strong>{machine.model || '—'}</strong>
             </div>
 
             <div className="detail-info-item">
-              <span>Categoria</span>
-              <strong>{getLocalizedField(machine, 'category', language) || '—'}</strong>
+              <span>{machineUi('category', language)}</span>
+              <strong data-no-translate>{getMachineLocalizedField(machine, 'category', language) || '—'}</strong>
             </div>
 
             <div className="detail-info-item">
-              <span>Condizione</span>
-              <strong>{getLocalizedField(machine, 'condition', language) || '—'}</strong>
+              <span>{machineUi('condition', language)}</span>
+              <strong data-no-translate>{getMachineLocalizedField(machine, 'condition', language) || '—'}</strong>
             </div>
 
             <div className="detail-info-item">
-              <span>Anno</span>
+              <span>{machineUi('year', language)}</span>
               <strong>{machine.year || '—'}</strong>
             </div>
 
           </div>
 
           <div className="detail-description">
-            <h3>Descrizione</h3>
-            <p>{getLocalizedField(machine, 'description', language) || 'Nessuna descrizione disponibile.'}</p>
+            <h3>{machineUi('description', language)}</h3>
+            <p data-no-translate>{getMachineLocalizedField(machine, 'description', language) || machineUi('noDescription', language)}</p>
           </div>
 
           <div className="detail-actions">
             <Link
               to={`/contatti?macchinario=${encodeURIComponent(
-                getLocalizedField(machine, 'title', language) || machine.model || ''
+                getMachineLocalizedField(machine, 'title', language) || machine.model || ''
               )}`}
               className="auth-button"
             >
-              Richiedi informazioni
+              {machineUi('request', language)}
             </Link>
           </div>
         </div>

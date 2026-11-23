@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useLanguage } from '../i18n/LanguageContext'
-import { getLocalizedField, getMachineStatusLabel } from '../i18n/contentTranslations'
+import { getMachineStatusLabel } from '../i18n/contentTranslations'
+import { getMachineLocalizedField, machineUi } from '../i18n/machineTranslations'
 import BackButton from '../components/BackButton'
 import '../styles/PublicStorePage.css'
 
@@ -52,8 +53,8 @@ export default function PublicStorePage() {
     <div className="page-shell">
       <div className="page-topbar">
         <div>
-          <h1>Store macchinari usati</h1>
-          <p>Consulta i macchinari attualmente pubblicati.</p>
+          <h1>{machineUi('storeTitle', language)}</h1>
+          <p>{machineUi('storeIntro', language)}</p>
         </div>
 
         <div className="topbar-actions">
@@ -63,25 +64,25 @@ export default function PublicStorePage() {
 
       <div className="content-card">
         {loading ? (
-          <p>Caricamento...</p>
+          <p>{machineUi('loading', language)}</p>
         ) : errorMessage ? (
           <div className="auth-message error">{errorMessage}</div>
         ) : machines.length === 0 ? (
           <div className="empty-state">
-            <h3>Nessun macchinario pubblicato</h3>
-            <p>Al momento lo store è vuoto.</p>
+            <h3>{machineUi('emptyTitle', language)}</h3>
+            <p>{machineUi('emptyText', language)}</p>
           </div>
         ) : (
           <div className="store-grid">
             {machines.map((machine) => {
-              const title = getLocalizedField(machine, 'title', language)
+              const title = getMachineLocalizedField(machine, 'title', language)
               const description = getDescriptionExcerpt(
-                getLocalizedField(machine, 'description', language) || machine.description
+                getMachineLocalizedField(machine, 'description', language) || machine.description
               )
               const metadata = [
                 machine.brand,
                 machine.model,
-                getLocalizedField(machine, 'category', language),
+                getMachineLocalizedField(machine, 'category', language),
                 machine.year ? String(machine.year) : '',
               ].filter(Boolean)
 
@@ -95,21 +96,21 @@ export default function PublicStorePage() {
                     {machine.cover_image ? (
                       <img src={machine.cover_image} alt={title} />
                     ) : (
-                      <div className="machine-thumb-placeholder">Nessuna immagine</div>
+                      <div className="machine-thumb-placeholder">{machineUi('missing', language)}</div>
                     )}
                   </div>
 
                   <div className="store-card-body">
-                    <h3>{title}</h3>
+                    <h3 data-no-translate>{title}</h3>
 
                     {metadata.length ? (
                       <div className="store-card-meta">
-                        {metadata.map((item, index) => <span key={`${item}-${index}`}>{item}</span>)}
+                        {metadata.map((item, index) => <span data-no-translate key={`${item}-${index}`}>{item}</span>)}
                       </div>
                     ) : null}
 
                     {description ? (
-                      <p className="store-card-description">{description}</p>
+                      <p className="store-card-description" data-no-translate>{description}</p>
                     ) : null}
 
                     <div className="store-card-footer">
@@ -124,7 +125,7 @@ export default function PublicStorePage() {
                             currency: 'EUR',
                           })}
                         </span>
-                        {machine.price_includes_vat === false ? <small>IVA esclusa</small> : null}
+                        {machine.price_includes_vat === false ? <small>{machineUi('vatExcluded', language)}</small> : null}
                       </strong>
                     </div>
                   </div>

@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext'
 import AdminLayout from '../components/AdminLayout'
 import { getMachineImageUrl } from '../lib/storagePublicUrl'
 import { slugify } from '../lib/slugify'
+import { translateMachineWithDeepL } from '../i18n/machineTranslations'
 import '../styles/AdminMachinesPage.css'
 
 function getCopyTitle(title = '') {
@@ -52,6 +53,8 @@ export default function AdminMachinesPage() {
   const [duplicatingId, setDuplicatingId] = useState(null)
   const [selectedId, setSelectedId] = useState(null)
   const [movingOrder, setMovingOrder] = useState(false)
+  const [translatingAll, setTranslatingAll] = useState(false)
+  const [translationProgress, setTranslationProgress] = useState('')
 
   const canReorder = profile?.role === 'admin'
 
@@ -202,6 +205,8 @@ export default function AdminMachinesPage() {
         .insert({
           ...copyableFields,
           title: copyTitle,
+          // Title changed: the copied record needs fresh EN/TR translations.
+          translations: {},
           slug: copySlug,
           cover_image: null,
           cover_image_path: null,
@@ -285,6 +290,38 @@ export default function AdminMachinesPage() {
     }
   }
 
+  async function translateAllMachines() {
+    if (!machines.length) return
+    const confirmed = window.confirm(
+      `Rigenerare con DeepL le traduzioni complete EN/TR dei ${machines.length} macchinari?\n` +
+      'Le traduzioni manuali precedenti saranno sovrascritte, ma non cambieranno testi italiani, prezzi o immagini.'
+    )
+    if (!confirmed) return
+
+    let completed = 0
+    setTranslatingAll(true)
+    setTranslationProgress('Inizio traduzione…')
+    setErrorMessage('')
+    setOperationMessage('')
+    try {
+      for (const machine of machines) {
+        setTranslationProgress(`Traduzione ${completed + 1} di ${machines.length}: ${machine.title}`)
+        const translations = await translateMachineWithDeepL(machine, { force: true })
+        const { error } = await supabase.from('machines').update({ translations }).eq('id', machine.id)
+        if (error) throw new Error(`${machine.title}: ${error.message}`)
+        completed += 1
+      }
+      setOperationMessage(`${completed} macchinari tradotti in EN/TR e salvati su Supabase. Aggiorna la pagina pubblica per verificarli.`)
+      await loadMachines()
+    } catch (error) {
+      setErrorMessage(`Traduzione interrotta dopo ${completed}/${machines.length} macchinari. ${error.message || ''}`)
+      await loadMachines()
+    } finally {
+      setTranslationProgress('')
+      setTranslatingAll(false)
+    }
+  }
+
   async function moveSelectedMachine(direction) {
     const selectedIndex = machines.findIndex((machine) => machine.id === selectedId)
     const targetIndex = direction === 'up' ? selectedIndex - 1 : selectedIndex + 1
@@ -339,6 +376,18 @@ export default function AdminMachinesPage() {
       subtitle="Gestisci le schede dello store, duplica i prodotti e stabilisci l’ordine di visualizzazione."
       actions={<Link to="/admin/macchinari/nuovo" className="admin-primary-button">+ Nuovo macchinario</Link>}
     >
+      {canReorder ? (
+        <div className="admin-panel-card machine-translation-bulk">
+          <div>
+            <strong>Traduzioni schede Usato · IT / EN / TR</strong>
+            <p>Le schede macchinario non usano il Website Editor. Questo comando traduce integralmente descrizioni, titolo, categoria e condizione già pubblicati.</p>
+            {translationProgress ? <small role="status">{translationProgress}</small> : null}
+          </div>
+          <button type="button" className="admin-primary-button" onClick={translateAllMachines} disabled={translatingAll || loading || !machines.length}>
+            {translatingAll ? 'Traduzione in corso…' : 'Rigenera EN/TR di tutti i macchinari con DeepL'}
+          </button>
+        </div>
+      ) : null}
       {operationMessage ? <div className="admin-operation-message">{operationMessage}</div> : null}
       {errorMessage ? <div className="auth-message error admin-machines-error">{errorMessage}</div> : null}
 

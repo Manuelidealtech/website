@@ -377,3 +377,19 @@
     right: 10px;
   }
 }
+
+/* Rigenerazione in blocco delle traduzioni delle schede usato */
+.machine-translation-bulk {
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 18px;
+  border: 1px solid #cfe2f6;
+}
+.machine-translation-bulk > div { flex: 1 1 280px; }
+.machine-translation-bulk strong { display: block; font-size: 1rem; color: #153f6f; }
+.machine-translation-bulk p { margin: 5px 0 0; color: #647d96; line-height: 1.5; }
+.machine-translation-bulk small { display: block; margin-top: 8px; font-weight: 700; color: #1168ac; }
