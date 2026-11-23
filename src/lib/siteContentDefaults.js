@@ -1,4 +1,4 @@
-import { defaultProductDetailCommon, defaultProductPageDetails } from './productPageDefaults'
+import { defaultProductDetailCommon, defaultProductPageDetails } from './productPageDefaults.js'
 
 export const defaultNavbarItems = [
   { id: 'home', label: 'Home', to: '/', visible: true },

@@ -1,27 +1,15 @@
-# Fix sicurezza clienti Assistenza
+# Fix sicurezza clienti Assistenza V2
 
-Questa versione corregge un problema di separazione ruoli: un cliente registrato dal portale Assistenza poteva ricevere anche un vecchio profilo `editor` nella tabella `profiles` e venire quindi interpretato come utente del CMS.
+Questa versione sostituisce la precedente patch SQL.
 
-## Operazione obbligatoria
+## Perché la V1 falliva
+La tabella `machines` contiene una foreign key `machines_created_by_fkey` verso `profiles.id`. Eliminare un profilo già usato come creatore di un macchinario viola quindi l'integrità referenziale.
 
-Dopo il deploy eseguire una sola volta in **Supabase > SQL Editor**:
+## Nuova strategia
+- `profiles` non viene mai cancellato durante la conversione a cliente/tecnico;
+- il record può restare come riferimento storico per macchinari e altri dati;
+- i permessi effettivi derivano da `auth.users.app_metadata`, `support_customers` e `support_staff`;
+- un cliente Assistenza prevale su eventuali vecchi ruoli `editor/admin` presenti in `profiles`;
+- admin e tecnici assegnati esplicitamente dall'amministratore continuano a funzionare.
 
-`SUPABASE_SECURITY_FIX_CLIENTI_ASSISTENZA.sql`
-
-Lo script:
-
-- imposta gli account presenti in `support_customers` come `customer` in Auth, salvo admin/tecnici espliciti;
-- elimina eventuali profili CMS/tecnico incompatibili dai clienti;
-- aggiunge un trigger permanente che impedisce ai nuovi clienti di ereditare profili staff;
-- rende `can_edit_site()`, `is_staff()`, `is_admin()` e le policy Assistenza dipendenti dal ruolo effettivo sicuro.
-
-## Comportamento applicazione
-
-- Cliente: `/assistenza/portale`
-- Tecnico: `/admin/assistenza`
-- Editor: `/admin`
-- Admin: tutte le aree admin
-
-Le route amministrative controllano il ruolo prima di renderizzare le pagine. Anche tentando di digitare manualmente `/admin`, un cliente viene rimandato al proprio portale ticket.
-
-Inoltre, alla prima sessione cliente, `/api/support-session-security` rimuove automaticamente eventuali vecchi privilegi rimasti.
+Eseguire `SUPABASE_SECURITY_FIX_CLIENTI_ASSISTENZA_V2.sql` nel SQL Editor. La V1 era racchiusa in una transazione, quindi se ha restituito errore non va considerata applicata.

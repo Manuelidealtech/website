@@ -7,6 +7,7 @@ import { SITE_CONTENT_DEFAULTS, SITE_CONTENT_FIELDS, SITE_SECTIONS } from '../li
 import { uploadSiteAsset } from '../lib/siteAssetStorage'
 import { slugify } from '../lib/slugify'
 import { readLocalizedText, writeLocalizedText } from '../i18n/localizedContent'
+import { findMissingCmsTranslations } from '../i18n/translationAudit'
 import '../styles/AdminSiteEditorPage.css'
 
 function rowsToMap(rows = []) {
@@ -48,6 +49,11 @@ export default function AdminSiteEditorPage() {
   const [openProductId, setOpenProductId] = useState('drum-line')
   const [openCatalogProductId, setOpenCatalogProductId] = useState('')
   const [editorLanguage, setEditorLanguage] = useState('it')
+
+  const translationIssues = useMemo(
+    () => findMissingCmsTranslations(values, SITE_CONTENT_FIELDS),
+    [values]
+  )
 
   const sectionFields = useMemo(
     () => SITE_CONTENT_FIELDS.filter((field) => {
@@ -221,6 +227,22 @@ export default function AdminSiteEditorPage() {
       setPublishing(true)
       setError('')
       setMessage('')
+
+      const missingTranslations = findMissingCmsTranslations(values, SITE_CONTENT_FIELDS)
+      if (missingTranslations.length) {
+        const preview = missingTranslations.slice(0, 8).map((item) => {
+          const language = item.language === 'en' ? 'EN' : 'TR'
+          const shortText = item.text.length > 72 ? `${item.text.slice(0, 69)}…` : item.text
+          return `${language}: ${shortText}`
+        })
+        const remaining = missingTranslations.length - preview.length
+        throw new Error(
+          `Pubblicazione bloccata: mancano ${missingTranslations.length} traduzioni. ` +
+          `Compila le schede EN e TR prima di pubblicare. ${preview.join(' | ')}` +
+          (remaining > 0 ? ` | +${remaining} altre` : '')
+        )
+      }
+
       const saved = await saveDraft({ silent: true })
       if (!saved) return
 
@@ -902,6 +924,23 @@ export default function AdminSiteEditorPage() {
     >
       {error ? <div className="cms-alert cms-alert--error">{error}</div> : null}
       {message ? <div className="cms-alert cms-alert--success">{message}</div> : null}
+
+      <div className={`cms-translation-audit ${translationIssues.length ? 'has-issues' : 'is-complete'}`}>
+        <div>
+          <strong>{translationIssues.length ? `${translationIssues.length} traduzioni mancanti` : 'Traduzioni complete'}</strong>
+          <span>{translationIssues.length
+            ? 'Completa EN e TR prima di pubblicare. La bozza può essere salvata normalmente.'
+            : 'Tutti i testi CMS hanno copertura IT / EN / TR.'}</span>
+        </div>
+        {translationIssues.length ? (
+          <div className="cms-translation-audit__items">
+            {translationIssues.slice(0, 4).map((item, index) => (
+              <span key={`${item.language}-${item.path}-${index}`}><b>{item.language.toUpperCase()}</b> {item.text.length > 80 ? `${item.text.slice(0, 77)}…` : item.text}</span>
+            ))}
+            {translationIssues.length > 4 ? <span>+ {translationIssues.length - 4} altre</span> : null}
+          </div>
+        ) : null}
+      </div>
 
       <div className="cms-editor-layout">
         <aside className="cms-section-nav admin-panel-card">

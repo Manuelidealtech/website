@@ -113,14 +113,15 @@ export default async function handler(req, res) {
     return json(res, 400, { error: 'Impossibile completare il profilo assistenza. Riprova.' })
   }
 
-  // Difesa in profondità: vecchi trigger del progetto possono creare automaticamente
-  // una riga in profiles. Un cliente assistenza non deve MAI ereditare privilegi CMS.
-  const [profileCleanup, staffCleanup] = await Promise.all([
-    serviceClient.from('profiles').delete().eq('id', data.user.id),
-    serviceClient.from('support_staff').delete().eq('user_id', data.user.id),
-  ])
+  // Difesa in profondità: non cancelliamo public.profiles, perché vecchi trigger
+  // possono averlo creato e altri record (es. machines.created_by) possono referenziarlo.
+  // I privilegi vengono neutralizzati dal ruolo server-side customer + RLS.
+  const { error: staffCleanupError } = await serviceClient
+    .from('support_staff')
+    .delete()
+    .eq('user_id', data.user.id)
 
-  if (profileCleanup.error || (staffCleanup.error && staffCleanup.error.code !== '42P01')) {
+  if (staffCleanupError && staffCleanupError.code !== '42P01') {
     await serviceClient.auth.admin.deleteUser(data.user.id)
     return json(res, 400, { error: 'Impossibile completare in sicurezza il profilo assistenza. Riprova.' })
   }

@@ -947,3 +947,14 @@
     gap: 3px;
   }
 }
+
+
+.cms-translation-audit { margin-bottom: 18px; padding: 14px 16px; border-radius: 16px; display: grid; gap: 10px; border: 1px solid; }
+.cms-translation-audit > div:first-child { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+.cms-translation-audit strong { font-weight: 900; }
+.cms-translation-audit span { font-size: .82rem; line-height: 1.4; }
+.cms-translation-audit.is-complete { color: #17633a; background: #effaf4; border-color: #bde8cf; }
+.cms-translation-audit.has-issues { color: #8a5700; background: #fff8e8; border-color: #f0d49b; }
+.cms-translation-audit__items { display: flex; flex-wrap: wrap; gap: 6px; }
+.cms-translation-audit__items > span { padding: 6px 9px; border-radius: 10px; background: rgba(255,255,255,.72); border: 1px solid rgba(138,87,0,.13); }
+.cms-translation-audit__items b { margin-right: 4px; }

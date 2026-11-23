@@ -1,10 +1,18 @@
 import { useEffect, useMemo } from 'react'
 import { useLocation } from 'react-router-dom'
 import { TRANSLATIONS } from './translations'
+import { CMS_TRANSLATION_OVERRIDES } from './localizedContent'
 import { useLanguage } from './LanguageContext'
 
 const ATTRIBUTE_NAMES = ['alt', 'aria-label', 'placeholder', 'title']
 const SKIP_TAGS = new Set(['SCRIPT', 'STYLE', 'NOSCRIPT', 'IFRAME', 'TEXTAREA', 'CODE', 'PRE'])
+
+const ALL_TRANSLATIONS = Object.fromEntries(
+  Object.keys(TRANSLATIONS).map((language) => [
+    language,
+    { ...(TRANSLATIONS[language] || {}), ...(CMS_TRANSLATION_OVERRIDES[language] || {}) },
+  ])
+)
 
 function normalizeText(value = '') {
   return value.replace(/\s+/g, ' ').trim()
@@ -20,7 +28,7 @@ function splitWhitespace(value = '') {
 function buildReverseMaps() {
   const reverseMaps = {}
 
-  Object.entries(TRANSLATIONS).forEach(([language, dictionary]) => {
+  Object.entries(ALL_TRANSLATIONS).forEach(([language, dictionary]) => {
     reverseMaps[language] = new Map()
 
     Object.entries(dictionary).forEach(([source, translated]) => {
@@ -36,7 +44,7 @@ const REVERSE_TRANSLATIONS = buildReverseMaps()
 function getSourceText(normalizedValue) {
   if (!normalizedValue) return ''
 
-  if (TRANSLATIONS.en?.[normalizedValue] || TRANSLATIONS.tr?.[normalizedValue]) {
+  if (ALL_TRANSLATIONS.en?.[normalizedValue] || ALL_TRANSLATIONS.tr?.[normalizedValue]) {
     return normalizedValue
   }
 
@@ -57,7 +65,7 @@ function translateValue(value, language) {
   const { leading, trailing } = splitWhitespace(value)
   const translated = language === 'it'
     ? source
-    : TRANSLATIONS[language]?.[source] || source
+    : ALL_TRANSLATIONS[language]?.[source] || source
 
   return `${leading}${translated}${trailing}`
 }

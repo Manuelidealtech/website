@@ -304,6 +304,19 @@ export default function AdminShopPage() {
       if (!productForm.name.trim()) throw new Error('Il nome prodotto è obbligatorio.')
       if (productForm.price === '' || Number(productForm.price) < 0) throw new Error('Inserisci un prezzo valido.')
 
+      if (productForm.is_published) {
+        const translations = normalizedProductTranslations()
+        const missing = []
+        for (const language of ['en', 'tr']) {
+          if (!translations[language]?.name) missing.push(`${language.toUpperCase()} nome`)
+          if (productForm.description.trim() && !translations[language]?.description) missing.push(`${language.toUpperCase()} descrizione`)
+          if (productForm.category.trim() && !translations[language]?.category) missing.push(`${language.toUpperCase()} categoria`)
+        }
+        if (missing.length) {
+          throw new Error(`Traduzioni Shop mancanti: ${missing.join(', ')}. Completa IT / EN / TR prima di pubblicare il prodotto.`)
+        }
+      }
+
       const resolvedImages = []
       for (const image of productImages) {
         if (image.source === 'saved') {

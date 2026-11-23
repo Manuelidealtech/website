@@ -51,13 +51,17 @@ export default async function handler(req, res) {
   const isCustomer = appRole === 'customer' || accountType === 'support_customer' || Boolean(customer)
   if (!isCustomer) return json(res, 200, { role: null, sanitized: false })
 
-  const [profileCleanup, staffCleanup] = await Promise.all([
-    serviceClient.from('profiles').delete().eq('id', currentUser.id),
-    serviceClient.from('support_staff').delete().eq('user_id', currentUser.id),
-  ])
+  // NON cancelliamo public.profiles: può essere referenziato da machines.created_by.
+  // Il profilo resta come riferimento storico, ma il ruolo effettivo del cliente
+  // viene imposto tramite app_metadata e dalle policy RLS.
+  const { error: staffCleanupError } = await serviceClient
+    .from('support_staff')
+    .delete()
+    .eq('user_id', currentUser.id)
 
-  if (profileCleanup.error) return json(res, 500, { error: 'Impossibile rimuovere il vecchio profilo amministrativo.' })
-  if (staffCleanup.error && staffCleanup.error.code !== '42P01') return json(res, 500, { error: 'Impossibile rimuovere il vecchio profilo tecnico.' })
+  if (staffCleanupError && staffCleanupError.code !== '42P01') {
+    return json(res, 500, { error: 'Impossibile rimuovere il vecchio profilo tecnico.' })
+  }
 
   const { error: metadataError } = await serviceClient.auth.admin.updateUserById(currentUser.id, {
     app_metadata: {

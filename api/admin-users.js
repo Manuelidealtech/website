@@ -40,29 +40,62 @@ async function getAuthorizedAdmin(req, serviceClient) {
 }
 
 async function countAdmins(serviceClient) {
-  const { count, error } = await serviceClient
-    .from('profiles')
-    .select('id', { count: 'exact', head: true })
-    .eq('role', 'admin')
-  if (error) throw error
-  return count || 0
+  const { data: usersData, error: usersError } = await serviceClient.auth.admin.listUsers({ page: 1, perPage: 1000 })
+  if (usersError) throw usersError
+
+  const users = usersData.users || []
+  const ids = users.map((user) => user.id)
+  const [profilesResult, customersResult] = await Promise.all([
+    ids.length
+      ? serviceClient.from('profiles').select('id,role').in('id', ids)
+      : Promise.resolve({ data: [], error: null }),
+    ids.length
+      ? serviceClient.from('support_customers').select('user_id').in('user_id', ids)
+      : Promise.resolve({ data: [], error: null }),
+  ])
+  if (profilesResult.error) throw profilesResult.error
+  if (customersResult.error && customersResult.error.code !== '42P01') throw customersResult.error
+
+  const profileMap = new Map((profilesResult.data || []).map((row) => [row.id, row]))
+  const customerSet = new Set((customersResult.data || []).map((row) => row.user_id))
+
+  return users.filter((user) => {
+    const appRole = String(user.app_metadata?.role || '').toLowerCase()
+    const accountType = String(user.app_metadata?.account_type || user.user_metadata?.account_type || '').toLowerCase()
+    if (appRole === 'admin') return true
+    if (appRole === 'technician' || appRole === 'customer' || accountType === 'support_customer') return false
+    if (customerSet.has(user.id)) return false
+    return profileMap.get(user.id)?.role === 'admin'
+  }).length
 }
 
 async function getRoleRecord(serviceClient, userId) {
-  const [profileResult, staffResult, customerResult] = await Promise.all([
+  const [authResult, profileResult, staffResult, customerResult] = await Promise.all([
+    serviceClient.auth.admin.getUserById(userId),
     serviceClient.from('profiles').select('id,full_name,role').eq('id', userId).maybeSingle(),
     serviceClient.from('support_staff').select('user_id,full_name,role,active').eq('user_id', userId).maybeSingle(),
     serviceClient.from('support_customers').select('user_id,full_name,company,phone,email').eq('user_id', userId).maybeSingle(),
   ])
 
+  if (authResult.error || !authResult.data?.user) throw authResult.error || new Error('Utente Supabase non trovato.')
   if (profileResult.error) throw profileResult.error
   if (staffResult.error && staffResult.error.code !== '42P01') throw staffResult.error
   if (customerResult.error && customerResult.error.code !== '42P01') throw customerResult.error
 
-  if (profileResult.data?.role === 'admin') return { role: 'admin', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
-  if (staffResult.data?.role === 'technician') return { role: 'technician', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
-  if (customerResult.data) return { role: 'customer', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
-  return { role: 'unassigned', profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
+  const user = authResult.data.user
+  const appRole = String(user.app_metadata?.role || '').toLowerCase()
+  const accountType = String(user.app_metadata?.account_type || user.user_metadata?.account_type || '').toLowerCase()
+
+  let role = 'unassigned'
+  if (appRole === 'admin') role = 'admin'
+  else if (appRole === 'technician') role = 'technician'
+  else if (appRole === 'customer' || accountType === 'support_customer') role = 'customer'
+  else if (staffResult.data?.role === 'technician' && staffResult.data?.active !== false) role = 'technician'
+  else if (customerResult.data) role = 'customer'
+  else if (profileResult.data?.role === 'admin') role = 'admin'
+  else if (profileResult.data?.role === 'editor') role = 'editor'
+
+  return { role, user, profile: profileResult.data, staff: staffResult.data, customer: customerResult.data }
 }
 
 async function assignRole({ serviceClient, userId, role, fullName, email }) {
@@ -84,9 +117,8 @@ async function assignRole({ serviceClient, userId, role, fullName, email }) {
   }
 
   if (role === 'technician') {
-    const { error: profileDeleteError } = await serviceClient.from('profiles').delete().eq('id', userId)
-    if (profileDeleteError) throw profileDeleteError
-
+    // Manteniamo l'eventuale profiles legacy per preservare FK/storico (es. machines.created_by).
+    // app_metadata=technician prevale comunque per tutte le autorizzazioni.
     const { error: staffError } = await serviceClient
       .from('support_staff')
       .upsert({ user_id: userId, full_name: fullName || email || 'Tecnico', role: 'technician', active: true })
@@ -94,12 +126,9 @@ async function assignRole({ serviceClient, userId, role, fullName, email }) {
   }
 
   if (role === 'customer') {
-    const [profileDeleteResult, staffDeleteResult] = await Promise.all([
-      serviceClient.from('profiles').delete().eq('id', userId),
-      serviceClient.from('support_staff').delete().eq('user_id', userId),
-    ])
-    if (profileDeleteResult.error) throw profileDeleteResult.error
-    if (staffDeleteResult.error && staffDeleteResult.error.code !== '42P01') throw staffDeleteResult.error
+    // Non cancelliamo profiles: può essere referenziato da macchinari o altri record storici.
+    const { error: staffDeleteError } = await serviceClient.from('support_staff').delete().eq('user_id', userId)
+    if (staffDeleteError && staffDeleteError.code !== '42P01') throw staffDeleteError
 
     const { error: customerError } = await serviceClient
       .from('support_customers')
@@ -171,11 +200,13 @@ export default async function handler(req, res) {
           ? 'customer'
           : staff?.role === 'technician'
             ? 'technician'
-            : profile?.role === 'admin'
-              ? 'admin'
-              : customer
-                ? 'customer'
-                : 'unassigned'
+            : customer
+              ? 'customer'
+              : profile?.role === 'admin'
+                ? 'admin'
+                : profile?.role === 'editor'
+                  ? 'editor'
+                  : 'unassigned'
 
       return {
         id: user.id,
@@ -299,6 +330,20 @@ export default async function handler(req, res) {
     if (linkedTickets > 0 || linkedMessages > 0) {
       return json(res, 409, {
         error: `Questo account ha storico assistenza collegato (${linkedTickets} ticket, ${linkedMessages} messaggi). Per sicurezza non viene eliminato da Auth, così non perdi lo storico. Puoi cambiarne il ruolo o la password.`,
+      })
+    }
+
+    const machineRefResult = await serviceClient
+      .from('machines')
+      .select('id', { count: 'exact', head: true })
+      .eq('created_by', userId)
+
+    if (machineRefResult.error && machineRefResult.error.code !== '42P01') {
+      return json(res, 400, { error: machineRefResult.error.message })
+    }
+    if ((machineRefResult.count || 0) > 0) {
+      return json(res, 409, {
+        error: `Questo account è collegato a ${machineRefResult.count} macchinari come creatore. Non viene eliminato da Supabase per preservare lo storico; puoi cambiarne ruolo o password.`,
       })
     }
 
