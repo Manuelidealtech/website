@@ -7,7 +7,7 @@ import { SITE_CONTENT_DEFAULTS, SITE_CONTENT_FIELDS, SITE_SECTIONS } from '../li
 import { uploadSiteAsset } from '../lib/siteAssetStorage'
 import { slugify } from '../lib/slugify'
 import { readLocalizedText, writeLocalizedText } from '../i18n/localizedContent'
-import { findMissingCmsTranslations } from '../i18n/translationAudit'
+import { findMissingCmsTranslations, collectCmsTranslationJobs, applyCmsTranslationJobs } from '../i18n/translationAudit'
 import '../styles/AdminSiteEditorPage.css'
 
 function rowsToMap(rows = []) {
@@ -49,6 +49,9 @@ export default function AdminSiteEditorPage() {
   const [openProductId, setOpenProductId] = useState('drum-line')
   const [openCatalogProductId, setOpenCatalogProductId] = useState('')
   const [editorLanguage, setEditorLanguage] = useState('it')
+  const [translating, setTranslating] = useState(false)
+  const [translationProgress, setTranslationProgress] = useState('')
+  const [publishedTranslationIssues, setPublishedTranslationIssues] = useState(null)
 
   const translationIssues = useMemo(
     () => findMissingCmsTranslations(values, SITE_CONTENT_FIELDS),
@@ -105,6 +108,10 @@ export default function AdminSiteEditorPage() {
         mergedValues['navbar.items'] = nextNav
       }
       setValues(mergedValues)
+      setPublishedTranslationIssues(findMissingCmsTranslations({
+        ...SITE_CONTENT_DEFAULTS,
+        ...rowsToMap(publishedResult.data),
+      }, SITE_CONTENT_FIELDS))
       setVersions(versionsResult.data || [])
       setDirty(false)
     } catch (err) {
@@ -189,6 +196,64 @@ export default function AdminSiteEditorPage() {
     setValue(key, items)
   }
 
+  async function translateCmsContent(force = false) {
+    if (force && !window.confirm('Rigenerare TUTTE le traduzioni EN/TR del CMS? Le versioni manuali attuali saranno sostituite. Le bozze possono essere salvate e controllate prima della pubblicazione.')) return
+
+    const jobs = collectCmsTranslationJobs(values, SITE_CONTENT_FIELDS, { force })
+    if (!jobs.length) {
+      setMessage('Non risultano traduzioni mancanti. Puoi usare “Rigenera EN/TR” se sul sito online vedi vecchi testi errati.')
+      return
+    }
+
+    try {
+      setTranslating(true)
+      setError('')
+      setMessage('')
+      const { data: sessionData, error: sessionError } = await supabase.auth.getSession()
+      const token = sessionData?.session?.access_token
+      if (sessionError || !token) throw new Error('Devi effettuare nuovamente il login admin per tradurre.')
+
+      // Deduplicate identical strings: translate once, use for every field/paragraph.
+      const unique = { en: [...new Set(jobs.filter((job) => job.language === 'en').map((job) => job.italian))],
+        tr: [...new Set(jobs.filter((job) => job.language === 'tr').map((job) => job.italian))] }
+      const translated = { en: {}, tr: {} }
+      const total = unique.en.length + unique.tr.length
+      let completed = 0
+      const size = (batch) => batch.reduce((sum, text) => sum + text.length, 0)
+
+      for (const language of ['en', 'tr']) {
+        const pending = [...unique[language]]
+        while (pending.length) {
+          const batch = []
+          while (pending.length && batch.length < 12 && size(batch) + pending[0].length <= 8000) batch.push(pending.shift())
+          if (!batch.length) throw new Error(`Testo troppo lungo per la traduzione: ${pending[0].slice(0, 90)}`)
+          setTranslationProgress(`${language.toUpperCase()}: ${completed} / ${total} testi tradotti…`)
+          const response = await fetch('/api/cms-translate', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ texts: batch, targetLanguage: language }),
+          })
+          const payload = await response.json().catch(() => ({}))
+          if (!response.ok) throw new Error(payload.error || `Errore HTTP ${response.status} durante la traduzione ${language.toUpperCase()}`)
+          if (!Array.isArray(payload.translations) || payload.translations.length !== batch.length) throw new Error('Risposta incompleta del servizio traduzioni.')
+          batch.forEach((original, index) => { translated[language][original] = payload.translations[index] })
+          completed += batch.length
+        }
+      }
+
+      const nextValues = applyCmsTranslationJobs(values, jobs, translated)
+      setValues(nextValues)
+      setDirty(true)
+      const remaining = findMissingCmsTranslations(nextValues, SITE_CONTENT_FIELDS).length
+      setMessage(`${completed} testi tradotti in EN/TR e inseriti nella bozza. ${remaining ? `Restano ${remaining} campi da verificare.` : 'Controllo traduzioni CMS superato.'} Apri l’anteprima e premi Pubblica per aggiornare il sito online.`)
+    } catch (err) {
+      setError(`Traduzione non completata: ${err.message}. I contenuti precedenti non sono stati modificati.`)
+    } finally {
+      setTranslationProgress('')
+      setTranslating(false)
+    }
+  }
+
   async function saveDraft({ silent = false } = {}) {
     try {
       setSaving(true)
@@ -223,6 +288,7 @@ export default function AdminSiteEditorPage() {
   }
 
   async function publish() {
+    if (translating) return
     try {
       setPublishing(true)
       setError('')
@@ -917,8 +983,8 @@ export default function AdminSiteEditorPage() {
       subtitle="Modifica testi, menu, prodotti e immagini senza intervenire sul codice. Le modifiche restano in bozza finché non premi Pubblica."
       actions={(
         <div className="cms-header-actions">
-          <button type="button" className="admin-secondary-button" onClick={openPreview} disabled={saving || publishing || loading}>Anteprima</button>
-          <button type="button" className="admin-primary-button" onClick={publish} disabled={saving || publishing || loading}>{publishing ? 'Pubblicazione...' : 'Pubblica'}</button>
+          <button type="button" className="admin-secondary-button" onClick={openPreview} disabled={saving || publishing || loading || translating}>Anteprima</button>
+          <button type="button" className="admin-primary-button" onClick={publish} disabled={saving || publishing || loading || translating}>{publishing ? 'Pubblicazione...' : 'Pubblica'}</button>
         </div>
       )}
     >
@@ -940,6 +1006,18 @@ export default function AdminSiteEditorPage() {
             {translationIssues.length > 4 ? <span>+ {translationIssues.length - 4} altre</span> : null}
           </div>
         ) : null}
+      </div>
+
+      <div className="cms-machine-translation-toolbar" role="group" aria-label="Traduzioni automatiche del CMS">
+        <div className="cms-machine-translation-toolbar__text">
+          <strong>Traduzioni reali salvate nel CMS</strong>
+          <span>{publishedTranslationIssues === null ? 'Verifica traduzioni online…' : `${publishedTranslationIssues.length} testi non completamente tradotti nei contenuti attualmente online.`} Il controllo della bozza non corregge automaticamente il sito già pubblicato.</span>
+          {translationProgress ? <small role="status">{translationProgress}</small> : null}
+        </div>
+        <div className="cms-machine-translation-toolbar__actions">
+          <button type="button" className="admin-primary-button" disabled={loading || translating || saving || publishing} onClick={() => translateCmsContent(false)}>{translating ? 'Traduzione in corso…' : 'Traduci testi mancanti EN/TR'}</button>
+          <button type="button" className="admin-secondary-button" disabled={loading || translating || saving || publishing} onClick={() => translateCmsContent(true)}>Rigenera tutte EN/TR</button>
+        </div>
       </div>
 
       <div className="cms-editor-layout">
@@ -970,7 +1048,7 @@ export default function AdminSiteEditorPage() {
                     <button key={code} type="button" className={editorLanguage === code ? 'is-active' : ''} onClick={() => setEditorLanguage(code)}>{label}</button>
                   ))}
                 </div>
-                <button type="button" className="admin-secondary-button" onClick={() => saveDraft()} disabled={saving || loading}>{saving ? 'Salvataggio...' : 'Salva bozza'}</button>
+                <button type="button" className="admin-secondary-button" onClick={() => saveDraft()} disabled={saving || loading || translating}>{saving ? 'Salvataggio...' : 'Salva bozza'}</button>
               </div>
             </div>
             <div className="cms-language-hint">

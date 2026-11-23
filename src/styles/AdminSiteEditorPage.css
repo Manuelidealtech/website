@@ -958,3 +958,12 @@
 .cms-translation-audit__items { display: flex; flex-wrap: wrap; gap: 6px; }
 .cms-translation-audit__items > span { padding: 6px 9px; border-radius: 10px; background: rgba(255,255,255,.72); border: 1px solid rgba(138,87,0,.13); }
 .cms-translation-audit__items b { margin-right: 4px; }
+
+/* Persistent translations: show exactly what is online vs what is in draft. */
+.cms-machine-translation-toolbar { margin-bottom: 18px; border: 1px solid #c8dff2; background: #f4f9ff; border-radius: 16px; padding: 16px; display: flex; gap: 14px; justify-content: space-between; align-items: center; flex-wrap: wrap; }
+.cms-machine-translation-toolbar__text { display: grid; gap: 5px; flex: 1; min-width: min(100%, 260px); color: #245277; }
+.cms-machine-translation-toolbar__text strong { color: #123b66; font-size: .97rem; }
+.cms-machine-translation-toolbar__text span, .cms-machine-translation-toolbar__text small { color: #5a7792; font-size: .8rem; line-height: 1.5; }
+.cms-machine-translation-toolbar__text small { font-weight: 800; color: #0969bd; }
+.cms-machine-translation-toolbar__actions { display: flex; flex-wrap: wrap; gap: 9px; }
+@media (max-width: 640px) { .cms-machine-translation-toolbar__actions { width: 100%; } .cms-machine-translation-toolbar__actions button { flex: 1 1 100%; } }

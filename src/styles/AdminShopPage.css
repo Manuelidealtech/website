@@ -433,3 +433,8 @@
   .shop-product-language-tabs button { padding: 7px; }
   .shop-product-language-tabs button span { display: none; }
 }
+
+/* DeepL translation tools in Shop product editor */
+.shop-product-auto-translate { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; padding: 10px 0 14px; }
+.shop-product-auto-translate small { display: block; color: #315779; line-height: 1.45; font-size: .78rem; }
+@media (max-width: 630px) { .shop-product-auto-translate button { width: 100%; } }

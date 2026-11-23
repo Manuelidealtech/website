@@ -1,18 +1,18 @@
 import { isLocalizedValue, readLocalizedText, translateKnownText } from './localizedContent.js'
 
-const LANGUAGES = ['en', 'tr']
+export const TARGET_CMS_LANGUAGES = ['en', 'tr']
+
+// These keys are technical identifiers or URLs, not text intended for visitors.
 const SKIP_KEYS = new Set([
-  'id', 'to', 'slug', 'url', 'href', 'image', 'images', 'galleryImages', 'visible', 'shop',
-  'hasDropdown', 'external', 'code', 'sku', 'email', 'phone', 'telephone', 'mapUrl', 'icon',
+  'id', 'to', 'slug', 'url', 'href', 'image', 'images', 'galleryImages',
+  'visible', 'enabled', 'shop', 'hasDropdown', 'external', 'code', 'sku',
+  'email', 'phone', 'telephone', 'mapUrl', 'icon', 'type', 'latitude',
+  'longitude', 'className', 'source', 'target', 'sort_order',
 ])
 
 function normalize(value = '') {
-  return String(value)
-    .normalize('NFKC')
-    .replace(/[’‘`´]/g, "'")
-    .replace(/\s+/g, ' ')
-    .trim()
-    .toLocaleLowerCase('it-IT')
+  return String(value).normalize('NFKC').replace(/[’‘`´]/g, "'")
+    .replace(/\s+/g, ' ').trim().toLocaleLowerCase('it-IT')
 }
 
 function looksNonTextual(value = '') {
@@ -21,82 +21,99 @@ function looksNonTextual(value = '') {
   if (/^(https?:\/\/|mailto:|tel:|\/|#)/i.test(text)) return true
   if (/\.(webp|png|jpe?g|svg|gif|pdf)(\?.*)?$/i.test(text)) return true
   if (/^[\d\s+().,;:/%°\-–—]+$/.test(text)) return true
-  if (/^[A-Z0-9][A-Z0-9._/+\- ]{1,30}$/.test(text)) return true
-  if (/^(Home|Packaging|Paper converting|Case maker|Spare Parts|Pompa)$/i.test(text)) return true
+  if (/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(text)) return true
+  if (/^[A-Z0-9]{1,8}(?:-[A-Z0-9]{1,8}){0,3}$/.test(text)) return true
+  if (/^(Idealtech|IdealTech|Idealtech S\.r\.l\.|IDM-GP EVO|IDM-GP|Drum Line|Extruder Line|Assy Line|Gun Line|Hose Line|Cold Line|Ideal Melt|IdealMelt)$/i.test(text)) return true
   return false
 }
 
-function isBrandLike(path, value) {
-  const lastKey = path.split('.').pop()?.replace(/\[\d+\]$/, '')
-  if (lastKey === 'name' || lastKey === 'kicker') return true
-  if (/^footer\.(company|address)$/.test(path)) return true
-  const text = String(value).trim()
-  if (/^(Idealtech|IdealTech|IDM(?:-GP)?(?: EVO)?|Drum Line|Extruder Line|Assy Line|Gun Line|Hose Line|Cold Line|Ideal Melt|Coating Heads|Custom Machines|Hand Guns|Shop|News)$/i.test(text)) return true
-  return false
+export function shouldTranslateCmsText(value, property = '') {
+  const text = isLocalizedValue(value) ? value.it : value
+  if (typeof text !== 'string' || looksNonTextual(text)) return false
+  if (SKIP_KEYS.has(String(property))) return false
+  return true
 }
 
-function translationMissing(value, language) {
-  const italian = isLocalizedValue(value)
-    ? (typeof value.it === 'string' ? value.it.trim() : '')
-    : (typeof value === 'string' ? value.trim() : '')
-  if (!italian) return false
-
+function hasTranslation(value, language) {
+  const italian = isLocalizedValue(value) ? String(value.it || '').trim() : String(value || '').trim()
+  if (!italian) return true
   const resolved = readLocalizedText(value, language)
-  if (!resolved || !String(resolved).trim()) return true
-
-  if (normalize(resolved) !== normalize(italian)) return false
+  if (!resolved || !String(resolved).trim()) return false
+  if (normalize(resolved) !== normalize(italian)) return true
+  // Natural international UI terms are already correct in English.
+  if (language === 'en' && /^(Home|News|Shop|Packaging|Gluing Technology|Custom Machines|Coating Heads|Spare Parts)$/i.test(italian)) return true
+  // DeepL may legitimately return proper names/technical terms unchanged.
+  if (isLocalizedValue(value) && value.__verified?.[language] === italian) return true
+  // For legacy strings, a complete known dictionary entry is acceptable.
   const known = translateKnownText(italian, language)
-  return !known || normalize(known) === normalize(italian)
+  return Boolean(known && normalize(known) !== normalize(italian))
 }
 
-function walk(value, path, issues) {
-  if (isLocalizedValue(value)) {
-    const italian = typeof value.it === 'string' ? value.it.trim() : ''
-    if (!italian || looksNonTextual(italian) || isBrandLike(path, italian)) return
-    for (const language of LANGUAGES) {
-      if (translationMissing(value, language)) {
-        issues.push({ path, language, text: italian })
-      }
-    }
+function traverse(value, fieldKey, path, property, callback) {
+  if (isLocalizedValue(value) || typeof value === 'string') {
+    if (!shouldTranslateCmsText(value, property)) return
+    callback(value, fieldKey, path)
     return
   }
-
-  if (typeof value === 'string') {
-    const text = value.trim()
-    if (!text || looksNonTextual(text) || isBrandLike(path, text)) return
-    for (const language of LANGUAGES) {
-      if (translationMissing(value, language)) {
-        issues.push({ path, language, text })
-      }
-    }
-    return
-  }
-
   if (Array.isArray(value)) {
-    value.forEach((child, index) => walk(child, `${path}[${index}]`, issues))
+    value.forEach((item, index) => traverse(item, fieldKey, [...path, index], property, callback))
     return
   }
-
   if (value && typeof value === 'object') {
-    for (const [key, child] of Object.entries(value)) {
-      if (SKIP_KEYS.has(key)) continue
-      walk(child, path ? `${path}.${key}` : key, issues)
-    }
+    Object.entries(value).forEach(([key, child]) => {
+      if (!SKIP_KEYS.has(key)) traverse(child, fieldKey, [...path, key], key, callback)
+    })
   }
+}
+
+/**
+ * The same traversal drives the admin report AND the automatic translation.
+ * This prevents the old bug: "0 missing" while published CMS paragraphs were still Italian.
+ */
+export function collectCmsTranslationJobs(values = {}, fields = [], { force = false } = {}) {
+  const keys = fields.length ? fields.map((field) => field.key) : Object.keys(values)
+  const jobs = []
+  for (const fieldKey of keys) {
+    traverse(values[fieldKey], fieldKey, [], fieldKey, (value, key, path) => {
+      const italian = isLocalizedValue(value) ? String(value.it || '') : String(value || '')
+      if (!italian.trim()) return
+      for (const language of TARGET_CMS_LANGUAGES) {
+        if (force || !hasTranslation(value, language)) {
+          jobs.push({ fieldKey: key, path, language, italian })
+        }
+      }
+    })
+  }
+  return jobs
 }
 
 export function findMissingCmsTranslations(values = {}, fields = []) {
-  const issues = []
-  const keys = fields.length ? fields.map((field) => field.key) : Object.keys(values)
-  for (const key of keys) {
-    walk(values[key], key, issues)
-  }
+  return collectCmsTranslationJobs(values, fields).map((job) => ({
+    ...job,
+    path: `${job.fieldKey}${job.path.map((part) => typeof part === 'number' ? `[${part}]` : `.${part}`).join('')}`,
+    text: job.italian,
+  }))
+}
 
-  const seen = new Set()
-  return issues.filter((issue) => {
-    const signature = `${issue.language}|${issue.path}|${normalize(issue.text)}`
-    if (seen.has(signature)) return false
-    seen.add(signature)
-    return true
-  })
+/** Apply only after ALL remote batches succeeded; never lose a half-complete edit. */
+export function applyCmsTranslationJobs(values, jobs, translatedByLanguage) {
+  const updated = structuredClone(values)
+  for (const job of jobs) {
+    const translated = translatedByLanguage[job.language]?.[job.italian]
+    if (typeof translated !== 'string' || !translated.trim()) {
+      throw new Error(`Traduzione ${job.language.toUpperCase()} assente per: ${job.italian.slice(0, 70)}`)
+    }
+    let container = updated
+    let key = job.fieldKey
+    for (const part of job.path) {
+      container = container[key]
+      key = part
+    }
+    const existing = container[key]
+    const previous = isLocalizedValue(existing)
+      ? existing
+      : { __i18n: true, it: String(existing || ''), en: '', tr: '' }
+    container[key] = { ...previous, __i18n: true, [job.language]: translated, __verified: { ...(previous.__verified || {}), [job.language]: job.italian } }
+  }
+  return updated
 }

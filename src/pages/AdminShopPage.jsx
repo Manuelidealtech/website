@@ -69,6 +69,8 @@ export default function AdminShopPage() {
   const [savingSettings, setSavingSettings] = useState(false)
   const [savingOrderStatus, setSavingOrderStatus] = useState(null)
   const [productLanguage, setProductLanguage] = useState('it')
+  const [translatingShop, setTranslatingShop] = useState(false)
+  const [shopTranslationNotice, setShopTranslationNotice] = useState('')
 
   async function loadData(showLoader = true) {
     if (showLoader) setLoading(true)
@@ -183,6 +185,7 @@ export default function AdminShopPage() {
     setProductImages([])
     setRemovedImagePaths([])
     setProductLanguage('it')
+    setShopTranslationNotice('')
     setProductModal(true)
   }
 
@@ -206,6 +209,7 @@ export default function AdminShopPage() {
     setProductImages(savedImages)
     setRemovedImagePaths([])
     setProductLanguage('it')
+    setShopTranslationNotice('')
     setProductModal(true)
   }
 
@@ -234,6 +238,42 @@ export default function AdminShopPage() {
         },
       },
     }))
+  }
+
+  async function translateProductInShop() {
+    try {
+      setTranslatingShop(true)
+      setShopTranslationNotice('Traduzione EN/TR in corso…')
+      const token = session?.access_token
+      if (!token) throw new Error('Sessione scaduta. Accedi nuovamente come amministratore.')
+      const names = ['name', 'category', 'description'].filter((field) => String(productForm[field] || '').trim())
+      if (!names.length) throw new Error('Compila prima il nome italiano del prodotto.')
+      const translation = {}
+      for (const targetLanguage of ['en', 'tr']) {
+        const response = await fetch('/api/cms-translate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          body: JSON.stringify({ texts: names.map((key) => String(productForm[key]).trim()), targetLanguage }),
+        })
+        const payload = await response.json().catch(() => ({}))
+        if (!response.ok) throw new Error(payload.error || `HTTP ${response.status}`)
+        if (!Array.isArray(payload.translations) || payload.translations.length !== names.length) throw new Error('Risposta incompleta di DeepL.')
+        translation[targetLanguage] = Object.fromEntries(names.map((name, index) => [name, payload.translations[index]]))
+      }
+      setProductForm((current) => ({
+        ...current,
+        translations: {
+          ...(current.translations || {}),
+          en: { ...(current.translations?.en || {}), ...translation.en },
+          tr: { ...(current.translations?.tr || {}), ...translation.tr },
+        },
+      }))
+      setShopTranslationNotice('Traduzioni EN/TR generate. Controllale nelle schede lingua e premi Salva prodotto.')
+    } catch (error) {
+      setShopTranslationNotice(`Traduzione non completata: ${error.message}. Nessuna traduzione parziale è stata applicata.`)
+    } finally {
+      setTranslatingShop(false)
+    }
   }
 
   function normalizedProductTranslations() {
@@ -654,6 +694,10 @@ export default function AdminShopPage() {
                 {productLanguage === 'it'
                   ? 'L’italiano è la lingua principale del prodotto.'
                   : `Inserisci nome, categoria e descrizione in ${productLanguage === 'en' ? 'inglese' : 'turco'}. Se lasci un campo vuoto, sul sito verrà usato l’italiano.`}
+              </div>
+              <div className="shop-product-auto-translate">
+                <button type="button" className="admin-secondary-button" disabled={translatingShop || savingProduct || !productForm.name.trim()} onClick={translateProductInShop}>{translatingShop ? 'Traduzione in corso…' : 'Traduci nome, categoria e descrizione EN/TR'}</button>
+                {shopTranslationNotice ? <small role="status">{shopTranslationNotice}</small> : null}
               </div>
               <div className="shop-product-form-grid">
                 <label className="shop-admin-field"><span>Nome prodotto {productLanguage === 'it' ? '*' : ''}</span><input value={getProductTextField('name')} onChange={(event) => updateProductTextField('name', event.target.value)} required={productLanguage === 'it'} maxLength="180" /></label>

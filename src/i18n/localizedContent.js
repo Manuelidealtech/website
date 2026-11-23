@@ -139,6 +139,12 @@ export const CMS_TRANSLATION_OVERRIDES = {
     'Controllo temperatura: RTD': 'Temperature control: RTD',
     'Alimentazione: 240 V': 'Power supply: 240 V',
     'Applicazione: erogazione adesivi hot-melt': 'Application: hot-melt adhesive dispensing',
+    'Teste di spalmatura per l’applicazione precisa e uniforme di adesivi hot-melt in processi industriali di spalmatura e laminazione.': 'Coating heads for precise and uniform application of hot-melt adhesives in industrial coating and lamination processes.',
+    'Le teste di spalmatura Idealtech sono progettate per l’applicazione precisa e uniforme di adesivi hot-melt in un’ampia gamma di processi industriali di spalmatura e laminazione. Adatte al rivestimento di profili, alla laminazione di pannelli, alla spalmatura di tessuti e ad altri processi continui, garantiscono una distribuzione uniforme dell’adesivo su larghezze di lavoro fino a 2500 mm. La struttura modulare e la regolazione precisa della larghezza assicurano stabilità del processo, elevata qualità di spalmatura e affidabilità operativa nel tempo.': 'Idealtech coating heads are designed for precise, uniform application of hot-melt adhesives across a wide range of industrial coating and lamination processes. Suitable for profile coating, panel lamination, textile coating and other continuous processes, they ensure even adhesive distribution across working widths of up to 2,500 mm. Their modular construction and precise width adjustment ensure stable operation, high coating quality and lasting reliability.',
+    'Larghezza di spalmatura fino a 2500 mm': 'Coating width up to 2,500 mm',
+    'Temperatura di lavoro fino a 220 °C': 'Operating temperature up to 220 °C',
+    'Viscosità adesivo 1.000–100.000 mPa·s': 'Adhesive viscosity: 1,000–100,000 mPa·s',
+    'Regolazione della larghezza manuale o motorizzata': 'Manual or motorised width adjustment',
   },
   tr: {
     // Varianti legacy / personalizzate usate nel sottomenu Prodotti
@@ -294,6 +300,12 @@ export const CMS_TRANSLATION_OVERRIDES = {
     'Controllo temperatura: RTD': 'Sıcaklık kontrolü: RTD',
     'Alimentazione: 240 V': 'Besleme: 240 V',
     'Applicazione: erogazione adesivi hot-melt': 'Uygulama: hot-melt yapıştırıcı dozajı',
+    'Teste di spalmatura per l’applicazione precisa e uniforme di adesivi hot-melt in processi industriali di spalmatura e laminazione.': 'Endüstriyel kaplama ve laminasyon proseslerinde sıcak eriyik yapıştırıcıların hassas ve homojen uygulanması için kaplama kafaları.',
+    'Le teste di spalmatura Idealtech sono progettate per l’applicazione precisa e uniforme di adesivi hot-melt in un’ampia gamma di processi industriali di spalmatura e laminazione. Adatte al rivestimento di profili, alla laminazione di pannelli, alla spalmatura di tessuti e ad altri processi continui, garantiscono una distribuzione uniforme dell’adesivo su larghezze di lavoro fino a 2500 mm. La struttura modulare e la regolazione precisa della larghezza assicurano stabilità del processo, elevata qualità di spalmatura e affidabilità operativa nel tempo.': 'Idealtech kaplama kafaları, geniş bir yelpazedeki endüstriyel kaplama ve laminasyon proseslerinde sıcak eriyik yapıştırıcıların hassas ve homojen uygulanması için tasarlanmıştır. Profil kaplama, panel laminasyonu, kumaş kaplama ve diğer sürekli prosesler için uygun olan bu sistemler, 2.500 mm’ye kadar çalışma genişliğinde yapıştırıcının eşit dağıtılmasını sağlar. Modüler yapıları ve hassas genişlik ayarları, kararlı proses, yüksek kaplama kalitesi ve uzun süreli güvenilirlik sunar.',
+    'Larghezza di spalmatura fino a 2500 mm': '2.500 mm’ye kadar kaplama genişliği',
+    'Temperatura di lavoro fino a 220 °C': '220 °C’ye kadar çalışma sıcaklığı',
+    'Viscosità adesivo 1.000–100.000 mPa·s': 'Yapıştırıcı viskozitesi: 1.000–100.000 mPa·s',
+    'Regolazione della larghezza manuale o motorizzata': 'Manuel veya motorlu genişlik ayarı',
   },
 }
 
@@ -397,6 +409,8 @@ export function readLocalizedText(value, language = 'it') {
 
     const selected = value[language]
     if (typeof selected === 'string' && selected.trim()) {
+      // A provider-verified translation is an explicit editorial value.
+      if (value.__verified?.[language] === italian) return selected
       // Auto-riparazione dei dati legacy: alcune vecchie versioni del CMS hanno
       // salvato nel campo EN/TR lo stesso testo italiano. In quel caso non
       // consideriamo la traduzione esplicita valida e la risolviamo nuovamente.
@@ -436,6 +450,7 @@ export function writeLocalizedText(value, language, nextText) {
   // chiaramente automatiche/copiate dall'italiano. Le traduzioni manuali vere
   // restano intatte.
   if (language === 'it' && nextText !== previousItalian) {
+    delete base.__verified
     for (const targetLanguage of ['en', 'tr']) {
       const current = typeof base[targetLanguage] === 'string' ? base[targetLanguage] : ''
       if (!current.trim()) continue
